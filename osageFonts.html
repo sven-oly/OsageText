@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Osage Unicode text with fonts
+   </title>
+
+  <link rel="stylesheet" type="text/css" href="/css/fonts.css">
+
+
+  <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen, projection">
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
+  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
+  <![endif]-->
+
+
+   <script type="text/javascript" src="/js/osage_utils.js"></script>
+
+
+   <script type="text/javascript" src="/js/osageConverter.js"></script>
+
+
+   <script type="text/javascript" src="/js/utils.js"></script>
+
+  
+   <script>
+    function onload() {
+    }
+   </script>
+   
+   </head>
+  
+  <body onload="onload()">
+  
+  {% for fontFam in fontFamilies %}
+  <b>{{fontFam}}</b>
+  <br />
+  <textarea id="{{fontFam|lower}}_area" class="{{fontFam|lower}}" cols="60" rows="3">
+  </textarea>
+  
+  <br />
+  {% endfor %}
+  <br />
+    <input type="button"
+           onclick="fillAllWithUnicodeOsage('Unicode_font_output_text',
+                    'new_hex');"
+           value="All Unicode characters" />
+
+  <br />
+  <br />
+  Old Osage:
+  <br />
+  <textarea id="oldosage_area" class="oldOsageText" cols="60" rows="3">
+  </textarea>
+    </body>
+</html>

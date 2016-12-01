@@ -1,0 +1,97 @@
+    @font-face{
+      font-family:'OldOsage';
+      src:url('/fonts/Osage_Font.TTF');
+      font-weight:normal;
+      font-style:normal;
+    }
+
+    // Unicode fonts
+    @font-face{
+      font-family:'Wynona';
+      src:url('/fonts/osage-fonts-1-10/Wynona/Wynona.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+
+    @font-face{
+      font-family:'Pawhuska';
+      src:url('/fonts/osage-fonts-1-10/Pawhuska/Pawhuska.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+
+    @font-face{
+      font-family:'Avant';
+      src:url('/fonts/osage-fonts-1-10/Avant/Avant.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+    
+    @font-face{
+      font-family:'Barnsdall';
+      src:url('/fonts/osage-fonts-1-10/Barnsdall-OsageDejavuSerif/Barnsdall.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+
+    @font-face{
+      font-family:'Nelagoney';
+      src:url('/fonts/osage-fonts-1-10/Nelagoney/Nelagoney.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+    @font-face{
+      font-family:'Prue';
+      src:url('/fonts/osage-fonts-1-10/Prue/Prue.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+
+    @font-face{ 
+      font-family:'Wazhezhe';
+     src:url('/fonts/osage-fonts-1-10/Wazhazhe-OsageTimes/Wazhazhe.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+    
+    .unicodeOsageText {
+	// font-family:'Pawhuska';
+	font-family:'Barnsdall';
+	//font-family:'Nelagoney';
+	//font-family:'Wazhezhe';
+	//font-family:'Prue';
+	// font-family:'Wynona';
+	font-size: 32px;
+    }
+
+    .oldOsageText {
+      font-family:'OldOsage';
+      font-size: 32px;
+    }
+    
+    .pawhuska {
+	font-family:'Pawhuska';
+	font-size: 32px;
+    }
+    .barnsdall {
+	font-family:'Barnsdall';
+	font-size: 32px;
+    }
+    .nelagoney {
+	font-family:'Nelagoney';
+	font-size: 32px;
+    }
+    .wazhezhe {
+	font-family:'Wazhezhe';
+	font-size: 32px;
+    }
+    .prue {
+	font-family:'Prue';
+	font-size: 32px;
+    }
+    .wynona {
+	font-family:'Wynona';
+	font-size: 32px;
+    }
+
+    
