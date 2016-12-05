@@ -24,18 +24,21 @@ import webapp2
 
 from google.appengine.ext.webapp import template
 
+# The Unicode fonts from Osage Nation.
+OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney', 
+  'Prue', 'Wazhezhe']
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+      cwd = os.getcwd()
+
       template_values = {'fontFamilies': OsageFonts,
+        'cwd': cwd,
       }
       path = os.path.join(os.path.dirname(__file__), 'osage.html')
       self.response.out.write(template.render(path, template_values))
       
-# The Unicode fonts from Osage Nation.
-OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney', 
-  'Prue', 'Wazhezhe']
-  
+
 class OsageFontTest(webapp2.RequestHandler):
   def get(self):
     template_values = {'fontFamilies': OsageFonts,
