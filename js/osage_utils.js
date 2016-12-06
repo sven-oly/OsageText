@@ -11,7 +11,18 @@ function fillWithUnicodeOsage(target, hex_target) {
   }
   output_text.innerHTML = outputString;
 
-  updateHex(target, hex_target);
+  if (hex_target) {
+    updateHex(target, hex_target);
+  }
+}
+
+function fillOsageCombos(target, hex_target) {
+  var output_text = document.getElementById(target);
+  outputString = " ";
+  output_text.innerHTML = outputString;
+  if (hex_target) {
+    updateHex(target, hex_target);
+  }
 }
 
 function fillWithUnicodeOsageMacron(target, hex_target) {
@@ -50,10 +61,23 @@ function fillWithUnicodeOsageDotted(target, hex_target) {
   updateHex(target, hex_target);
 }
 
+function fillWithUnicodeOsageStringAppended(target, stringToAppend, hex_target) {
+  var output_text = document.getElementById(target);
+  var outputString = "";
+  for (var codePt = 0x104b0; codePt <= 0x104d3; codePt++) {
+    outputString += getUnicodeCharacter(codePt);
+    outputString += stringToAppend;
+  }
+  outputString += "\n";
+  for (var codePt = 0x104d8; codePt <= 0x104fb; codePt++) {
+    outputString += getUnicodeCharacter(codePt);
+    outputString += stringToAppend;
+  }
+  output_text.innerHTML = outputString;
 
+  updateHex(target, hex_target);
+}
 
-
-// Check text encoding.  If in Zawgyi, return converted text in Unicode.
 function convertLatinToUnicode(oldIn, newOut) {
   var input_text = document.getElementById(oldIn);
   var output_text = document.getElementById(newOut);

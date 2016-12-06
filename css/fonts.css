@@ -5,7 +5,7 @@
       font-style:normal;
     }
 
-    // Unicode fonts
+    /* Unicode fonts */
     @font-face{
       font-family:'Wynona';
       src:url('/fonts/osage-fonts-1-10/Wynona/Wynona.ttf');
@@ -55,12 +55,13 @@
     }
     
     .unicodeOsageText {
-	// font-family:'Pawhuska';
+	/* font-family:'Avant'; */
+	/* font-family:'Pawhuska'; */
 	font-family:'Barnsdall';
-	//font-family:'Nelagoney';
-	//font-family:'Wazhezhe';
-	//font-family:'Prue';
-	// font-family:'Wynona';
+	/* font-family:'Nelagoney'; */
+	/*font-family:'Wazhezhe';  */
+	/*font-family:'Prue'; */
+	/* font-family:'Wynona'; */
 	font-size: 32px;
     }
 
@@ -71,6 +72,10 @@
     
     .pawhuska {
 	font-family:'Pawhuska';
+	font-size: 32px;
+    }
+    .avant {
+	font-family:'Avant';
 	font-size: 32px;
     }
     .barnsdall {

@@ -49,6 +49,6 @@ class OsageFontTest(webapp2.RequestHandler):
     
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/OsageFontTest/', OsageFontTest), 
+    ('/OsageFonts/', OsageFontTest), 
 	], debug=True)
     

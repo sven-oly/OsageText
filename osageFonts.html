@@ -24,33 +24,74 @@
 
   
    <script>
-    function onload() {
-    }
+   function fillAllWithUnicodeOsage() {
+     area_List = [{% for fontFam in fontFamilies %}"{{fontFam|lower}}_area",{% endfor %} "None"];
+     for (var i = 0; i < area_List.length - 1; i ++) {
+       var name = area_List[i];
+       fillWithUnicodeOsage(name, null);
+     }
+   }
+
+   function copyToAll(input_id) {
+     var input_id = document.getElementById(input_id);
+     var input_text = input_id.value;
+     area_List = [{% for fontFam in fontFamilies %}"{{fontFam|lower}}_area",{% endfor %} "None"];
+     for (var i = 0; i < area_List.length - 1; i ++) {
+       var name = area_List[i];
+       var output_id = document.getElementById(name);
+       output_id.innerHTML = input_text;
+     }
+   }
+
+   function onload() {
+   }
    </script>
    
    </head>
   
   <body onload="onload()">
-  
+
+  <div class="container">
+  <div class="span-1">  
+  </div>
+  <div class="span-18 last">
+  <h2>Testing fonts for Unicode block of Osage script.
+  </h2>
+  <br />
+  <h2>Fonts</h2>
   {% for fontFam in fontFamilies %}
   <b>{{fontFam}}</b>
   <br />
-  <textarea id="{{fontFam|lower}}_area" class="{{fontFam|lower}}" cols="60" rows="3">
-  </textarea>
+  <text id="{{fontFam|lower}}_area" class="{{fontFam|lower}}" style="font-size:32px" colums="80" rows="2">
+  </text>
   
+  <br />
   <br />
   {% endfor %}
   <br />
     <input type="button"
            onclick="fillAllWithUnicodeOsage('Unicode_font_output_text',
                     'new_hex');"
-           value="All Unicode characters" />
-
+           value="Insert all Osage Unicode characters" />
+  <br />
+  <br />
+  Input:
+  <br />
+  <textarea id="input_area" class="avant" cols="60" rows="3">
+  </textarea>
+  <input type="button"
+           onclick="copyToAll('input_area',
+                    null);"
+           value="Copy to all" />
   <br />
   <br />
   Old Osage:
   <br />
   <textarea id="oldosage_area" class="oldOsageText" cols="60" rows="3">
   </textarea>
-    </body>
+  <br />
+    </div>
+    <a href="/">Osage converter</a>    
+  </div>
+  </body>
 </html>
