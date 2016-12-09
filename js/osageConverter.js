@@ -93,12 +93,12 @@ var osage_latin_to_unicode_map = {
   'ah': [String.fromCodePoint(0x104db), '\uf04a'],
   'b':  [String.fromCodePoint(0x104dc), '\uf042'],
   'br': [String.fromCodePoint(0x104dc), '\uf042'],
-  'hch':[String.fromCodePoint(0x104dd), '\uf043'],
-  'c':  [String.fromCodePoint(0x104de), '\uf043'],
+  'hc': [String.fromCodePoint(0x104de), '\uf043'],
+  'c':  [String.fromCodePoint(0x104dd), '\uf043'],
   'ch': [String.fromCodePoint(0x104de), '\uf043'],
   'd':  [String.fromCodePoint(0x104f0), '\uf044'],
-  'e':  [String.fromCodePoint(0x104b7), '\uf045'],
-  'ee': [String.fromCodePoint(0x104de)+macron, '\uf045\uf045'], // Macron
+  'e':  [String.fromCodePoint(0x104df), '\uf045'],
+  'ee': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
   'en': [String.fromCodePoint(0x104e0), '\uf065'],
   'g':  [String.fromCodePoint(0x104f9), '\uf059'],
   'h':  [String.fromCodePoint(0x104e1), '\uf048'],
@@ -144,13 +144,9 @@ var osage_latin_to_unicode_map = {
   'B':  [String.fromCodePoint(0x104b4), '\uf042'],
   'Br': [String.fromCodePoint(0x104b4), '\uf042'],
   'BR': [String.fromCodePoint(0x104b4), '\uf042'],
-  'hch':[String.fromCodePoint(0x104b5), '\uf043'],
-  'Hch':[String.fromCodePoint(0x104b5), '\uf043'],
-  'HCh':[String.fromCodePoint(0x104b5), '\uf043'],
-  'HCH':[String.fromCodePoint(0x104b5), '\uf043'],
-  'c':  [String.fromCodePoint(0x104b6), '\uf043'],
-  'C':  [String.fromCodePoint(0x104b6), '\uf043'],
-  'ch': [String.fromCodePoint(0x104b6), '\uf043'],
+  'Hc':[String.fromCodePoint(0x104b6), '\uf043'],
+  'HC':[String.fromCodePoint(0x104b6), '\uf043'],
+  'C':  [String.fromCodePoint(0x104b5), '\uf043'],
   'Ch': [String.fromCodePoint(0x104b6), '\uf043'],
   'CH': [String.fromCodePoint(0x104b6), '\uf043'],
   'D':  [String.fromCodePoint(0x104c8), '\uf044'],
@@ -365,7 +361,7 @@ function latinToOldOsage(textIn, convertToLower) {
   }
 }
 
-var osage_latin_regex = /aa|a\'|ah|an|a|br|b|ch|c|d|ee|en|e|g|hch|hk|hp|hts|ht|hy|h|ii|iu|i|j|ky|k|l|m|n|on|oo|o|p|sh|s|tt|th|tsh|ts|ts\'|t|uu|u|v|w|x|y|zh|z|\'|\[|\]|\\|\/|6|\;|\S|\s/gi;
+var osage_latin_regex = /aa|a\'|ah|an|a|br|b|ch|c|d|ee|en|e|g|hch|hc|hk|hp|hts|ht|hy|h|ii|iu|i|j|ky|k|l|m|n|on|oo|o|p|sh|s|tt|th|tsh|ts|ts\'|t|uu|u|v|w|x|y|zh|z|\'|\[|\]|\\|\/|6|\;|\S|\s/gi;
 
 var combiningDotUpAboveRight = "\u0358";
 

@@ -111,7 +111,7 @@ function fillWithLatinOsage(target, hex_target, modifier) {
     }
   }
   output_text.innerHTML = outputString;
-  //    updateHex(target, hex_target);
+  output_text.value = outputString;
 }
 
 // Check text encoding.  If in Zawgyi, return converted text in Unicode.
