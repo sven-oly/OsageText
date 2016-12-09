@@ -46,9 +46,19 @@ class OsageFontTest(webapp2.RequestHandler):
     
     path = os.path.join(os.path.dirname(__file__), 'osageFonts.html')
     self.response.out.write(template.render(path, template_values))
+
+class OsageKeyboard(webapp2.RequestHandler):
+  def get(self):
+    template_values = {'fontFamilies': OsageFonts,
+    }
     
+    path = os.path.join(os.path.dirname(__file__), 'keyboard_osa.html')
+    self.response.out.write(template.render(path, template_values))
+        
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/OsageFonts/', OsageFontTest), 
+    ('/OsageFonts/', OsageFontTest),
+    ('/keyboard/', OsageKeyboard), 
+
 	], debug=True)
     

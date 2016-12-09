@@ -15,11 +15,27 @@
  */
 
 /* Fonts for Osage input. */
-@font-face{
-      font-family:'Pawhuska';
-      src:url('/fonts/osage-fonts-1-10/Pawhuska/Pawhuska.ttf');
+    @font-face{
+      font-family:'OldOsage';
+      src:url('Osage_Font.TTF');
       font-weight:normal;
       font-style:normal;
+    }
+
+    .oldOsageText {
+      font-family:'OldOsage';
+      font-size: 32px;
+    }
+
+@font-face{
+      font-family:'Pawhuska';
+      src:url('Pawhuska.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+    .pawhuska {
+      font-family:'Pawhuska';
+      font-size: 32px;
     }
 
 .vk-box, .vk-btn, .vk-btn-n, .vk-cap, .vk-cap-i, .vk-t, .vk-t-btn {
@@ -35,7 +51,7 @@
   /* @alternate */ border: 1px solid #B8B8B8;
   /* @alternate */ border: 1px solid rgba(0,0,0,0.3);
   z-index: 2147483644;
-  font-family: arial,sans-serif, Pawhuska;
+  font-family: arial,sans-serif,Pawhuska, OldOsage;
   font-size: 14px;
   position: fixed;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
