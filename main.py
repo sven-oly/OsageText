@@ -47,8 +47,10 @@ class MainHandler(webapp2.RequestHandler):
 class OsageFontTest(webapp2.RequestHandler):
   def get(self):
     utext = self.request.get("utext", "")
+    osageText = self.request.get("osageText", "")
     template_values = {
       'fontFamilies': OsageFonts,
+      'osageText': osageText,
       'utext': utext,
     }
     

@@ -17,7 +17,7 @@
 /* Fonts for Osage input. */
     @font-face{
       font-family:'OldOsage';
-      src:url('Osage_Font.TTF');
+      src:url('/fonts/Osage_Font.TTF');
       font-weight:normal;
       font-style:normal;
     }
@@ -29,12 +29,12 @@
 
 @font-face{
       font-family:'Pawhuska';
-      src:url('Pawhuska.ttf');
+      src:url('/fonts/osage-fonts-1-10/Pawhuska/Pawhuska.ttf');
       font-weight:normal;
       font-style:normal;
     }
     .pawhuska {
-      font-family:'Pawhuska';
+      font-family:'/Pawhuska';
       font-size: 32px;
     }
 

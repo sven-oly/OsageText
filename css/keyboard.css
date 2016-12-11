@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-/* Fonts for Osage input. */
-@font-face{
-      font-family:'Pawhuska';
-      src:url('/fonts/osage-fonts-1-10/Pawhuska/Pawhuska.ttf');
-      font-weight:normal;
-      font-style:normal;
-    }
-
 .vk-box, .vk-btn, .vk-btn-n, .vk-cap, .vk-cap-i, .vk-t, .vk-t-btn {
   display: inline-block;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
+  font-family: Pawhuska, OldOsage, arial,sans-serif;
 }
 .vk-box { /* vk outerbox */
   height: auto;
@@ -35,7 +28,7 @@
   /* @alternate */ border: 1px solid #B8B8B8;
   /* @alternate */ border: 1px solid rgba(0,0,0,0.3);
   z-index: 2147483644;
-  font-family: arial,sans-serif, Pawhuska;
+  font-family: Pawhuska, OldOsage, arial,sans-serif;
   font-size: 14px;
   position: fixed;
   box-shadow: 0 4px 16px rgba(0,0,0,0.2);
@@ -44,15 +37,16 @@
   opacity: 0.5;
   -webkit-transition: opacity 0.1s linear;
 }
-.vk-box.vk-min {
+.vk-box, .vk-min {
   padding: 2px;
 }
-.vk-box.vk-sf-ie {
+.vk-box, .vk-sf-ie {
   border: 1px solid #CCC;
 }
 .vk-btn { /* vk key button in normal state */
   /* @alternate */ border: 1px solid #DCDCDC;
   /* @alternate */ border: 1px solid rgba(0,0,0,0.1);
+  font-family: Pawhuska, OldOsage, arial,sans-serif;
   width: 29px;
   height: 29px;
   margin: 2px;
@@ -81,7 +75,7 @@
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
 }
-.vk-btn.vk-sf-h { /* vk key button when mouse hover */
+.vk-btn, .vk-sf-h { /* vk key button when mouse hover */
   border-color: #C6C6C6;
   color: #222;
   background-color: #f8f8f8;
@@ -97,7 +91,7 @@
       startColorStr='#f8f8f8',EndColorStr='#f1f1f1');
   box-shadow: 0px 1px 1px rgba(0,0,0,0.1);
 }
-.vk-btn.vk-sf-a { /* vk key button when mouse down */
+.vk-btn, .vk-sf-a { /* vk key button when mouse down */
   border-color: #C6C6C6;
   color: #333;
   background-color: #f6f6f6;
@@ -113,7 +107,7 @@
       startColorStr='#f6f6f6',EndColorStr='#f1f1f1');
   box-shadow: inset 0px 1px 2px rgba(0,0,0,0.1);
 }
-.vk-btn.vk-sf-s { /* vk key button when depressed */
+.vk-btn, .vk-sf-s { /* vk key button when depressed */
   border-color: #CCC;
   color: #333;
   background-color: #EEEEEE;
@@ -131,17 +125,17 @@
 }
 .vk-cap, .vk-t {
   font-size: 14px;
-  font-family: arial,sans-serif, Pawhuska;
+  font-family: Pawhuska, OldOsage, arial, sans-serif;
   font-weight: normal;
   line-height: 25px;
 }
 .vk-cap {
   cursor: default;
 }
-.vk-cap.vk-sf-b, .vk-t-btn {
+.vk-cap, .vk-sf-b, .vk-t-btn {
   background-repeat: no-repeat;
 }
-.vk-cap.vk-sf-b { /* vk state button's caption with background image */
+.vk-cap, .vk-sf-b { /* vk state button's caption with background image */
   background-image: ITA_SPRITE_IMG;
   width: 22px;
   height: 17px;

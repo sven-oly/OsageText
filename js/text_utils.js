@@ -68,7 +68,7 @@ function utf16common(text, prefix, suffix, asciitoo, highlight_list)
 
       }
       if (i < highlight_list.length && highlight_list[i]) {
-        res += "<b>" + prefix + tmp + suffix + "</b>";
+        res += prefix + tmp + suffix;
       } else {
         res += prefix + tmp + suffix;
       }
@@ -81,7 +81,7 @@ function utf16common(text, prefix, suffix, asciitoo, highlight_list)
 
   function uplus(text)
   {
-    return utf16common(text, "U+", " ", true, diff_list)
+    return utf16common(text, "u+", " ", true, diff_list)
   }
 
 
@@ -103,7 +103,7 @@ function utf16common(text, prefix, suffix, asciitoo, highlight_list)
    // var hexSplit = textinput.split(" ");
    var charsOut = new Array(hexSplit.length);
    for (i = 0; i < hexSplit.length; i++) {
-     var hex = hexSplit[i].replace("U+", "").trim();
+     var hex = hexSplit[i].replace("u+", "").trim();
      var charCode = parseInt(hex, 16);
      charsOut[i] = String.fromCharCode(charCode);
    }
