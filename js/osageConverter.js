@@ -139,8 +139,9 @@ var osage_latin_to_unicode_map = {
   'A\'': [String.fromCodePoint(0x104b1), '\uf049'],
   'An': [String.fromCodePoint(0x104b2), '\uf061'],
   'An': [String.fromCodePoint(0x104b2), '\uf061'],
+  'AN': [String.fromCodePoint(0x104b2), '\uf061'],
   'Ah': [String.fromCodePoint(0x104b3), '\uf04a'],
-  'Ah': [String.fromCodePoint(0x104b3), '\uf04a'],
+  'AH': [String.fromCodePoint(0x104b3), '\uf04a'],
   'B':  [String.fromCodePoint(0x104b4), '\uf042'],
   'Br': [String.fromCodePoint(0x104b4), '\uf042'],
   'BR': [String.fromCodePoint(0x104b4), '\uf042'],
@@ -202,13 +203,17 @@ var osage_latin_to_unicode_map = {
   'Z':  [String.fromCodePoint(0x104d2), '\uf05a'],
   'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],  
   'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
-  '\;':  [" ", " ", '\uf03b'],
-  '\[':  [String.fromCodePoint(0x104d3), '\uf05b'],
-  '\]':  [String.fromCodePoint(0x104dcb), '\uf05d'],
-  '\/': [String.fromCodePoint(0x104dbe), '\uf03f'],
-  '\\': [" ", " ", '\uf05c'],
+  ';':  [" ", '\uf03b'],
+  ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
+  '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
+  '\]': [String.fromCodePoint(0x104cb), '\uf05d'],
+  '\/': [String.fromCodePoint(0x104be), '\uf03f'],
+  '\\': [" ", '\uf05c'],
+  '\"': [String.fromCodePoint(0x104be), '\uf056'],
   // TODO: Finish these.
 }
+
+var full_map = osage_private_use_map;
 
 var minOsageU = String.fromCodePoint(0x104b0);
 var maxOsageU = String.fromCodePoint(0x104d8);
@@ -216,8 +221,9 @@ var lowerCaseOffset = 0x28;
 
 // Converts from old Osage codepoints to Unicode Standard.
 // Converts to lower case if the flag is set.
+// Converts Latin characters if flag is set.
 // TODO: Convert to UTF-16.
-function oldOsageToUnicode(textIn, convertToLower) {
+function oldOsageToUnicode(textIn, convertToLower, convertLatin) {
   var convertResult = "";
   var index;
   var outputIsUTF16 = true;
@@ -241,7 +247,14 @@ function oldOsageToUnicode(textIn, convertToLower) {
       }
     } else {
       // It's not in the map.
-      out = c;
+      if (convertLatin) {
+        result = osage_latin_to_unicode_map[c];
+      }
+      if (result == null) {
+        out = c;
+      } else {
+        out = result[0];
+      }
     }
     convertResult += out;
   }
@@ -274,6 +287,9 @@ function latinToUnicode(textIn, convertToLower) {
   var outputIsUTF16 = true;
 
   var parsedInput = preParseLatin(textIn);
+  if (!parsedInput) {
+    return "";
+  }
   for (index = 0; index < parsedInput.length; index ++) {
     var c = parsedInput[index];
     if (convertToLower) {
@@ -361,7 +377,9 @@ function latinToOldOsage(textIn, convertToLower) {
   }
 }
 
+var teststring = /abc/;
 var osage_latin_regex = /aa|a\'|ah|an|a|br|b|ch|c|d|ee|en|e|g|hch|hc|hk|hp|hts|ht|hy|h|ii|iu|i|j|ky|k|l|m|n|on|oo|o|p|sh|s|tt|th|tsh|ts|ts\'|t|uu|u|v|w|x|y|zh|z|\'|\[|\]|\\|\/|6|\;|\S|\s/gi;
+var osage_latin_chars = "aa|a\'|ah|an|a|br|b|ch|c|d|ee|en|e|g|hch|hc|hk|hp|hts|ht|hy|h|ii|iu|i|j|ky|k|l|m|n|on|oo|o|p|sh|s|tt|th|tsh|ts|ts\'|t|uu|u|v|w|x|y|zh|z|'|[|]|\\|/|6|\;|,|\\S|\\s";
 
 var combiningDotUpAboveRight = "\u0358";
 
@@ -374,8 +392,12 @@ function preParseLatin(instring) {
 
 // For converting input to sets of connected characters.
 var old_osage_regex = /\uf021|\uf022|\uf023|\uf024|\uf025|\uf026|\uf027|\uf028|\uf029|\uf02a|\uf02b|\uf02c|\uf02d|\uf02e|\uf02f|\uf030|\uf031|\uf032|\uf033|\uf034|\uf035|\uf036|\uf037|\uf038|\uf039|\uf03a|\uf03b|\uf03c|\uf03d|\uf03e|\uf03f|\uf040|\uf041\uf041|\uf041|\uf042|\uf043|\uf044|\uf045\uf045|\uf045|\uf048\uf043|\uf048\uf04b|\uf048\uf050|\uf048\uf044|\uf048\uf05d|\uf048|\uf049|\uf04a|\uf04b|\uf04c|\uf04d|\uf04e|\uf04f\uf04f|\uf04f|\uf050|\uf053|\uf054|\uf055\uf055|\uf055|\uf056|\uf057|\uf058|\uf059\uf059|\uf059|\uf05a|\uf05b|\uf05c|\uf05d|\uf05e|\uf05f|\uf060|\uf061|\uf065|\uf06f|\uf07b|\uf07c|\uf07d|\uf07e|\uf0b6|\S|\s/gi;
+var old_osage_chars = "\uf021|\uf022|\uf023|\uf024|\uf025|\uf026|\uf027|\uf028|\uf029|\uf02a|\uf02b|\uf02c|\uf02d|\uf02e|\uf02f|\uf030|\uf031|\uf032|\uf033|\uf034|\uf035|\uf036|\uf037|\uf038|\uf039|\uf03a|\uf03b|\uf03c|\uf03d|\uf03e|\uf03f|\uf040|\uf041\uf041|\uf041|\uf042|\uf043|\uf044|\uf045\uf045|\uf045|\uf048\uf043|\uf048\uf04b|\uf048\uf050|\uf048\uf044|\uf048\uf05d|\uf048|\uf049|\uf04a|\uf04b|\uf04c|\uf04d|\uf04e|\uf04f\uf04f|\uf04f|\uf050|\uf053|\uf054|\uf055\uf055|\uf055|\uf056|\uf057|\uf058|\uf059\uf059|\uf059|\uf05a|\uf05b|\uf05c|\uf05d|\uf05e|\uf05f|\uf060|\uf061|\uf065|\uf06f|\uf07b|\uf07c|\uf07d|\uf07e|\uf0b6|";
 
 function preParseOldOsage(instring) {
-  var outList = instring.match(old_osage_regex);
+  var combined_chars = old_osage_chars + osage_latin_chars;
+  var regex2 = new RegExp(combined_chars, "gi");
+  var outList = instring.match(regex2);
+  //var outList = instring.match(old_osage_regex);
   return outList;
 }

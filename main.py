@@ -30,10 +30,15 @@ OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney',
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-      cwd = os.getcwd()
+      oldOsageInput = self.request.get("text", "")
+      unicodeInput = self.request.get("utext", "")
+      latinInput = self.request.get("latintext", "")
 
-      template_values = {'fontFamilies': OsageFonts,
-        'cwd': cwd,
+      template_values = {
+        'osageInput': oldOsageInput,
+        'unicodeInput': unicodeInput,
+        'latinInput': latinInput,
+        'fontFamilies': OsageFonts,
       }
       path = os.path.join(os.path.dirname(__file__), 'osage.html')
       self.response.out.write(template.render(path, template_values))
@@ -41,10 +46,25 @@ class MainHandler(webapp2.RequestHandler):
 
 class OsageFontTest(webapp2.RequestHandler):
   def get(self):
-    template_values = {'fontFamilies': OsageFonts,
+    utext = self.request.get("utext", "")
+    template_values = {
+      'fontFamilies': OsageFonts,
+      'utext': utext,
     }
     
     path = os.path.join(os.path.dirname(__file__), 'osageFonts.html')
+    self.response.out.write(template.render(path, template_values))
+
+class OsageUload(webapp2.RequestHandler):
+  def get(self):
+    infile = self.request.get("infile", "")
+    outfile = self.request.get("outfile", "")
+    template_values = {
+      'infile': infile,
+      'outfile': outfile,
+    }
+    
+    path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
     self.response.out.write(template.render(path, template_values))
 
 class OsageKeyboard(webapp2.RequestHandler):
@@ -57,8 +77,10 @@ class OsageKeyboard(webapp2.RequestHandler):
         
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/OsageConverter/', MainHandler),
     ('/OsageFonts/', OsageFontTest),
     ('/keyboard/', OsageKeyboard), 
+    ('/upload/', OsageUload), 
 
 	], debug=True)
     

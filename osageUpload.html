@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>Osage Unicode text with fonts
+    <title>Osage File Upload
    </title>
 
   <link rel="stylesheet" type="text/css" href="/css/fonts.css">
@@ -57,42 +57,12 @@
   <div class="span-1">  
   </div>
   <div class="span-18 last">
-  <h2>Testing fonts for Unicode block of Osage script.
+  <h2>Testing file conversion.
   </h2>
   <br />
-  <h2>Fonts</h2>
-  {% for fontFam in fontFamilies %}
-  <b>{{fontFam}}</b>
+  infile = {{infile}}
   <br />
-  <text id="{{fontFam|lower}}_area" class="{{fontFam|lower}}" style="font-size:32px" colums="80" rows="2">
-  </text>
-  
-  <br />
-  <br />
-  {% endfor %}
-  <br />
-    <input type="button"
-           onclick="fillAllWithUnicodeOsage('Unicode_font_output_text',
-                    'new_hex');"
-           value="Insert all Osage Unicode characters" />
-  <br />
-  <br />
-  Input:
-  <br />
-  <textarea id="input_area" class="avant" cols="60" rows="3" 
-    onchanged="copyToAll('input_area', null);">{{utext}}
-  </textarea>
-  <input type="button"
-           onclick="copyToAll('input_area',
-                    null);"
-           value="Copy to all" />
-  <br />
-  <br />
-  Old Osage:
-  <br />
-  <textarea id="oldosage_area" class="oldOsageText" cols="60" rows="3">
-  </textarea>
-  <br />
+  outfile = {{outfile}}
     </div>
     <a href="/">Osage converter</a>    
   </div>

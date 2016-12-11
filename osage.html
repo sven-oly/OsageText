@@ -33,9 +33,10 @@
     var hex_output_id = "new_hex";
 
     // Call Unicode converter.
-    // Get flag indicating lower case conversion
+    // Get flags.
     var convertToLower = document.getElementById("DoLower").checked;
-    var uText = oldOsageToUnicode(input_text.value, convertToLower);
+    var convertLatin = document.getElementById("convertLatin").checked;
+    var uText = oldOsageToUnicode(input_text.value, convertToLower, convertLatin);
     output_text.innerHTML = uText;
     output_text.value = uText;
 
@@ -51,6 +52,16 @@
       hex_output.value = hexString;
       hex_output.innerHTML = hexString;
     }
+  }
+  
+  function clearArea(outId, outArea) {
+    var inText = "";
+    var output_text = document.getElementById(outId);
+    output_text.innerHTML = inText;
+    output_text.value = inText;
+
+    var hex_output = document.getElementById(outArea);
+    var hexString = "";
   }
 
   // Fills the input with all the characters in the old Osage range.
@@ -91,6 +102,15 @@
     output_text.style.fontFamily = fontFam;
   }
   
+  function toOsageFonts(area1) {
+  // Open a comparison window with the resulting text.
+  var area1Elem = document.getElementById(area1);
+  var text1 = area1Elem.value;
+   
+  compareUrl = "/OsageFonts/?utext=" + text1;
+
+  window.location=compareUrl;   
+}
   function init() {
     // Fill in if needed.
   }
@@ -106,18 +126,24 @@
     <h2>Old Osage font data</h2>
     <textarea class="oldOsageText" id="old_font_input_text"
               cols="60" rows="3" style="font-size: 28px;"
-              onchange="updateHex('old_font_input_text', 'old_hex');"></textarea>
+              onchange="updateHex('old_font_input_text', 'old_hex');">{{osageInput}}</textarea>
     <br />
 
+    <input type="button" value="Clear"
+           onclick="clearArea('old_font_input_text', 'old_hex');">
     <input type="button" value="All old chars"
            onclick="fillWithOldOsage('old_font_input_text', 'old_hex')">
     <input type="button" value="Special combinations"
            onclick="fillOsageCombos('old_font_input_text', 'old_hex')">
+    <input type="button" value="All latin chars"
+           onclick="fillWithLatinOsage('old_font_input_text', 'old_hex', '')">
     <input type="button" value="Convert to Unicode"
            onclick="convertToUnicode('old_font_input_text',
                     'Unicode_font_output_text');">
+    <input type="checkbox" name="convertLatin" id="convertLatin" checked>Convert Latin?
     <input type="checkbox" name="lowerCase" id="DoLower">To lower?<br />
-
+    <br />
+    
     <br/>
     <p> Note that two characters 0xf03b and 0xf05c are no longer used. The underlined characters now are written with a central dot.
     <textarea id="old_hex" cols="80" rows="2" style="display:none;"></textarea>
@@ -128,39 +154,42 @@
 
     <h2>Unicode Osage font data</h2>
     <textarea class="unicodeOsageText" id="Unicode_font_output_text" 
-              cols="50" rows="3" style="font-size: 28px;"></textarea>
+              cols="50" rows="3" style="font-size: 28px;">{{unicodeInput}}</textarea>
     <br />
+    <input type="button" value="Clear"
+           onclick="clearArea('Unicode_font_output_text', 'old_hex');">
     <input type="button"
            onclick="fillWithUnicodeOsage('Unicode_font_output_text',
                     'new_hex');"
            value="All new chars" />
-    <input type="button"
-           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0304',
-                    'new_hex');"
-           value="Characters with macron" />
-    <input type="button"
-           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0358',
-                    'new_hex');"
-           value="Characters with dot above right" />
-     <input type="button"
-           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0301',
-                    'new_hex');"
-           value="Characters with single accent" />
-     <input type="button"
-           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u030b',
-                    'new_hex');"
-           value="Characters with double accent" />
-    <input type="button"
-           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0304\u0358',
-                    'new_hex');"
-           value="Characters with macron + dot" />
-
-    <br />
     Select font: <select onchange="onFontSelected(this);" id="selectKeyboard">
       {% for font in fontFamilies %}
       <option value="{{font}}">{{font}}</option>
       {% endfor %}
     </select>
+    <br />
+    <input type="button"
+           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0304',
+                    'new_hex');"
+           value="macron" />
+    <input type="button"
+           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0358',
+                    'new_hex');"
+           value="dot" />
+     <input type="button"
+           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0301',
+                    'new_hex');"
+           value="single accent" />
+     <input type="button"
+           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u030b',
+                    'new_hex');"
+           value="double accent" />
+    <input type="button"
+           onclick="fillWithUnicodeOsageStringAppended('Unicode_font_output_text', '\u0304\u0358',
+                    'new_hex');"
+           value="macron + dot" />
+    <br />
+    <input type="button" onclick="toOsageFonts('Unicode_font_output_text');" value="To all fonts">
     <br />
     <textarea id="new_hex" col="80" rows="3" style="display:none;"></textarea>
     <br />
@@ -173,9 +202,11 @@
       <h2>Latin Osage data</h2>
     <textarea class="latinOsageText" id="latin_input_text"
               cols="60" rows="3"
-              onchange="updateHex('latin_input_text', 'latin_hex');"></textarea>
+              onchange="updateHex('latin_input_text', 'latin_hex');">{{latinInput}}</textarea>
     <br />
 
+    <input type="button" value="Clear"
+           onclick="clearArea('latin_input_text', 'old_hex');">
     <input type="button" value="All latin chars"
            onclick="fillWithLatinOsage('latin_input_text', 'old_hex', '')">
     <input type="button" value="Only mono case"
@@ -185,11 +216,12 @@
                     'old_font_input_text');">
     <input type="button" value="Convert to Unicode"
            onclick="convertLatinToUnicode('latin_input_text',
-                    'Unicode_font_output_text');">    <input type="checkbox" name="lowerCase" id="DoLower2">Force to lower?<br />
+                    'Unicode_font_output_text');">
+    <input type="checkbox" name="lowerCase" id="DoLower2">Lower case?<br />
 
     <br/>
       </div>
-      <a href="/OsageFonts/">Test Osage Fonts</a>
+      <a href="javascript:toOsageFonts('Unicode_font_output_text');">Test Osage Fonts</a>
       <br />
       <a href="http://www.unicode.org/charts/PDF/U104B0.pdf">Unicode Osage table</a>
   </div>
