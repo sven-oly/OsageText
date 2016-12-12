@@ -87,6 +87,8 @@ var osage_private_use_map = {
 // Handles upper case, too.
 var osage_latin_to_unicode_map = {
   'a': [String.fromCodePoint(0x104d8), '\uf041'],
+  // 'a': [String.fromCodePoint(0x104d8), '\uf041'],
+  'a': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
   'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'a\'': [String.fromCodePoint(0x104d9), '\uf049'],
   'an': [String.fromCodePoint(0x104da), '\uf061'],
@@ -112,7 +114,8 @@ var osage_latin_to_unicode_map = {
   'l':  [String.fromCodePoint(0x104e7), '\uf04c'],
   'm':  [String.fromCodePoint(0x104f8), '\uf04d'],
   'n':  [String.fromCodePoint(0x104e9), '\uf04e'],
-  'o':  [String.fromCodePoint(0x104ea), '\uf04f'],
+//  'o':  [String.fromCodePoint(0x104ea), '\uf04f'],
+  'o': [String.fromCodePoint(0x104c2)+macron, '\uf04f\uf04f'], // Macron
   'oo': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
   'on': [String.fromCodePoint(0x104eb), '\uf06f'],
   'p':  [String.fromCodePoint(0x104ec), '\uf050'],
@@ -159,7 +162,8 @@ var osage_latin_to_unicode_map = {
   'G':  [String.fromCodePoint(0x104d1), '\uf059'],
   'H':  [String.fromCodePoint(0x104b9), '\uf048'],
   'HY': [String.fromCodePoint(0x104ba), '\uf02c'],
-  'I':  [String.fromCodePoint(0x104bb), '\uf059'],
+  'I':  [String.fromCodePoint(0x104b1), '\uf059'],
+//  'I':  [String.fromCodePoint(0x104bb), '\uf059'],
   'Ii': [String.fromCodePoint(0x104bb)+macron, '\uf059\uf059'], // Macron
   'II': [String.fromCodePoint(0x104bb)+macron, '\uf059\uf059'], // Macron
   'J':  [String.fromCodePoint(0x104b3), '\uf04a'],
@@ -182,7 +186,8 @@ var osage_latin_to_unicode_map = {
   'S':  [String.fromCodePoint(0x104c6), '\uf053'],
   'Sh': [String.fromCodePoint(0x104c7), '\uf022'],
   'SH': [String.fromCodePoint(0x104c7), '\uf022'],
-  'T':  [String.fromCodePoint(0x104c8), '\uf044'],
+  'T':  [String.fromCodePoint(0x104cd), '\uf044'],
+//  'T':  [String.fromCodePoint(0x104c8), '\uf044'],
   'Ht': [String.fromCodePoint(0x104c9), '\uf048\uf04b'],
   'HT': [String.fromCodePoint(0x104c9), '\uf048\uf04b'],
   'Ts': [String.fromCodePoint(0x104ca), '\uf05d'],
@@ -206,8 +211,11 @@ var osage_latin_to_unicode_map = {
   ';':  [" ", '\uf03b'],
   ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
   '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
+  '{': [String.fromCodePoint(0x104d3), '\uf05b'],
   '\]': [String.fromCodePoint(0x104cb), '\uf05d'],
+  '}': [String.fromCodePoint(0x104cb), '\uf05d'],
   '\/': [String.fromCodePoint(0x104be), '\uf03f'],
+  '|': [" ", '\uf05c'],
   '\\': [" ", '\uf05c'],
   '\"': [String.fromCodePoint(0x104be), '\uf056'],
   // TODO: Finish these.
