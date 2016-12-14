@@ -41,8 +41,20 @@ class MainHandler(webapp2.RequestHandler):
         'fontFamilies': OsageFonts,
       }
       path = os.path.join(os.path.dirname(__file__), 'osage.html')
-      self.response.out.write(template.render(path, template_values))
-      
+      self.response.out.write(template.render(path, template_values))     
+
+class ConverterTestHandler(webapp2.RequestHandler):
+  def get(self):
+    utext = self.request.get("utext", "")
+    osageText = self.request.get("osageText", "")
+    template_values = {
+      'fontFamilies': OsageFonts,
+      'osageText': osageText,
+      'utext': utext,
+    }
+    
+    path = os.path.join(os.path.dirname(__file__), 'testConvert.html')
+    self.response.out.write(template.render(path, template_values))
 
 class OsageFontTest(webapp2.RequestHandler):
   def get(self):
@@ -57,6 +69,14 @@ class OsageFontTest(webapp2.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'osageFonts.html')
     self.response.out.write(template.render(path, template_values))
 
+class OsageKeyboard(webapp2.RequestHandler):
+  def get(self):
+    template_values = {'fontFamilies': OsageFonts,
+    }
+    
+    path = os.path.join(os.path.dirname(__file__), 'keyboard_osa.html')
+    self.response.out.write(template.render(path, template_values))
+        
 class OsageUload(webapp2.RequestHandler):
   def get(self):
     infile = self.request.get("infile", "")
@@ -69,17 +89,10 @@ class OsageUload(webapp2.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
     self.response.out.write(template.render(path, template_values))
 
-class OsageKeyboard(webapp2.RequestHandler):
-  def get(self):
-    template_values = {'fontFamilies': OsageFonts,
-    }
-    
-    path = os.path.join(os.path.dirname(__file__), 'keyboard_osa.html')
-    self.response.out.write(template.render(path, template_values))
-        
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/OsageConverter/', MainHandler),
+    ('/OsageConverter/test/', ConverterTestHandler),
     ('/OsageFonts/', OsageFontTest),
     ('/keyboard/', OsageKeyboard), 
     ('/upload/', OsageUload), 
