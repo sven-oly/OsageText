@@ -1,5 +1,11 @@
 var macron = "\u0304";
 var combiningDotAboveRight = "\u0358";
+var osageCaseOffset = 40;  // Amount to add to get lower case from upper.
+
+// TODO 13-Dec-2016:
+// 1. Simplify lower/upper conversion using the offset above.
+// 2. Create a Python transliteration.
+// 3. Simplify the regular expressions. Mostly done 13-Dec.
 
 var osage_private_use_map = {
   '\uf020': ' ',
@@ -420,26 +426,27 @@ function latinToOldOsage(textIn, convertToLower) {
   }
 }
 
-var teststring = /abc/;
-var osage_latin_regex = /aa|a\'|ah|an|a^|a|br|b|ch|c|d|ee|en|e^|e|g|hch|hc|hk|hp|hts|ht|hy|h|ii|iu|i|j|ky|k|l|m|n|on|oo|o^|o|p|sh|s|tt|th|tsh|ts|ts\'|t|uu|u^|u|v|w|x|y^|y|zh|z|\'|\[|\]|\\|\/|6|\;|\S|\s/gi;
-var osage_latin_chars = "aa|a\'|ah|an|a\\^|a|br|b|ch|c|d|ee|en|e\\^|e|g|hch|hc|hk|hp|hts|ht|hy|h|ii|iu|i|j|ky|k|l|m|n|on|oo|o\\^|o|p|sh|s|tt|th|tsh|ts|ts\'|t|uu|u\\^|u|v|w|x|y\\^|y|zh|z|'|[|]|\\|/|6|\;|,|\\S|\\s";
+// Parsing of Latin combinations.
+// vowel + ^, double vowels, dotted, pre-aspirated, single letters, non-letters
+var osage_latin_chars =
+  "[aeouy][\\^\f05e]|aa|ee|ii|oo|uu|yy|a\'|ts\'|ah|[aeo]n|br|[cs]h|hch|hts|h[ckpty]|iu|ky|tsh|t[hst]|zh|[a-eg-pst-z]|['|\\/\;,]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}
 function preParseLatin(instring) {
-  outList = instring.match(osage_latin_regex);
+  var regex1 = new RegExp(osage_latin_chars, "gi");
+  var outList = instring.match(regex1);
   return outList;
 }
 
 // For converting input to sets of connected characters.
-var old_osage_regex = /\uf021|\uf022|\uf023|\uf024|\uf025|\uf026|\uf027|\uf028|\uf029|\uf02a|\uf02b|\uf02c|\uf02d|\uf02e|\uf02f|\uf030|\uf031|\uf032|\uf033|\uf034|\uf035|\uf036|\uf037|\uf038|\uf039|\uf03a|\uf03b|\uf03c|\uf03d|\uf03e|\uf03f|\uf040|\uf041\uf041|\uf041|\uf042|\uf043|\uf044|\uf045\uf045|\uf045|\uf048\uf043|\uf048\uf04b|\uf048\uf050|\uf048\uf044|\uf048\uf05d|\uf048|\uf049|\uf04a|\uf04b|\uf04c|\uf04d|\uf04e|\uf04f\uf04f|\uf04f|\uf050|\uf053|\uf054|\uf055\uf055|\uf055|\uf056|\uf057|\uf058|\uf059\uf059|\uf059|\uf05a|\uf05b|\uf05c|\uf05d|\uf05e|\uf05f|\uf060|\uf061|\uf065|\uf06f|\uf07b|\uf07c|\uf07d|\uf07e|\uf0b6|\S|\s/gi;
-var old_osage_chars = "[\uf041\uf045\uf04f\uf055\uf059][\\^\uf05e]|\uf045\\^|\uf04f\\^|\uf055\\^|\uf059\\^|\uf021|\uf022|\uf023|\uf024|\uf025|\uf026|\uf027|\uf028|\uf029|\uf02a|\uf02b|\uf02c|\uf02d|\uf02e|\uf02f|\uf030|\uf031|\uf032|\uf033|\uf034|\uf035|\uf036|\uf037|\uf038|\uf039|\uf03a|\uf03b|\uf03c|\uf03d|\uf03e|\uf03f|\uf040|\uf041\uf041|\uf041|\uf042|\uf043|\uf044|\uf045\uf045|\uf045|\uf048\uf043|\uf048\uf04b|\uf048\uf050|\uf048\uf044|\uf048\uf05d|\uf048|\uf049|\uf04a|\uf04b|\uf04c|\uf04d|\uf04e|\uf04f\uf04f|\uf04f|\uf050|\uf053|\uf054|\uf055\uf055|\uf055|\uf056|\uf057|\uf058|\uf059\uf059|\uf059|\uf05a|\uf05b|\uf05c|\uf05d|\uf05e|\uf05f|\uf060|\uf061|\uf065|\uf06f|\uf07b|\uf07c|\uf07d|\uf07e|\uf0b6|";
+// Vowels + ^, double vowels, pre-aspirated consonants, single characters.
+var old_osage_chars =
+  "[\uf041\uf045\uf04f\uf055\uf059][\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf07b-\uf07e\uf0b6]|";
 
 function preParseOldOsage(instring) {
   var combined_chars = old_osage_chars + osage_latin_chars;
-  //var combined_chars = temp_parse;  // *** TEMPORARY
   var regex2 = new RegExp(combined_chars, "gi");
   var outList = instring.match(regex2);
-  //var outList = instring.match(old_osage_regex);
   return outList;
 }
