@@ -43,16 +43,14 @@ var osage_private_use_map = {
   '\uf040': '@',
   '\uf041\uf041': [String.fromCodePoint(0x104b0)+macron, String.fromCodePoint(0x104d8)+macron],
   '\uf041': [String.fromCodePoint(0x104b0), String.fromCodePoint(0x104d8)],
-  '\uf041^': [String.fromCodePoint(0x104b0)+combiningDotAboveRight,
-     String.fromCodePoint(0x104d8)+combiningDotAboveRight],
-  '\uf041\uf05e': [String.fromCodePoint(0x104b0)+combiningDotAboveRight,
-     String.fromCodePoint(0x104d8)+combiningDotAboveRight],  '\uf042': [String.fromCodePoint(0x104b4), String.fromCodePoint(0x104dc)],
+
+  '\uf041\uf059': [String.fromCodePoint(0x104b1), String.fromCodePoint(0x104d9)],
+  '\uf042': [String.fromCodePoint(0x104b4), String.fromCodePoint(0x104dc)],
   '\uf043': [String.fromCodePoint(0x104b5), String.fromCodePoint(0x104dd)],
   '\uf044': [String.fromCodePoint(0x104c8), String.fromCodePoint(0x104f0)],
   '\uf045\uf045': [String.fromCodePoint(0x104b7)+macron, String.fromCodePoint(0x104df)+macron],
   '\uf045': [String.fromCodePoint(0x104b7), String.fromCodePoint(0x104df)],
-  '\uf045^': [String.fromCodePoint(0x104b7)+combiningDotAboveRight,
-     String.fromCodePoint(0x104df)+combiningDotAboveRight],
+
   '\uf045\uf05e': [String.fromCodePoint(0x104b7)+combiningDotAboveRight,
      String.fromCodePoint(0x104df)+combiningDotAboveRight],
   '\uf048': [String.fromCodePoint(0x104b9), String.fromCodePoint(0x104e1)],
@@ -71,8 +69,6 @@ var osage_private_use_map = {
   '\uf04e': [String.fromCodePoint(0x104c1), String.fromCodePoint(0x104e9)],
   '\uf04f\uf04f': [String.fromCodePoint(0x104c2)+macron, String.fromCodePoint(0x104ea)+macron],
   '\uf04f': [String.fromCodePoint(0x104c2), String.fromCodePoint(0x104ea)],
-  '\uf04f^': [String.fromCodePoint(0x104c2)+combiningDotAboveRight,
-    String.fromCodePoint(0x104ea)+combiningDotAboveRight],
   '\uf04f\uf05e': [String.fromCodePoint(0x104c2)+combiningDotAboveRight,
     String.fromCodePoint(0x104ea)+combiningDotAboveRight],
   '\uf050': [String.fromCodePoint(0x104c4), String.fromCodePoint(0x104ec)],
@@ -80,8 +76,6 @@ var osage_private_use_map = {
   '\uf054': [String.fromCodePoint(0x104cd), String.fromCodePoint(0x104f5)],
   '\uf055\uf055': [String.fromCodePoint(0x104ce)+macron, String.fromCodePoint(0x104f6)+macron],
   '\uf055': [String.fromCodePoint(0x104ce), String.fromCodePoint(0x104f6)],
-  '\uf055^': [String.fromCodePoint(0x104ce)+combiningDotAboveRight,
-    String.fromCodePoint(0x104f6)+combiningDotAboveRight],
   '\uf055\uf05e': [String.fromCodePoint(0x104ce)+combiningDotAboveRight,
     String.fromCodePoint(0x104f6)+combiningDotAboveRight],
   '\uf056': [String.fromCodePoint(0x104c7), String.fromCodePoint(0x104ef)],
@@ -91,13 +85,14 @@ var osage_private_use_map = {
   '\uf059': [String.fromCodePoint(0x104bb), String.fromCodePoint(0x104e3)],
   '\uf059^': [String.fromCodePoint(0x104bb)+combiningDotAboveRight,
     String.fromCodePoint(0x104e3)+combiningDotAboveRight],
+  '\uf059\uf059': [String.fromCodePoint(0x104bb)+macron, String.fromCodePoint(0x104e3)+macron],
   '\uf059\uf05e': [String.fromCodePoint(0x104bb)+combiningDotAboveRight,
     String.fromCodePoint(0x104e3)+combiningDotAboveRight],
   '\uf05a': [String.fromCodePoint(0x104d2), String.fromCodePoint(0x104fa)],  // ??
   '\uf05b': [String.fromCodePoint(0x104d3), String.fromCodePoint(0x104fb)],  // ??
   '\uf05c': [' ', ' '],  // Character is no longer used.
   '\uf05d': [String.fromCodePoint(0x104ca), String.fromCodePoint(0x104f2)],  // ??],
-  '\uf05e': '^',
+  '\uf05e': [combiningDotAboveRight, combiningDotAboveRight],  // '^',
   '\uf05f': '_',
   '\uf060': '`',
   '\uf061': [String.fromCodePoint(0x104b2), String.fromCodePoint(0x104da)],  // ??
@@ -118,7 +113,8 @@ var osage_latin_to_unicode_map = {
   'a\'': [String.fromCodePoint(0x104d9), '\uf049'],
   'an': [String.fromCodePoint(0x104da), '\uf061'],
   'ah': [String.fromCodePoint(0x104db), '\uf04a'],
-  'a^': [String.fromCodePoint(0x104d8)+combiningDotAboveRight, '\uf04a^'],
+  'ah': [String.fromCodePoint(0x104db), '\uf04a'],
+  'ay': [String.fromCodePoint(0x104d9), '\uf04a'],
   'b':  [String.fromCodePoint(0x104dc), '\uf042'],
   'br': [String.fromCodePoint(0x104dc), '\uf042'],
   'hc': [String.fromCodePoint(0x104de), '\uf043'],
@@ -127,14 +123,13 @@ var osage_latin_to_unicode_map = {
   'd':  [String.fromCodePoint(0x104f0), '\uf044'],
   // 'e':  [String.fromCodePoint(0x104df), '\uf045'],
   'e':  [String.fromCodePoint(0x104b8), '\uf065'],
-  'e^':  [String.fromCodePoint(0x104df)+combiningDotAboveRight, '\uf065^'],
   'ee': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
   'en': [String.fromCodePoint(0x104e0), '\uf065'],
   'g':  [String.fromCodePoint(0x104f9), '\uf059'],
   'h':  [String.fromCodePoint(0x104e1), '\uf048'],
   'hy': [String.fromCodePoint(0x104e2), '\uf02c'],
-  'i':  [String.fromCodePoint(0x104e3), '\uf059'],
-  'ii': [String.fromCodePoint(0x104e3)+macron, '\uf059\uf059'], // Macron
+  'i':  [String.fromCodePoint(0x104d9), '\uf049'],
+  'ii': [String.fromCodePoint(0x104d9)+macron, '\uf049\uf054'], // Macron
   'j':  [String.fromCodePoint(0x104db), '\uf04a'],
   'k':  [String.fromCodePoint(0x104e4), '\uf04b'],
   'hk': [String.fromCodePoint(0x104e5), '\uf048\uf04b'],
@@ -144,7 +139,6 @@ var osage_latin_to_unicode_map = {
   'n':  [String.fromCodePoint(0x104e9), '\uf04e'],
   // 'o':  [String.fromCodePoint(0x104ea), '\uf04f'],
   'o': [String.fromCodePoint(0x104c3), '\uf06f'],
-  'o^': [String.fromCodePoint(0x104ea)+combiningDotAboveRight, '\uf06f^'],
   'oo': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
   'on': [String.fromCodePoint(0x104eb), '\uf06f'],
   'p':  [String.fromCodePoint(0x104ec), '\uf050'],
@@ -157,26 +151,25 @@ var osage_latin_to_unicode_map = {
   'hts': [String.fromCodePoint(0x104f3), '\uf054'],
   'tsh': [String.fromCodePoint(0x104f4), '\uf054'],
   'u':  [String.fromCodePoint(0x104f6), '\uf055'],
-  'u^': [String.fromCodePoint(0x104f6)+combiningDotAboveRight, '\uf055^'],
   'uu': [String.fromCodePoint(0x104f6)+macron, '\uf055\uf055'], // Macron
   'v':  [String.fromCodePoint(0x104ef), '\uf056'],
   'w':  [String.fromCodePoint(0x104f7), '\uf057'],
   'x':  [String.fromCodePoint(0x104f8), '\uf058'],
-  'y':  [String.fromCodePoint(0x104e3), '\uf05a'],
-  'y^':  [String.fromCodePoint(0x104e3)+combiningDotAboveRight, '\uf05a^'],
+  'y':  [String.fromCodePoint(0x104e3), '\uf059'],
+  'yy':  [String.fromCodePoint(0x104e3)+macron, '\uf059\uf059'],
   'z':  [String.fromCodePoint(0x104fa), '\uf05a'],
   'zh': [String.fromCodePoint(0x104fb), '\uf05b'],
   // Upper case input.
   'A': [String.fromCodePoint(0x104b0), '\uf041'],
-  'A^': [String.fromCodePoint(0x104b0)+combiningDotAboveRight, '\uf041^'],
   'Aa': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
   'AA': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
   'A\'': [String.fromCodePoint(0x104b1), '\uf049'],
   'An': [String.fromCodePoint(0x104b2), '\uf061'],
-  'An': [String.fromCodePoint(0x104b2), '\uf061'],
   'AN': [String.fromCodePoint(0x104b2), '\uf061'],
   'Ah': [String.fromCodePoint(0x104b3), '\uf04a'],
   'AH': [String.fromCodePoint(0x104b3), '\uf04a'],
+  'Ay': [String.fromCodePoint(0x104b1), '\uf04a'],
+  'AY': [String.fromCodePoint(0x104b1), '\uf04a'],
   'B':  [String.fromCodePoint(0x104b4), '\uf042'],
   'Br': [String.fromCodePoint(0x104b4), '\uf042'],
   'BR': [String.fromCodePoint(0x104b4), '\uf042'],
@@ -187,7 +180,6 @@ var osage_latin_to_unicode_map = {
   'CH': [String.fromCodePoint(0x104b6), '\uf043'],
   'D':  [String.fromCodePoint(0x104c8), '\uf044'],
   'E':  [String.fromCodePoint(0x104b7), '\uf045'],
-  'E^':  [String.fromCodePoint(0x104b7)+combiningDotAboveRight, '\uf045^'],
   'Ee': [String.fromCodePoint(0x104b7)+macron, '\uf045\uf045'], // Macron
   'EE': [String.fromCodePoint(0x104b7)+macron, '\uf045\uf045'], // Macron
   'En': [String.fromCodePoint(0x104b8), '\uf065'],
@@ -195,10 +187,10 @@ var osage_latin_to_unicode_map = {
   'G':  [String.fromCodePoint(0x104d1), '\uf059'],
   'H':  [String.fromCodePoint(0x104b9), '\uf048'],
   'HY': [String.fromCodePoint(0x104ba), '\uf02c'],
-  'I':  [String.fromCodePoint(0x104b1), '\uf059'],
+  'I':  [String.fromCodePoint(0x104b1), '\uf049'],
 //  'I':  [String.fromCodePoint(0x104bb), '\uf059'],
-  'Ii': [String.fromCodePoint(0x104bb)+macron, '\uf059\uf059'], // Macron
-  'II': [String.fromCodePoint(0x104bb)+macron, '\uf059\uf059'], // Macron
+  'Ii': [String.fromCodePoint(0x104b1)+macron, '\uf049\uf049'], // Macron
+  'II': [String.fromCodePoint(0x104b1)+macron, '\uf049\uf049'], // Macron
   'J':  [String.fromCodePoint(0x104b3), '\uf04a'],
   'K':  [String.fromCodePoint(0x104bc), '\uf04b'],
   'Hk': [String.fromCodePoint(0x104bd), '\uf048\uf04b'],
@@ -209,7 +201,6 @@ var osage_latin_to_unicode_map = {
   'M':  [String.fromCodePoint(0x104c0), '\uf04d'],
   'N':  [String.fromCodePoint(0x104c1), '\uf04e'],
   'O':  [String.fromCodePoint(0x104c2), '\uf04f'],
-  'O^':  [String.fromCodePoint(0x104c2)+combiningDotAboveRight, '\uf04f^'],
   'Oo': [String.fromCodePoint(0x104c2)+macron, '\uf04f\uf04f'], // Macron
   'OO': [String.fromCodePoint(0x104c2)+macron, '\uf04f\uf04f'], // Macron
   'On': [String.fromCodePoint(0x104c3), '\uf06f'],
@@ -233,24 +224,25 @@ var osage_latin_to_unicode_map = {
   'TSh': [String.fromCodePoint(0x104cc), '\uf054'],
   'TSH': [String.fromCodePoint(0x104cc), '\uf054'],
   'U':  [String.fromCodePoint(0x104ce), '\uf055'],
-  'U^':  [String.fromCodePoint(0x104ce)+combiningDotAboveRight, '\uf055^'],
   'Uu': [String.fromCodePoint(0x104ce)+macron, '\uf055\uf055'], // Macron
   'UU': [String.fromCodePoint(0x104ce)+macron, '\uf055\uf055'], // Macron
   'V':  [String.fromCodePoint(0x104c7), '\uf056'],
   'W':  [String.fromCodePoint(0x104cf), '\uf057'],
   'X':  [String.fromCodePoint(0x104d0), '\uf058'],
   'Y':  [String.fromCodePoint(0x104bb), '\uf05a'],
-  'Y^':  [String.fromCodePoint(0x104bb)+combiningDotAboveRight, '\uf05a^'],
+  'Yy':  [String.fromCodePoint(0x104bb)+macron, '\uf05a\uf05a'],
+  'YY':  [String.fromCodePoint(0x104bb)+macron, '\uf05a\uf05a'],
   'Z':  [String.fromCodePoint(0x104d2), '\uf05a'],
   'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],  
   'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
   ';':  [" ", '\uf03b'],
+  '^':  [combiningDotAboveRight, '\uf05e'],
   ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
   '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
-  '{': [String.fromCodePoint(0x104d3), '\uf05b'],
+  '{': [' ', '\uf05b'],
   '\]': [String.fromCodePoint(0x104cb), '\uf05d'],
-  '}': [String.fromCodePoint(0x104cb), '\uf05d'],
-  '\/': [String.fromCodePoint(0x104be), '\uf03f'],
+  '}': [' ', '\uf05d'],
+  '\/': [' ', '\uf03f'],
   '|': [" ", '\uf05c'],
   '\\': [" ", '\uf05c'],
   '\"': [String.fromCodePoint(0x104be), '\uf056'],
@@ -429,7 +421,7 @@ function latinToOldOsage(textIn, convertToLower) {
 // Parsing of Latin combinations.
 // vowel + ^, double vowels, dotted, pre-aspirated, single letters, non-letters
 var osage_latin_chars =
-  "[aeouy][\\^\f05e]|aa|ee|ii|oo|uu|yy|a\'|ts\'|ah|[aeo]n|br|[cs]h|hch|hts|h[ckpty]|iu|ky|tsh|t[hst]|zh|[a-eg-pst-z]|['|\\/\;,]|\\|/|6|\;|,|\\S|\\s";
+  "[aeouy]\f05e|aa|ee|ii|oo|uu|yy|ay|a\'|ts\'|ah|[aeo]n|br|[cs]h|hch|hts|h[ckpty]|iu|ky|tsh|t[hst]|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}
@@ -442,7 +434,7 @@ function preParseLatin(instring) {
 // For converting input to sets of connected characters.
 // Vowels + ^, double vowels, pre-aspirated consonants, single characters.
 var old_osage_chars =
-  "[\uf041\uf045\uf04f\uf055\uf059][\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf07b-\uf07e\uf0b6]|";
+  "[\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|\uf041\uf059|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf07b-\uf07e\uf0b6]|";
 
 function preParseOldOsage(instring) {
   var combined_chars = old_osage_chars + osage_latin_chars;

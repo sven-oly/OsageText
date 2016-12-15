@@ -17,8 +17,6 @@
 // Based on Osage tranditional keyboard
 // Unicode output
 
-// TODO: Complete the Unicode mapping.
-
 var OSA_UNICODE_LAYOUT = {
   'id': 'osa',
   'title': 'Osage Unicode',

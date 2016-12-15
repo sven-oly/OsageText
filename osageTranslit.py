@@ -6,7 +6,9 @@ import sys
 #TODO 13-Dec-2016
 # 1. Fix quoted output characters.
 # 2. Handle upper and lower case.
-# 3. Test
+# 3. Create tests
+# 4. Build main progrm
+# 5. Keep in sync with Javascript version.
 
 Description = OsageUnicode_description = u'Old Osage font encoding conversion'
 

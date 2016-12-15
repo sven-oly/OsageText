@@ -53,7 +53,7 @@ function fillWithUnicodeOsage(target, hex_target) {
 // Special cases.
 function fillOsageCombos(target, hex_target) {
   var output_text = document.getElementById(target);
-  outputString = "\n\n^^^^^ " +
+  outputString = "\n ^ ^ \n^^^^^ " +
     "" + 
     "\na^e^o^u^y^ A^E^O^U^Y^\naeo";
   output_text.innerHTML = outputString;
