@@ -106,7 +106,42 @@ var OSA_UNICODE_LAYOUT = {
     '^i': 'i\u0301\u0330',
     '^o': 'o\u0301\u0330',
     '^u': 'u\u0301\u0330',
-  }
+    '\ud801\udce1\ud801\udcec': '\ud801\udced',  // h-pa
+    '\ud801\udce1\ud801\udcc4': '\ud801\udcc5',  // H-PA
+    '\ud801\udcb9\ud801\udcec': '\ud801\udced',  // H-pa
+    '\ud801\udcb9\ud801\udcc4': '\ud801\udcc5',  // H-PA
+
+    '\ud801\udce1\ud801\udce4': '\ud801\udce5',  // h-ka
+    '\ud801\udce1\ud801\udcbc': '\ud801\udcbd',  // h-KA
+    '\ud801\udcb9\ud801\udce4': '\ud801\udce5',  // H-ka
+    '\ud801\udcb9\ud801\udcbc': '\ud801\udcbd',  // H-KA
+    
+    '\ud801\udce1\ud801\udcf0': '\ud801\udcf1',  // h-ta
+    '\ud801\udce1\ud801\udcc8': '\ud801\udcc9',  // h-ta
+    '\ud801\udcb9\ud801\udcf0': '\ud801\udcf1',  // H-ta
+    '\ud801\udcb9\ud801\udcc8': '\ud801\udcc9',  // H-TA
+
+    '\ud801\udce1\ud801\udcdd': '\ud801\udcde',  // h-cha 
+    '\ud801\udce1\ud801\udcb5': '\ud801\udcb6',  // h-CHA 
+    '\ud801\udcb9\ud801\udcdd': '\ud801\udcde',  // H-cha
+    '\ud801\udcb9\ud801\udcb5': '\ud801\udcb6',  // H-CHA
+    
+    '\ud801\udce1\ud801\udcf2': '\ud801\udcf3',  // h-sha 
+    '\ud801\udce1\ud801\udccb': '\ud801\udccc',  // h-SHA 
+    '\ud801\udcb9\ud801\udcf2': '\ud801\udcf3',  // H-sha 
+    '\ud801\udcb9\ud801\udccb': '\ud801\udccc',  // H-SHA    
+
+    '\ud801\udcb0\ud801\udcb0': '\ud801\udcb0\u0304',  // AA    
+    '\ud801\udcd8\ud801\udcd8': '\ud801\udcd8\u0304',  // aa    
+    '\ud801\udcb7\ud801\udcb7': '\ud801\udcb7\u0304',  // EE
+    '\ud801\udcdf\ud801\udcdf': '\ud801\udcdf\u0304',  // AA    
+    '\ud801\udcc2\ud801\udcc2': '\ud801\udcc2\u0304',  // OO
+    '\ud801\udcea\ud801\udcea': '\ud801\udcea\u0304',  // oo
+    '\ud801\udcbb\ud801\udcbb': '\ud801\udcbb\u0304',  // II
+    '\ud801\udce3\ud801\udce3': '\ud801\udce3\u0304',  // ii
+    '\ud801\udcce\ud801\udcce': '\ud801\udcce\u0304',  // II
+    '\ud801\udcf6\ud801\udcf6': '\ud801\udcf6\u0304',  // ii
+    }
 };
 
 // Load the layout and inform the keyboard to switch layout if necessary.
