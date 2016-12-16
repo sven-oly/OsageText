@@ -114,7 +114,7 @@ var osage_latin_to_unicode_map = {
   'an': [String.fromCodePoint(0x104da), '\uf061'],
   'ah': [String.fromCodePoint(0x104db), '\uf04a'],
   'ah': [String.fromCodePoint(0x104db), '\uf04a'],
-  'ay': [String.fromCodePoint(0x104d9), '\uf04a'],
+//  'ay': [String.fromCodePoint(0x104d9), '\uf04a'],
   'b':  [String.fromCodePoint(0x104dc), '\uf042'],
   'br': [String.fromCodePoint(0x104dc), '\uf042'],
   'hc': [String.fromCodePoint(0x104de), '\uf043'],
@@ -127,13 +127,13 @@ var osage_latin_to_unicode_map = {
   'en': [String.fromCodePoint(0x104e0), '\uf065'],
   'g':  [String.fromCodePoint(0x104f9), '\uf059'],
   'h':  [String.fromCodePoint(0x104e1), '\uf048'],
-  'hy': [String.fromCodePoint(0x104e2), '\uf02c'],
+//  'hy': [String.fromCodePoint(0x104e2), '\uf02c'],
   'i':  [String.fromCodePoint(0x104d9), '\uf049'],
   'ii': [String.fromCodePoint(0x104d9)+macron, '\uf049\uf054'], // Macron
   'j':  [String.fromCodePoint(0x104db), '\uf04a'],
   'k':  [String.fromCodePoint(0x104e4), '\uf04b'],
   'hk': [String.fromCodePoint(0x104e5), '\uf048\uf04b'],
-  'ky': [String.fromCodePoint(0x104e6), '\uf048\uf03f'],
+//  'ky': [String.fromCodePoint(0x104e6), '\uf048\uf03f'],
   'l':  [String.fromCodePoint(0x104e7), '\uf04c'],
   'm':  [String.fromCodePoint(0x104f8), '\uf04d'],
   'n':  [String.fromCodePoint(0x104e9), '\uf04e'],
@@ -167,9 +167,9 @@ var osage_latin_to_unicode_map = {
   'An': [String.fromCodePoint(0x104b2), '\uf061'],
   'AN': [String.fromCodePoint(0x104b2), '\uf061'],
   'Ah': [String.fromCodePoint(0x104b3), '\uf04a'],
-  'AH': [String.fromCodePoint(0x104b3), '\uf04a'],
-  'Ay': [String.fromCodePoint(0x104b1), '\uf04a'],
-  'AY': [String.fromCodePoint(0x104b1), '\uf04a'],
+//  'AH': [String.fromCodePoint(0x104b3), '\uf04a'],
+//  'Ay': [String.fromCodePoint(0x104b1), '\uf04a'],
+//  'AY': [String.fromCodePoint(0x104b1), '\uf04a'],
   'B':  [String.fromCodePoint(0x104b4), '\uf042'],
   'Br': [String.fromCodePoint(0x104b4), '\uf042'],
   'BR': [String.fromCodePoint(0x104b4), '\uf042'],
@@ -186,7 +186,7 @@ var osage_latin_to_unicode_map = {
   'EN': [String.fromCodePoint(0x104b8), '\uf065'],
   'G':  [String.fromCodePoint(0x104d1), '\uf059'],
   'H':  [String.fromCodePoint(0x104b9), '\uf048'],
-  'HY': [String.fromCodePoint(0x104ba), '\uf02c'],
+//  'HY': [String.fromCodePoint(0x104ba), '\uf02c'],
   'I':  [String.fromCodePoint(0x104b1), '\uf049'],
 //  'I':  [String.fromCodePoint(0x104bb), '\uf059'],
   'Ii': [String.fromCodePoint(0x104b1)+macron, '\uf049\uf049'], // Macron
@@ -195,8 +195,8 @@ var osage_latin_to_unicode_map = {
   'K':  [String.fromCodePoint(0x104bc), '\uf04b'],
   'Hk': [String.fromCodePoint(0x104bd), '\uf048\uf04b'],
   'HK': [String.fromCodePoint(0x104bd), '\uf048\uf04b'],
-  'Ky': [String.fromCodePoint(0x104be), '\uf048\uf03f'],
-  'KY': [String.fromCodePoint(0x104be), '\uf048\uf03f'],
+//  'Ky': [String.fromCodePoint(0x104be), '\uf048\uf03f'],
+//  'KY': [String.fromCodePoint(0x104be), '\uf048\uf03f'],
   'L':  [String.fromCodePoint(0x104bf), '\uf04c'],
   'M':  [String.fromCodePoint(0x104c0), '\uf04d'],
   'N':  [String.fromCodePoint(0x104c1), '\uf04e'],
@@ -235,16 +235,16 @@ var osage_latin_to_unicode_map = {
   'Z':  [String.fromCodePoint(0x104d2), '\uf05a'],
   'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],  
   'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
-  ';':  [" ", '\uf03b'],
+  ';':  [";", '\uf03b'],  // ??
   '^':  [combiningDotAboveRight, '\uf05e'],
   ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
   '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
-  '{': [' ', '\uf05b'],
+  '{': ['{', '\uf05b'],
   '\]': [String.fromCodePoint(0x104cb), '\uf05d'],
-  '}': [' ', '\uf05d'],
+  '}': ['}', '\uf05d'],
   '\/': [' ', '\uf03f'],
-  '|': [" ", '\uf05c'],
-  '\\': [" ", '\uf05c'],
+  '|': ["|", '\uf05c'],
+  '\\': ["\\", '\uf05c'],
   '\"': [String.fromCodePoint(0x104be), '\uf056'],
   // TODO: Finish these.
 }
@@ -421,7 +421,7 @@ function latinToOldOsage(textIn, convertToLower) {
 // Parsing of Latin combinations.
 // vowel + ^, double vowels, dotted, pre-aspirated, single letters, non-letters
 var osage_latin_chars =
-  "[aeouy]\f05e|aa|ee|ii|oo|uu|yy|ay|a\'|ts\'|ah|[aeo]n|br|[cs]h|hch|hts|h[ckpty]|iu|ky|tsh|t[hst]|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
+  "[aeouy]\f05e|aa|ee|ii|oo|uu|yy|a\'|ts\'|[aeo]n|br|[cs]h|hch|hts|h[ckpt]|iu|tsh|t[hst]|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}

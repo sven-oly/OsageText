@@ -1,6 +1,6 @@
     /* Private use area. */
     @font-face{
-      font-family:'OldOsage';
+      font-family:'Osage';
       src:url('/fonts/Osage_Font.TTF');
       font-weight:normal;
       font-style:normal;
@@ -57,7 +57,7 @@
 
     /* Classes for these text families */
     .oldOsageText {
-      font-family:'OldOsage';
+      font-family:'Osage';
       font-size: 32px;
     }
     
