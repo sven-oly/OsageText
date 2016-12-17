@@ -25,3 +25,15 @@ class WordHandler(webapp2.RequestHandler):
 #     for saving new status
 #     for getting records approved or not
 #     for showing all records.
+
+class GetDataHandler(webapp2.RequestHandler):
+  def get(self):
+    # Get info from client on which item.
+    text = self.request.get("text", "")
+    self.response.headers['Content-Type'] = 'application/json'   
+    
+    # TODO: fetch data
+    # TODO: put data into return object  
+    obj = { 
+    }
+    self.response.out.write(json.dumps(obj))

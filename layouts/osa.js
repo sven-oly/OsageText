@@ -128,9 +128,9 @@ var OSA_UNICODE_LAYOUT = {
     '\ud801\udcb9\ud801\udcb5': '\ud801\udcb6',  // H-CHA
     
     '\ud801\udce1\ud801\udcf2': '\ud801\udcf3',  // h-sha 
-    '\ud801\udce1\ud801\udccb': '\ud801\udccc',  // h-SHA 
+    '\ud801\udce1\ud801\udcca': '\ud801\udccb',  // h-SHA 
     '\ud801\udcb9\ud801\udcf2': '\ud801\udcf3',  // H-sha 
-    '\ud801\udcb9\ud801\udccb': '\ud801\udccc',  // H-SHA    
+    '\ud801\udcb9\ud801\udcca': '\ud801\udccb',  // H-SHA    
 
     '\ud801\udcb0\ud801\udcb0': '\ud801\udcb0\u0304',  // AA    
     '\ud801\udcd8\ud801\udcd8': '\ud801\udcd8\u0304',  // aa    
