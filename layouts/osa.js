@@ -23,7 +23,7 @@ var OSA_UNICODE_LAYOUT = {
   'mappings': {
     '': {
       '': '{{\u0301}}1234567890-=' +
-        '{{\ud801\udcd9\u0358}}{{\ud801\udcf7}}{{\ud801\udcdf}}{{\ud801\udcf2}}' +
+        '{{\ud801\udcd8\u0358}}{{\ud801\udcf7}}{{\ud801\udcdf}}{{\ud801\udcf2}}' +
 	      '{{\ud801\udcf5}}{{\ud801\udcfb}}{{\ud801\udcf6}}{{\ud801\udce3}}' +
 	      '{{\ud801\udcea}}{{\ud801\udcec}}[]\\' +
         '{{\ud801\udcd8}}{{\ud801\udcee}}{{\ud801\udcf0}}{{\u0358}}' +
@@ -34,7 +34,7 @@ var OSA_UNICODE_LAYOUT = {
     },
     's': {
       '': '{{\u030b}}!@#$%^&*()_+' +
-      '{{\ud801\udcb0\u0358}}{{\ud801\udccf}}{{\ud801\udcb7}}{{\ud801\udccb}}' +
+      '{{\ud801\udcb0\u0358}}{{\ud801\udccf}}{{\ud801\udcb7}}{{\ud801\udcca}}' +
 	    '{{\ud801\udccd}}{{\ud801\udcd3}}{{\ud801\udcce}}{{\ud801\udcbb}}' +
 	    '{{\ud801\udcc2}}{{\ud801\udcc4}}{}|' +
       '{{\ud801\udcb0}}{{\ud801\udcc6}}{{\ud801\udcc8}}{{\u0304}}' +
@@ -45,8 +45,9 @@ var OSA_UNICODE_LAYOUT = {
     },
    'c': {  // alt-control
       '': '`{{¡}}™£¢\u221e§¶•{{\u25B8}}°–{{\u2260}}' +
-        '{{\ud801\udcda}}{{\ud801\udceb}}{{\ud801\udce0}}{{\ud801\udcf3}}{{\u00a5}}' +
-          '{{}}{{}}{{\ud801\udce3\u0358}}{{\ud801\udcea\u0358}}' +
+        '{{\ud801\udcda}}{{\ud801\udceb}}{{\ud801\udce0}}{{\ud801\udcf3}}' +
+          '{{\ud801\udcf4}}{{\u00a5}}' +
+          '{{}}{{\ud801\udce3\u0358}}{{\ud801\udcea\u0358}}' +
           '{{\ud801\udced}}{{\u201C}}{{\u2018}}{{\u00ab}}' +
 	  '{{\ud801\udcd9}}{{\ud801\udcef}}{{\ud801\udcf1}}{{}}' + 
 	     '{{\u00a9}}{{\ud801\udce2}}{{\ud801\udcdb\u0358}}' +
