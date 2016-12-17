@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+import words
+
 import json
 import logging
 import os
@@ -89,6 +91,7 @@ class OsageUload(webapp2.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
     self.response.out.write(template.render(path, template_values))
 
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/OsageConverter/', MainHandler),
@@ -96,6 +99,7 @@ app = webapp2.WSGIApplication([
     ('/OsageFonts/', OsageFontTest),
     ('/keyboard/', OsageKeyboard), 
     ('/upload/', OsageUload), 
+    ('/words/', words.WordHandler)
 
 	], debug=True)
     

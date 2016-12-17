@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+
+  <title>Testing Osage Unicode and conversion</title>
+
+  <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
+  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
+  <![endif]-->
+
+  <link rel="stylesheet" type="text/css" href="/css/fonts.css">
+
+  <style>
+  textarea {
+    width: 200px;
+	height: 100px;
+	border: 2px solid #cccccc;
+	padding: 5px;
+	font-size: 18px;
+	}
+   .default {
+     font-family: "Courier New";
+   }
+  </style>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/osageConverter.js"></script>
+  <script src="/js/osage_utils.js"></script>
+  <script>
+
+  function init() {
+    // Fill in if needed.
+  convertToUnicode('OldOsage',
+                    'UnicodeOsage', 'old_hex')
+  }
+  </script>
+  
+  </head>
+
+  <body onload="init()">
+  <div class="container">
+    <h2>Data from approved word list</h2>
+    <div class="span-1">  
+    </div>
+    <div class="span-6">
+      <textarea id="OldOsage" class="oldOsageText" >HKAA^]E ZY [Y^</textarea>
+    </div>
+    <div class="span-6">
+      <textarea id="UnicodeOsage" class="unicodeOsageText">𐒽𐒰̄͘𐓋𐒷 𐓒𐒻 𐓓𐒻͘</textarea>
+	</div>
+    <div class="span-6">
+      <textarea id="English" class="default">Apricot</textarea>
+    </div>
+    <div class="span-4 last">
+      <input type="checkbox" name="clearOsageDot" id="clearOsageDot" checked>Clear OldOsage dot?
+      <br />
+      <input type="checkbox" name="convertLatin" id="convertLatin" checked>Convert Latin?
+      <br />
+      <input type="checkbox" name="lowerCase" id="DoLower">To lower?<br />
+	  <br />
+      <input type="button" value="Convert to Unicode"
+           onclick="convertToUnicode('OldOsage',
+                    'UnicodeOsage', 'old_hex');">
+    </div> <!-- end span last -->
+  </div> <!-- end container --> 
+</body>
+</html>

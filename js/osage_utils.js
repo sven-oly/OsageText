@@ -192,3 +192,14 @@ function convertLatinToOldOsage(oldIn, newOut) {
 
     updateHex(newOut, hex_output_id);
   }
+
+  // When an area is changed, set the hex characters, too.
+  function updateHex(inArea, outArea) {
+    var inText = document.getElementById(inArea).value;
+    var hex_output = document.getElementById(outArea);
+    var hexString = charsToHexString(inText);
+    if (hex_output != null) {
+      hex_output.value = hexString;
+      hex_output.innerHTML = hexString;
+    }
+  }  

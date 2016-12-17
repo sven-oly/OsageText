@@ -236,7 +236,9 @@ var osage_latin_to_unicode_map = {
   ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
   '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
   '{': ['{', '\uf05b'],
-  '\]': [String.fromCodePoint(0x104cb), '\uf05d'],
+  '\]': [String.fromCodePoint(0x104ca), '\uf05d'],
+  'h]': [String.fromCodePoint(0x104cb), '\uf048\uf05d'],
+  'H]': [String.fromCodePoint(0x104cb), '\uf048\uf05d'],
   '}': ['}', '\uf05d'],
   '\/': [' ', '\uf03f'],
   '|': ["|", '\uf05c'],
@@ -417,7 +419,7 @@ function latinToOldOsage(textIn, convertToLower) {
 // Parsing of Latin combinations.
 // vowel + ^, double vowels, dotted, pre-aspirated, single letters, non-letters
 var osage_latin_chars =
-  "[aeouy]\f05e|aa|ee|ii|oo|uu|yy|a\'|ts\'|[aeo]n|br|[cs]h|hch|hts|h[ckpt]|iu|tsh|t[hst]|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
+  "h\]|[aeouy]\f05e|aa|ee|ii|oo|uu|yy|a\'|ts\'|[aeo]n|br|[cs]h|hch|hts|h[ckpt]|iu|tsh|t[hst]|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}
