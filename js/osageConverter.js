@@ -112,8 +112,6 @@ var osage_latin_to_unicode_map = {
   'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'a\'': [String.fromCodePoint(0x104d9), '\uf049'],
   'an': [String.fromCodePoint(0x104da), '\uf061'],
-  'ah': [String.fromCodePoint(0x104db), '\uf04a'],
-  'ah': [String.fromCodePoint(0x104db), '\uf04a'],
   'b':  [String.fromCodePoint(0x104dc), '\uf042'],
   'br': [String.fromCodePoint(0x104dc), '\uf042'],
   'hc': [String.fromCodePoint(0x104de), '\uf043'],
@@ -125,6 +123,7 @@ var osage_latin_to_unicode_map = {
   'en': [String.fromCodePoint(0x104e0), '\uf065'],
   'g':  [String.fromCodePoint(0x104f9), '\uf059'],
   'h':  [String.fromCodePoint(0x104e1), '\uf048'],
+  'hd':  [String.fromCodePoint(0x104f1), '\uf048\uf044'],
 //  'hy': [String.fromCodePoint(0x104e2), '\uf02c'],
   'i':  [String.fromCodePoint(0x104d9), '\uf049'],
   'ii': [String.fromCodePoint(0x104d9)+macron, '\uf049\uf054'], // Macron
@@ -149,6 +148,8 @@ var osage_latin_to_unicode_map = {
   'hts': [String.fromCodePoint(0x104f3), '\uf054'],
   'tsh': [String.fromCodePoint(0x104f4), '\uf054'],
   'u':  [String.fromCodePoint(0x104f6), '\uf055'],
+  'uh': [String.fromCodePoint(0x104db), '\uf04a'],
+  'uH': [String.fromCodePoint(0x104db), '\uf04a'],
   'uu': [String.fromCodePoint(0x104f6)+macron, '\uf055\uf055'], // Macron
   'v':  [String.fromCodePoint(0x104ef), '\uf056'],
   'w':  [String.fromCodePoint(0x104f7), '\uf057'],
@@ -164,8 +165,8 @@ var osage_latin_to_unicode_map = {
   'A\'': [String.fromCodePoint(0x104b1), '\uf049'],
   'An': [String.fromCodePoint(0x104b2), '\uf061'],
   'AN': [String.fromCodePoint(0x104b2), '\uf061'],
-  'Ah': [String.fromCodePoint(0x104b3), '\uf04a'],
-  'AH': [String.fromCodePoint(0x104b3), '\uf04a'],
+//  'Ah': [String.fromCodePoint(0x104b3), '\uf04a'],
+//  'AH': [String.fromCodePoint(0x104b3), '\uf04a'],
 //  'Ay': [String.fromCodePoint(0x104b1), '\uf04a'],
 //  'AY': [String.fromCodePoint(0x104b1), '\uf04a'],
   'B':  [String.fromCodePoint(0x104b4), '\uf042'],
@@ -176,7 +177,7 @@ var osage_latin_to_unicode_map = {
   'C':  [String.fromCodePoint(0x104b5), '\uf043'],
   'Ch': [String.fromCodePoint(0x104b6), '\uf043'],
   'CH': [String.fromCodePoint(0x104b6), '\uf043'],
-  'D':  [String.fromCodePoint(0x104c8), '\uf044'],
+  'D':  [String.fromCodePoint(0x104cD), '\uf044'],
   'E':  [String.fromCodePoint(0x104b7), '\uf045'],
   'Ee': [String.fromCodePoint(0x104b7)+macron, '\uf045\uf045'], // Macron
   'EE': [String.fromCodePoint(0x104b7)+macron, '\uf045\uf045'], // Macron
@@ -185,6 +186,8 @@ var osage_latin_to_unicode_map = {
   'G':  [String.fromCodePoint(0x104d1), '\uf059'],
   'H':  [String.fromCodePoint(0x104b9), '\uf048'],
 //  'HY': [String.fromCodePoint(0x104ba), '\uf02c'],
+  'Hd': [String.fromCodePoint(0x104f1), '\uf048\uf044'],
+  'HD': [String.fromCodePoint(0x104c9), '\uf048\uf044'],
   'I':  [String.fromCodePoint(0x104b1), '\uf049'],
   'Ii': [String.fromCodePoint(0x104b1)+macron, '\uf049\uf049'], // Macron
   'II': [String.fromCodePoint(0x104b1)+macron, '\uf049\uf049'], // Macron
@@ -220,7 +223,8 @@ var osage_latin_to_unicode_map = {
   'TSh': [String.fromCodePoint(0x104cc), '\uf054'],
   'TSH': [String.fromCodePoint(0x104cc), '\uf054'],
   'U':  [String.fromCodePoint(0x104ce), '\uf055'],
-  'Uu': [String.fromCodePoint(0x104ce)+macron, '\uf055\uf055'], // Macron
+  'Uh': [String.fromCodePoint(0x104b3), '\uf04a'],
+  'UH': [String.fromCodePoint(0x104b3), '\uf04a'],  'Uu': [String.fromCodePoint(0x104ce)+macron, '\uf055\uf055'], // Macron
   'UU': [String.fromCodePoint(0x104ce)+macron, '\uf055\uf055'], // Macron
   'V':  [String.fromCodePoint(0x104c7), '\uf056'],
   'W':  [String.fromCodePoint(0x104cf), '\uf057'],
@@ -419,7 +423,7 @@ function latinToOldOsage(textIn, convertToLower) {
 // Parsing of Latin combinations.
 // vowel + ^, double vowels, dotted, pre-aspirated, single letters, non-letters
 var osage_latin_chars =
-  "h\]|[aeouy]\f05e|aa|ee|ii|oo|uu|yy|a\'|ts\'|[aeo]n|br|[cs]h|hch|hts|h[ckpt]|iu|tsh|t[hst]|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
+  "h\]|[aeouy]\f05e|aa|ee|ii|oo|uu|yy|a\'|ts\'|[aeo]n|br|[cs]h|hch|hts|h[cdkpt]|iu|uh|tsh|t[hst]|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}
