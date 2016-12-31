@@ -103,5 +103,8 @@ app = webapp2.WSGIApplication([
     ('/words/upload/', words.ProcessUpload),
     ('/words/startUpload/', words.SolicitUpload),
     ('/words/getWords/', words.GetWordsHandler),
-	], debug=True)
+    ('/words/clear/', words.ClearWords),
+    ('/words/getPhrases/', words.GetPhrases),
+    ('/words/updateStatus/', words.UpdateStatus),
+  ], debug=True)
     

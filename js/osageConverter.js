@@ -290,6 +290,9 @@ function oldOsageToUnicode(textIn, convertToLower, convertLatin, clearOsageDot) 
       }
     } else {
       // It's not in the map.
+      if (convertToLower) {
+        c = c.toLowerCase();
+      }
       if (convertLatin) {
         result = osage_latin_to_unicode_map[c];
       }

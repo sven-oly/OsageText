@@ -35,7 +35,7 @@
   function getPrevious() {
     indexObj = document.getElementById('index');
     index = parseInt(indexObj.innerText);
-    if (index >= 0) {
+    if (index > 1) {
       dataRequest(index - 1);
     }
   }
@@ -48,13 +48,14 @@
     }
   }
 
-function goTo(inputArea) {
+  function goTo(inputArea) {
     indexObj = document.getElementById(inputArea);
     index = parseInt(indexObj.value);
     if (index >= 0) {
       dataRequest(index);
     }
-  }  
+  }
+  
   // Code to request Osage data at index. 
   function dataRequest(index) {
     
@@ -74,12 +75,13 @@ function goTo(inputArea) {
     xmlhttp.onreadystatechange=function()
 	{
 	  if(xmlhttp.readyState==4) {
-	      var returned_json = xmlhttp.responseText
+	      var returned_json = xmlhttp.responseText;
 		  var index = document.getElementById('index');
 		  var oldOsage = document.getElementById('OldOsage');
 		  var unicodeOsage = document.getElementById('UnicodeOsage');
 		  var english = document.getElementById('English');
 		  var newIndex = document.getElementById('newIndex');
+		  var status = document.getElementById('status');
 		  var json_obj = JSON.parse(returned_json);
 
           index.value = index.innerHTML = json_obj.index;
@@ -87,8 +89,23 @@ function goTo(inputArea) {
           oldOsage.value = oldOsage.innerHTML = json_obj.oldtext;
           unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
           english.value = english.innerHTML = json_obj.english;
+          var newStatus = json_obj.status;
+          if (newStatus == "" || newStatus == "unknown") {
+            newStatus = "Unknown";
+          }
+          status.value = status.innerHTML = newStatus;
           convertToUnicode('OldOsage',
-                    'UnicodeOsage', 'old_hex')     
+                    'UnicodeOsage', 'old_hex');
+
+          // TODO: Set the status radio button
+          var statusButtons = document.getElementsByName('updateStatus');
+          for (var i = 0; i < statusButtons.length; i++) {       
+            if (statusButtons[i].value == newStatus) {
+              statusButtons[i].checked = true;
+          } else {
+              statusButtons[i].checked = false;
+          }
+    }          
      }
 	}
 	
@@ -99,6 +116,48 @@ function goTo(inputArea) {
 	var size = target.length;
 	xmlhttp.send(null);	  
   }
+
+  function updateStatus(indexArea, statusSetter) {
+    // Get id and new status value.
+    // Prepare for the call to the backendvar xmlhttp;
+    var indexObj = document.getElementById(indexArea);
+    var index = parseInt(indexObj.innerText);
+	if (window.XMLHttpRequest)
+	  {
+	  // code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	  }
+	else
+	  {
+	  // code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	  }
+
+    // Deal with the results	  
+    xmlhttp.onreadystatechange=function()
+	{
+	  if(xmlhttp.readyState==4) {
+	      var returned_json = xmlhttp.responseText;
+		  var json_obj = JSON.parse(returned_json);        
+     }
+	}
+	
+  	// Set up the call with new status.
+  	var newStatus = "";
+  	var statusButtons = document.getElementsByName(statusSetter);
+    for (var i = 0; i < statusButtons.length; i++) {       
+      if (statusButtons[i].checked) {
+        newStatus = statusButtons[i].value;
+        break;
+      }
+    }
+  	
+	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus;
+	//xmlhttp.open("POST", target, true);
+	xmlhttp.open("GET", target, true);
+	var size = target.length;
+	xmlhttp.send(null);
+ }
 
   </script>
 
@@ -118,13 +177,16 @@ function goTo(inputArea) {
     <div class="span-1">  
     </div>
     <div class="span-16">
-      Index: <div id="index">{{index}}</div>
+      Index: <div id="index"><strong>{{index}}</strong></div>
+      Total entries: {{numEntries}}
       <br />
       <textarea id="OldOsage" class="oldOsageText" >{{oldtext}}</textarea>
       <br />
       <textarea id="UnicodeOsage" class="unicodeOsageText">{{utext}}͘</textarea>
       <br />
       <textarea id="English" class="default">{{english}}</textarea>
+      <br/ >
+      <strong>Status:</strong><div id="status">{{status}}</div>
     </div>
 
     <div class="span-4 last">
@@ -149,6 +211,17 @@ function goTo(inputArea) {
            onclick="goTo('newIndex');"/>
         <input id='newIndex' type=text value='{{index}}' size='3'/>
 
+      <br />
+      <br />
+      <strong>Status:</strong>
+      <form action="" id="set_status">
+        <input type="radio" name="updateStatus" value="Unknown"> Unknown 
+        <input type="radio" name="updateStatus" value="Verified"> Verified 
+        <input type="radio" name="updateStatus" value="Incorrect"> Incorrect
+        <input type="radio" name="updateStatus" value="Other"> Other
+     </form>
+    <input type="button" value="Update status"
+           onclick="updateStatus('index', 'updateStatus');"/>
      </div> <!-- end span last -->
   </div> <!-- end container --> 
 </body>

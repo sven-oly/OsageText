@@ -25,7 +25,9 @@ class OsagePhraseDB(db.Model):
     osagePhraseLatin = db.StringProperty(u'')
     osagePhraseUnicode = db.StringProperty(u'')
     status = db.StringProperty('')
-  
+
+
+# Retrieves data at a given index via AJAX. 
 class GetWordsHandler(webapp2.RequestHandler):
   def post(self):
     self.response.headers['Content-Type'] = 'text/plain'   
@@ -42,13 +44,15 @@ class GetWordsHandler(webapp2.RequestHandler):
       oldtext = result.osagePhraseLatin
       utext = result.osagePhraseUnicode
       english = result.englishPhrase
+      status = result.status
     else:
-      oldtext = utext = english = ''
+      oldtext = utext = english = status = ''
     obj = {
         'index': index,
         'oldtext': oldtext,
         'utext': utext,
         'english': english,
+        'status': status,
       }
     self.response.out.write(json.dumps(obj))
 
@@ -61,27 +65,35 @@ class WordHandler(webapp2.RequestHandler):
       utext = self.request.get('utext', '')
       english = self.request.get('english', '')
       index = int(self.request.get('index', '1'))
+      status = ''
+
       q = OsagePhraseDB.all()
+      currentEntries = 0
+      for p in q.run():
+        currentEntries += 1
       q.filter("index =", index)
       result = q.get()
+
       if result:
         oldtext = result.osagePhraseLatin
         utext = result.osagePhraseUnicode
         english = result.englishPhrase
+        status = result.status
       logging.info('q = %s' % result)
       template_values = {
         'index': index,
+        'numEntries': currentEntries,
         'fontFamilies': fontList,
         'oldtext': oldtext,
         'utext': utext,
         'english': english,
+        'status': status
       }
       path = os.path.join(os.path.dirname(__file__), 'words.html')
       self.response.out.write(template.render(path, template_values))
 
 
-# TODO: Get data and add next/previous
-# Add approve
+# TODO: Add approve
 # Add controls for loading records
 #     for saving new status
 #     for getting records approved or not
@@ -118,19 +130,95 @@ class ProcessUpload(webapp2.RequestHandler):
     self.response.out.write(fileInfo)
 
     logging.info('$$$$$$$$$ fileInfo = %s' % fileInfo)
-    entries = process_csv(fileInfo)
 
+    # Update with new data.
+    # TODO: check for duplicates
+    q = OsagePhraseDB.all()
     numEntries = 0
+    for p in q.run():
+      numEntries += 1
+    logging.info('### Starting at index %d' % numEntries)
+    self.response.out.write('### Starting at index %d' % numEntries) 
+    startIndex = numEntries + 1
+    currentIndex = startIndex
     stringReader = unicode_csv_reader(StringIO.StringIO(fileInfo))
     for row in stringReader:
-      entry = processRow(numEntries, row)
+      entry = processRow(currentIndex, row)
+      currentIndex += 1
       numEntries += 1
-      #self.response.out.write(entry) 
+      self.response.out.write(entry) 
 
-    logging.info('### %d entries found', numEntries)
-    self.response.out.write('\n\n### %d entries found' % numEntries) 
+    logging.info('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex))
+    self.response.out.write('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex)) 
+    q = OsagePhraseDB.all()
+    currentEntries = 0
+    for p in q.run():
+      currentEntries += 1
+    self.response.out.write('!!! Current entries now = %d.' %
+      (currentEntries)) 
 
 
+# Clear out the entire phrase data store, or part of it (eventually)
+class ClearWords(webapp2.RequestHandler): 
+  def get(self):
+    q = OsagePhraseDB.all()
+    numEntries = 0
+    nullCount = 0
+    for p in q.run():
+      numEntries += 1
+      if not p.index:
+        nullCount += 1
+      OsagePhraseDB.delete(p)
+    # TODO: delete them, with message.
+    self.response.out.write('!!! Will delete %d null index entries.' % nullCount)
+    self.response.out.write('!!! Will delete all of the %d entries.' % numEntries)
+
+
+# Gets all the phrase data store, or part of it (eventually)
+class UpdateStatus(webapp2.RequestHandler): 
+  def get(self):
+    index = int(self.request.get('index', '1'))
+    newStatus = self.request.get('newStatus', 'Unknown')
+
+    logging.info('UpdateStatus: index = %d, newStatus = %s' % (index, newStatus))
+
+    q = OsagePhraseDB.all()
+    q.filter("index =", index)
+    result = q.get()
+
+    result.status = newStatus;
+    result.put()
+    
+    # Send update back to client
+    obj = {
+      'index': index,
+      'status' : result.status,   
+    }
+    self.response.out.write(json.dumps(obj))
+
+  
+ # Resets status for given item.
+class GetPhrases(webapp2.RequestHandler): 
+  def get(self):
+    q = OsagePhraseDB.all()
+    numEntries = 0
+    entries = []
+    nullIndexCount = 0
+    for p in q.run():
+      numEntries += 1
+      if not p.index:
+        nullIndexCount += 1
+      entry = (p.index, p.englishPhrase, p.osagePhraseLatin, p.osagePhraseUnicode,
+        p.status)
+      entries.append(entry)
+    # TODO: get them, and sent to client
+    obj = {
+      'entries': entries   
+    }
+    self.response.out.write('!!! %d entries. %d with null index' % (numEntries, nullIndexCount))
+    self.response.out.write(json.dumps(obj))
+  
+# Uses blob. TODO: make this work.
 class OldProcessUpload(webapp2.RequestHandler): 
    def post(self):
      upload_files = self.get_uploads('file')
@@ -164,12 +252,12 @@ def utf_8_encoder(unicode_csv_data):
         
 def processRow(index, row):
   english, osageLatin = row
-  #logging.info('!!     english= %s' % english)
+  logging.info('!! index = %d     english= %s' % (index, english))
   entry = OsagePhraseDB(index=index,
     englishPhrase=english,
     osagePhraseLatin=osageLatin,
     osagePhraseUnicode='',
-    status="unknown")
+    status="Unknown")
   entry.put()
   return entry
 
@@ -182,7 +270,7 @@ def process_csv(fileInfo):
     #logging.info('!!     english= %s' % english)
     entry = OsagePhraseDB(englishPhrase=english, osagePhraseLatin=osageLatin,
       osagePhraseUnicode='',
-      status="unknown",
+      status="Unknown",
       lastUpdate=None)
     entry.put()
     entries.append(entry)
