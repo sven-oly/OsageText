@@ -32,7 +32,7 @@
   <body onload="init()">
   <div class="container">
     <h2>Data from approved word list</h2>
-    <div class="span-18 default last">
+    <div class="span-18 default">
     Number of entries returned: {{entries|length}}
     {% if filter %}
     <br />
@@ -63,6 +63,18 @@
      </tr>
       {% endfor %}
     </table>
+    </div>
+    <div class="span-4 last">
+      <h4>Filter by status:</h4>
+      <form action="/words/getPhrases/" id="set_status">
+        <input type="radio" name="filterStatus" value="" checked> All phrases (no filter)
+        <br />
+        <input type="radio" name="filterStatus" value="Unknown"> Unknown 
+        <input type="radio" name="filterStatus" value="Verified"> Verified 
+        <input type="radio" name="filterStatus" value="Incorrect"> Incorrect
+        <input type="radio" name="filterStatus" value="Other"> Other
+        <input type="submit">
+   
     </div>
   </div>
   </body>
