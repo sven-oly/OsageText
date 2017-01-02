@@ -36,7 +36,7 @@
     indexObj = document.getElementById('index');
     index = parseInt(indexObj.innerText);
     if (index > 1) {
-      dataRequest(index - 1);
+      dataRequest(index - 1, -1);
     }
   }
 
@@ -44,7 +44,7 @@
     indexObj = document.getElementById('index');
     index = parseInt(indexObj.innerText);
     if (index >= 0) {
-      dataRequest(index + 1);
+      dataRequest(index + 1, 1);
     }
   }
 
@@ -52,28 +52,22 @@
     indexObj = document.getElementById(inputArea);
     index = parseInt(indexObj.value);
     if (index >= 0) {
-      dataRequest(index);
+      dataRequest(index, 0);
     }
   }
   
-  // Code to request Osage data at index. 
-  function dataRequest(index) {
-    
+  // Code to request Osage data at index with optional filter.
+  // Direction indicates previous (-1) or next (+1)
+  function dataRequest(index, direction) {
     // Prepare for the call to the backendvar xmlhttp;
-	if (window.XMLHttpRequest)
-	  {
-	  // code for IE7+, Firefox, Chrome, Opera, Safari
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
-	  }
-	else
-	  {
-	  // code for IE6, IE5
+	} else { // code for IE6, IE5
 	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	  }
+	}
 
     // Deal with the results	  
-    xmlhttp.onreadystatechange=function()
-	{
+    xmlhttp.onreadystatechange=function() {
 	  if(xmlhttp.readyState==4) {
 	      var returned_json = xmlhttp.responseText;
 		  var index = document.getElementById('index');
@@ -82,56 +76,61 @@
 		  var english = document.getElementById('English');
 		  var newIndex = document.getElementById('newIndex');
 		  var status = document.getElementById('status');
+		  var errorMsg = document.getElementById('errorMsg');
 		  var json_obj = JSON.parse(returned_json);
-
+          if (json_obj.error) {
+            // Warn, and don't change values.
+            alert(json_obj.error);
+            return;
+          }
           index.value = index.innerHTML = json_obj.index;
           newIndex.value = newIndex.innerHTML = json_obj.index;
           oldOsage.value = oldOsage.innerHTML = json_obj.oldtext;
-          unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
           english.value = english.innerHTML = json_obj.english;
+
+          if (json_obj.utext) {
+            unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
+          } else {
+            // Compute the conversion.
+            convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
+          }        
+
           var newStatus = json_obj.status;
           if (newStatus == "" || newStatus == "unknown") {
             newStatus = "Unknown";
           }
+          
           status.value = status.innerHTML = newStatus;
-          convertToUnicode('OldOsage',
-                    'UnicodeOsage', 'old_hex');
-
-          // TODO: Set the status radio button
-          var statusButtons = document.getElementsByName('updateStatus');
-          for (var i = 0; i < statusButtons.length; i++) {       
-            if (statusButtons[i].value == newStatus) {
-              statusButtons[i].checked = true;
-          } else {
-              statusButtons[i].checked = false;
-          }
-    }          
-     }
-	}
+          // Reset the status radio button
+          setStatusRadioButton("updateStatus", newStatus);
+        }          
+      }
 	
-	// Set up the call.
-	var target = "/words/getWords/?index=" + index;
+	// Set up the call, with filtering.
+	var filterStatus = getStatusRadioButton("filterStatus");
+    if (direction == 0) {
+      // Should not filter if a direct "go to".
+      filterStatus = "All";
+    }
+	var target = "/words/getWords/?index=" + index + "&filterStatus=" + filterStatus
+	  + "&direction=" + direction;
 	//xmlhttp.open("POST", target, true);
 	xmlhttp.open("GET", target, true);
 	var size = target.length;
 	xmlhttp.send(null);	  
   }
 
-  function updateStatus(indexArea, statusSetter) {
+  function updatePhraseStatus(indexArea, statusSetter) {
     // Get id and new status value.
     // Prepare for the call to the backendvar xmlhttp;
     var indexObj = document.getElementById(indexArea);
     var index = parseInt(indexObj.innerText);
-	if (window.XMLHttpRequest)
-	  {
-	  // code for IE7+, Firefox, Chrome, Opera, Safari
+    var unicodeData = document.getElementById("UnicodeOsage").innerHTML;
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
-	  }
-	else
-	  {
-	  // code for IE6, IE5
+	} else { // code for IE6, IE5
 	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	  }
+	}
 
     // Deal with the results	  
     xmlhttp.onreadystatechange=function()
@@ -143,30 +142,41 @@
 	}
 	
   	// Set up the call with new status.
-  	var newStatus = "";
-  	var statusButtons = document.getElementsByName(statusSetter);
-    for (var i = 0; i < statusButtons.length; i++) {       
-      if (statusButtons[i].checked) {
-        newStatus = statusButtons[i].value;
-        break;
-      }
-    }
-  	
-	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus;
-	//xmlhttp.open("POST", target, true);
+  	var newStatus = getStatusRadioButton(statusSetter); 
+	
+	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus +
+	  "&unicodePhrase=" + unicodeData;
 	xmlhttp.open("GET", target, true);
 	var size = target.length;
 	xmlhttp.send(null);
  }
 
-  </script>
-
-  <script>
-  function init() {
-    // Fill in if needed.
-  convertToUnicode('OldOsage',
-                    'UnicodeOsage', 'old_hex')
+ function getStatusRadioButton(statusSetter) {
+  	var statusButtons = document.getElementsByName(statusSetter);
+    for (var i = 0; i < statusButtons.length; i++) {       
+      if (statusButtons[i].checked) {
+        return statusButtons[i].value;
+      }
+    }
+    return "";
   }
+
+  function setStatusRadioButton(statusSetter, status) {
+  	// Set up the call with new status.
+  	var statusButtons = document.getElementsByName(statusSetter);
+    for (var i = 0; i < statusButtons.length; i++) {       
+      statusButtons[i].checked = (statusButtons[i].value == status);
+    }
+  }
+   
+  // Initialize the page.
+  function init() {
+    convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
+    // Set initial status.
+    var status = document.getElementById("status").innerHTML;
+    setStatusRadioButton("updateStatus", status);
+  }
+
   </script>
   
   </head>
@@ -177,51 +187,59 @@
     <div class="span-1">  
     </div>
     <div class="span-16">
-      Index: <div id="index"><strong>{{index}}</strong></div>
       Total entries: {{numEntries}}
       <br />
+      <h3>Index: <span id="index"><strong>{{index}}</strong></span></h3>
       <textarea id="OldOsage" class="oldOsageText" >{{oldtext}}</textarea>
       <br />
-      <textarea id="UnicodeOsage" class="unicodeOsageText">{{utext}}͘</textarea>
-      <br />
-      <textarea id="English" class="default">{{english}}</textarea>
-      <br/ >
-      <strong>Status:</strong><div id="status">{{status}}</div>
-    </div>
-
-    <div class="span-4 last">
-      <input type="checkbox" name="clearOsageDot" id="clearOsageDot" checked>Clear OldOsage dot?
-      <br />
-      <input type="checkbox" name="convertLatin" id="convertLatin" checked>Convert Latin?
-      <br />
-      <input type="checkbox" name="lowerCase" id="DoLower">To lower?<br />
-	  <br />
       <input type="button" value="Convert to Unicode"
            onclick="convertToUnicode('OldOsage',
                     'UnicodeOsage', 'old_hex');">
+      <input type="checkbox" name="clearOsageDot" id="clearOsageDot" checked>Clear OldOsage dot?
+      <input type="checkbox" name="convertLatin" id="convertLatin" checked>Convert Latin?
+      <input type="checkbox" name="lowerCase" id="DoLower">To lower?
 	  <br />
-	  <br />
-      <input type="button" value="Previous"
-           onclick="getPrevious();"/>
-      <input type="button" value="Next"
-           onclick="getNext();"/>
-       <br />
-        <br />
-      <input type="button" value="Go to: "
-           onclick="goTo('newIndex');"/>
-        <input id='newIndex' type=text value='{{index}}' size='3'/>
-
+	  <textarea id="UnicodeOsage" class="unicodeOsageText">{{utext}}͘</textarea>
       <br />
-      <br />
-      <strong>Status:</strong>
+      <textarea id="English" class="default">{{english}}</textarea>
+      <br/ >
+      <h4>Status: <span id="status">{{status}}</span></h4>
+      <br>
+      <h4>Change status of this phrase:</h4>
       <form action="" id="set_status">
         <input type="radio" name="updateStatus" value="Unknown"> Unknown 
         <input type="radio" name="updateStatus" value="Verified"> Verified 
         <input type="radio" name="updateStatus" value="Incorrect"> Incorrect
         <input type="radio" name="updateStatus" value="Other"> Other
-     </form>
-    <input type="button" value="Update status"
-           onclick="updateStatus('index', 'updateStatus');"/>
+      <input type="button" value="Update status"
+           onclick="updatePhraseStatus('index', 'updateStatus');"/>
+      </form>
+      <div id='errorMsg'>{{error}}</div>
+    </div>
+
+    <div class="span-4 last">
+      <h3>Total entries: {{numEntries}}</h3>
+
+      <input type="button" value="Previous"
+           onclick="getPrevious();"/>
+      <input type="button" value="Next"
+           onclick="getNext();"/>
+       <br />
+       <input type="button" value="Go to: "
+           onclick="goTo('newIndex');"/>
+      <input id='newIndex' type=text value='{{index}}' size='3'/>
+      <br />
+      <br />
+      <h4>Filter by status:</h4>
+      <form action="" id="set_status">
+        <input type="radio" name="filterStatus" value="All" checked> All phrases (no filter)
+        <br />
+        <input type="radio" name="filterStatus" value="Unknown"> Unknown 
+        <input type="radio" name="filterStatus" value="Verified"> Verified 
+        <input type="radio" name="filterStatus" value="Incorrect"> Incorrect
+        <input type="radio" name="filterStatus" value="Other"> Other
+     </form>      
+
      </div> <!-- end span last -->
   </div> <!-- end container --> 
 </body>

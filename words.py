@@ -37,23 +37,44 @@ class GetWordsHandler(webapp2.RequestHandler):
 
   def get(self):
     index = int(self.request.get('index', '1'))
+    filterStatus = self.request.get('filterStatus', 'All')
+    direction = int(self.request.get('direction', '0'))
+     
     q = OsagePhraseDB.all()
-    q.filter("index =", index)
-    result = q.get()
+    if filterStatus == 'All':
+      # Get the specified index, with no status filter.
+      q.filter("index =", index)
+    else:
+      # Set up to get next phrase with required status and index >= query index.
+      logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
+      q.filter('status =', filterStatus)
+      if direction < 0:
+        q.filter('index <=', index)
+        q.order('-index')
+      else:
+        q.filter('index >=', index)
+        q.order('index')
+
+    result = q.get()  # Use get_multi for more than one?
+    logging.info('RESULT = %s' % (result))
     if result:
+      index = result.index
       oldtext = result.osagePhraseLatin
       utext = result.osagePhraseUnicode
       english = result.englishPhrase
       status = result.status
+      errorMsg = '' 
     else:
       oldtext = utext = english = status = ''
+      errorMsg = 'No results found' 
     obj = {
         'index': index,
         'oldtext': oldtext,
         'utext': utext,
         'english': english,
         'status': status,
-      }
+        'error': errorMsg,
+    }
     self.response.out.write(json.dumps(obj))
 
 # Show data from word list converted for human verification
@@ -112,7 +133,7 @@ class GetDataHandler(webapp2.RequestHandler):
     }
     self.response.out.write(json.dumps(obj))
 
-
+# Show simple interface for CSV upload.
 class SolicitUpload(webapp2.RequestHandler):
   def get(self):
     # upload_url = blobstore.create_upload_url('upload')
@@ -123,7 +144,8 @@ class SolicitUpload(webapp2.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'wordsUpload.html')
     self.response.out.write(template.render(path, template_values))
 
-
+# Add entries in the uploaded CSV to the data store.
+# TODO: check for duplicates.
 class ProcessUpload(webapp2.RequestHandler): 
   def post(self):
     fileInfo = self.request.get('file')
@@ -174,19 +196,23 @@ class ClearWords(webapp2.RequestHandler):
     self.response.out.write('!!! Will delete all of the %d entries.' % numEntries)
 
 
-# Gets all the phrase data store, or part of it (eventually)
+# Updates the status of an entry and sets the Unicode field.
 class UpdateStatus(webapp2.RequestHandler): 
   def get(self):
     index = int(self.request.get('index', '1'))
     newStatus = self.request.get('newStatus', 'Unknown')
+    unicodePhrase = self.request.get('unicodePhrase', '')
 
-    logging.info('UpdateStatus: index = %d, newStatus = %s' % (index, newStatus))
+    logging.info('UpdateStatus: index = %d, newStatus = %s, unicode = %s' %
+      (index, newStatus, unicodePhrase))
 
     q = OsagePhraseDB.all()
     q.filter("index =", index)
     result = q.get()
 
     result.status = newStatus;
+    if unicodePhrase:
+      result.osagePhraseUnicode = unicodePhrase
     result.put()
     
     # Send update back to client
@@ -200,7 +226,12 @@ class UpdateStatus(webapp2.RequestHandler):
  # Resets status for given item.
 class GetPhrases(webapp2.RequestHandler): 
   def get(self):
+    filterStatus = self.request.get('filterStatus', '')
     q = OsagePhraseDB.all()
+    if filterStatus:
+      q.filter('status =', filterStatus)
+    q.order('index')
+    
     numEntries = 0
     entries = []
     nullIndexCount = 0
@@ -210,13 +241,17 @@ class GetPhrases(webapp2.RequestHandler):
         nullIndexCount += 1
       entry = (p.index, p.englishPhrase, p.osagePhraseLatin, p.osagePhraseUnicode,
         p.status)
-      entries.append(entry)
+      entries.append(p)
     # TODO: get them, and sent to client
-    obj = {
-      'entries': entries   
+    template_values = {
+      'entries': entries,
+      'filter': filterStatus, 
     }
-    self.response.out.write('!!! %d entries. %d with null index' % (numEntries, nullIndexCount))
-    self.response.out.write(json.dumps(obj))
+    logging.info('%d entries' % len(entries))
+    #self.response.out.write('!!! %d entries. %d with null index' % (numEntries, nullIndexCount))
+    #self.response.out.write(json.dumps(template_values))
+    path = os.path.join(os.path.dirname(__file__), 'phrasesList.html')
+    self.response.out.write(template.render(path, template_values))
   
 # Uses blob. TODO: make this work.
 class OldProcessUpload(webapp2.RequestHandler): 
