@@ -99,12 +99,14 @@ app = webapp2.WSGIApplication([
     ('/OsageFonts/', OsageFontTest),
     ('/keyboard/', OsageKeyboard), 
     ('/upload/', OsageUload), 
+
     ('/words/', words.WordHandler),
-    ('/words/upload/', words.ProcessUpload),
-    ('/words/startUpload/', words.SolicitUpload),
-    ('/words/getWords/', words.GetWordsHandler),
+    ('/words/addPhrase/', words.AddPhrase),
     ('/words/clear/', words.ClearWords),
+    ('/words/getWords/', words.GetWordsHandler),
     ('/words/getPhrases/', words.GetPhrases),
+    ('/words/startUpload/', words.SolicitUpload),
     ('/words/updateStatus/', words.UpdateStatus),
+    ('/words/upload/', words.ProcessUpload),   
   ], debug=True)
     

@@ -31,7 +31,8 @@
   <script src="/js/osage_utils.js"></script>
 
   <script type="text/javascript" >
-  
+
+  // Navigate to phrases.
   function getPrevious() {
     indexObj = document.getElementById('index');
     index = parseInt(indexObj.innerText);
@@ -48,6 +49,7 @@
     }
   }
 
+  // Jump to specific index.
   function goTo(inputArea) {
     indexObj = document.getElementById(inputArea);
     index = parseInt(indexObj.value);
@@ -151,7 +153,8 @@
 	xmlhttp.send(null);
  }
 
- function getStatusRadioButton(statusSetter) {
+  // Which radio button option is checked?
+  function getStatusRadioButton(statusSetter) {
   	var statusButtons = document.getElementsByName(statusSetter);
     for (var i = 0; i < statusButtons.length; i++) {       
       if (statusButtons[i].checked) {
@@ -161,6 +164,7 @@
     return "";
   }
 
+  // Set which radio button is checked.
   function setStatusRadioButton(statusSetter, status) {
   	// Set up the call with new status.
   	var statusButtons = document.getElementsByName(statusSetter);
@@ -168,7 +172,43 @@
       statusButtons[i].checked = (statusButtons[i].value == status);
     }
   }
-   
+
+  function addPhraseToDatastore(oldOsageText, UnicodeOsageText, englishText) {
+    
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	} else { // code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+
+    // Deal with the results	  
+    xmlhttp.onreadystatechange=function()
+	{
+	  if (xmlhttp.readyState==4) {
+	    var returned_json = xmlhttp.responseText;
+		var json_obj = JSON.parse(returned_json);
+
+        // Set up alert for results.
+        alert(json_obj.message);       
+      }
+	}
+	
+  	// Set up the call to store new phrase information.
+    var oldTextObj = document.getElementById(oldOsageText);
+    var uTextObj = document.getElementById(UnicodeOsageText);
+    var englishTextObj = document.getElementById(englishText);
+    var oldText = oldTextObj.value;
+    var unicodeText = uTextObj.innerHTML;
+    var englishText = englishTextObj.value; 
+    
+	var target = "/words/addPhrase/?oldtext=" + oldText + "&utext=" + unicodeText +
+	  "&engtext=" + englishText;
+	xmlhttp.open("GET", target, true);
+	var size = target.length;
+	xmlhttp.send(null);
+  }
+
+
   // Initialize the page.
   function init() {
     convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
@@ -238,8 +278,14 @@
         <input type="radio" name="filterStatus" value="Verified"> Verified 
         <input type="radio" name="filterStatus" value="Incorrect"> Incorrect
         <input type="radio" name="filterStatus" value="Other"> Other
-     </form>      
-
+     </form>  
+     <br />    
+     <hr />
+     <!-- Add a new value to the data store -->
+     <input type="button" onclick="addPhraseToDatastore('OldOsage', 'UnicodeOsage', 'English');"
+       value="Add new phrase to database">
+     <hr />
+     <a href="/words/getPhrases/">View database. </a>       
      </div> <!-- end span last -->
   </div> <!-- end container --> 
 </body>

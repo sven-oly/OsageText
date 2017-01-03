@@ -32,21 +32,25 @@ class GetWordsHandler(webapp2.RequestHandler):
   def post(self):
     self.response.headers['Content-Type'] = 'text/plain'   
 
-    print 'ConvertHandler get received.'
-    self.response.out.write('ConvertHandler get received.\n')
+    print 'GetWordsHandler received.'
+    self.response.out.write('GetWordsHandler received.\n')
 
   def get(self):
     index = int(self.request.get('index', '1'))
     filterStatus = self.request.get('filterStatus', 'All')
     direction = int(self.request.get('direction', '0'))
-     
+    
+    #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
+    #   (index, filterStatus, direction))
+
     q = OsagePhraseDB.all()
-    if filterStatus == 'All':
+    if filterStatus == 'All' or filterStatus == 'all':
       # Get the specified index, with no status filter.
+      #logging.info('Going for index = %d' % index)
       q.filter("index =", index)
     else:
       # Set up to get next phrase with required status and index >= query index.
-      logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
+      #logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
       q.filter('status =', filterStatus)
       if direction < 0:
         q.filter('index <=', index)
@@ -56,7 +60,8 @@ class GetWordsHandler(webapp2.RequestHandler):
         q.order('index')
 
     result = q.get()  # Use get_multi for more than one?
-    logging.info('RESULT = %s' % (result))
+
+    #logging.info('RESULT = %s' % (result))
     if result:
       index = result.index
       oldtext = result.osagePhraseLatin
@@ -100,7 +105,7 @@ class WordHandler(webapp2.RequestHandler):
         utext = result.osagePhraseUnicode
         english = result.englishPhrase
         status = result.status
-      logging.info('q = %s' % result)
+      #logging.info('q = %s' % result)
       template_values = {
         'index': index,
         'numEntries': currentEntries,
@@ -138,7 +143,7 @@ class SolicitUpload(webapp2.RequestHandler):
   def get(self):
     # upload_url = blobstore.create_upload_url('upload')
     upload_url = '/words/upload/'
-    logging.info('$$$$$$$$$ upload_url %s' % upload_url)
+    #logging.info('$$$$$$$$$ upload_url %s' % upload_url)
 
     template_values = {'upload_url':upload_url}
     path = os.path.join(os.path.dirname(__file__), 'wordsUpload.html')
@@ -151,7 +156,7 @@ class ProcessUpload(webapp2.RequestHandler):
     fileInfo = self.request.get('file')
     self.response.out.write(fileInfo)
 
-    logging.info('$$$$$$$$$ fileInfo = %s' % fileInfo)
+    #logging.info('$$$$$$$$$ fileInfo = %s' % fileInfo)
 
     # Update with new data.
     # TODO: check for duplicates
@@ -159,7 +164,7 @@ class ProcessUpload(webapp2.RequestHandler):
     numEntries = 0
     for p in q.run():
       numEntries += 1
-    logging.info('### Starting at index %d' % numEntries)
+    #logging.info('### Starting at index %d' % numEntries)
     self.response.out.write('### Starting at index %d' % numEntries) 
     startIndex = numEntries + 1
     currentIndex = startIndex
@@ -170,7 +175,7 @@ class ProcessUpload(webapp2.RequestHandler):
       numEntries += 1
       self.response.out.write(entry) 
 
-    logging.info('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex))
+    #logging.info('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex))
     self.response.out.write('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex)) 
     q = OsagePhraseDB.all()
     currentEntries = 0
@@ -203,8 +208,8 @@ class UpdateStatus(webapp2.RequestHandler):
     newStatus = self.request.get('newStatus', 'Unknown')
     unicodePhrase = self.request.get('unicodePhrase', '')
 
-    logging.info('UpdateStatus: index = %d, newStatus = %s, unicode = %s' %
-      (index, newStatus, unicodePhrase))
+    #logging.info('UpdateStatus: index = %d, newStatus = >%s<, unicode = %s' %
+    # (index, newStatus, unicodePhrase))
 
     q = OsagePhraseDB.all()
     q.filter("index =", index)
@@ -222,8 +227,42 @@ class UpdateStatus(webapp2.RequestHandler):
     }
     self.response.out.write(json.dumps(obj))
 
-  
- # Resets status for given item.
+
+class AddPhrase(webapp2.RequestHandler): 
+  def get(self):
+    oldtext = self.request.get('oldtext', '')
+    utext = self.request.get('utext', '')    
+    engtext = self.request.get('engtext', '')
+
+    # Check if this already exists.
+    q = OsagePhraseDB.all()
+    q.filter('osagePhraseLatin =', oldtext)
+    result = q.get()
+    if result:
+      # It's a duplicate. Return warning.
+      message = 'This Osage message already exists at index %s' % result.index
+    else:
+      # It's not there so get new index and store.
+      q = OsagePhraseDB.all()
+      maxIndex = 0
+      for p in q.run():
+        if p.index > maxIndex:
+          maxIndex = p.index
+      entry = OsagePhraseDB(index=maxIndex + 1,
+        englishPhrase=engtext,
+        osagePhraseLatin=oldtext,
+        osagePhraseUnicode=utext,
+        status='Unknown')
+      entry.put()
+      message = 'New Osage message added at index %s' % entry.index  
+
+    response = {
+      'message': message,
+    }    
+    self.response.out.write(json.dumps(response))
+
+
+# Resets status for given item.
 class GetPhrases(webapp2.RequestHandler): 
   def get(self):
     filterStatus = self.request.get('filterStatus', '')
@@ -247,7 +286,7 @@ class GetPhrases(webapp2.RequestHandler):
       'entries': entries,
       'filter': filterStatus, 
     }
-    logging.info('%d entries' % len(entries))
+    #logging.info('%d entries' % len(entries))
     #self.response.out.write('!!! %d entries. %d with null index' % (numEntries, nullIndexCount))
     #self.response.out.write(json.dumps(template_values))
     path = os.path.join(os.path.dirname(__file__), 'phrasesList.html')
@@ -257,10 +296,10 @@ class GetPhrases(webapp2.RequestHandler):
 class OldProcessUpload(webapp2.RequestHandler): 
    def post(self):
      upload_files = self.get_uploads('file')
-     logging.info('$$$$$$$$$ upload_files %s' % upload_files[1])
+     #logging.info('$$$$$$$$$ upload_files %s' % upload_files[1])
 
      blob_info = upload_files[0]
-     logging.info('$$$$$$$$$ blob_info %s' % blob_info)
+     #logging.info('$$$$$$$$$ blob_info %s' % blob_info)
      
      entries = process_csv(blob_info)
      blobstore.delete(blob_info.key())  # optional: delete file after import
@@ -287,7 +326,7 @@ def utf_8_encoder(unicode_csv_data):
         
 def processRow(index, row):
   english, osageLatin = row
-  logging.info('!! index = %d     english= %s' % (index, english))
+  #logging.info('!! index = %d     english= %s' % (index, english))
   entry = OsagePhraseDB(index=index,
     englishPhrase=english,
     osagePhraseLatin=osageLatin,
@@ -295,7 +334,6 @@ def processRow(index, row):
     status="Unknown")
   entry.put()
   return entry
-
 
 def process_csv(fileInfo):
   stringReader = unicode_csv_reader(StringIO.StringIO(fileInfo))
