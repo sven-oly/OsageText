@@ -94,6 +94,13 @@
 
           if (json_obj.utext) {
             unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
+            var uText = oldOsageToUnicode(json_obj.oldtext,
+              false, true, false);
+              if (!(uText === json_obj.utext)) {
+                alert("Warning: store Unicode data different from new conversion.\n\n" +
+                  "Please convert, check, and update status!" + 
+                  "\n" + uText + " " + json_obj.utext);
+              }
           } else {
             // Compute the conversion.
             convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
@@ -129,7 +136,7 @@
     // Prepare for the call to the backendvar xmlhttp;
     var indexObj = document.getElementById(indexArea);
     var index = parseInt(indexObj.innerText);
-    var unicodeData = document.getElementById("UnicodeOsage").innerHTML;
+    var unicodeData = document.getElementById("UnicodeOsage").value;
 	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
 	} else { // code for IE6, IE5
@@ -254,8 +261,9 @@
         <input type="radio" name="updateStatus" value="Unknown"> Unknown 
         <input type="radio" name="updateStatus" value="Verified"> Verified 
         <input type="radio" name="updateStatus" value="Incorrect"> Incorrect
+        <input type="radio" name="updateStatus" value="Font"> Font
         <input type="radio" name="updateStatus" value="Other"> Other
-      <input type="button" value="Update status"
+     <input type="button" value="Update status"
            onclick="updatePhraseStatus('index', 'updateStatus');"/>
       </form>
       <br />
@@ -287,6 +295,8 @@
         <input type="radio" name="filterStatus" value="Unknown"> Unknown 
         <input type="radio" name="filterStatus" value="Verified"> Verified 
         <input type="radio" name="filterStatus" value="Incorrect"> Incorrect
+        <input type="radio" name="filterStatus" value="Font"> Font
+        <br />
         <input type="radio" name="filterStatus" value="Other"> Other
      </form>  
      <br />    
