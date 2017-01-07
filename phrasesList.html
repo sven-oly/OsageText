@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
 
-  <title>Testing Osage Unicode and conversion</title>
+  <title>Osage Phrase Database</title>
 
   <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
   <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
@@ -52,6 +52,7 @@
         <th>Old Osage</th>
         <th>Unicode</th>
         <th>English</th>
+        <th>Comment</th>
 	  </tr>
       {% for entry in entries %}
       <tr class="default">
@@ -60,6 +61,7 @@
         <td>{{entry.osagePhraseLatin}}</td>
         <td class="unicodeOsageText size18">{{entry.osagePhraseUnicode}}</td>
         <td>{{entry.englishPhrase}}</td>
+        <td>{{entry.comment}}</td>
      </tr>
       {% endfor %}
     </table>

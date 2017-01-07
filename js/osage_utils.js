@@ -159,7 +159,16 @@ function fillWithLatinOsage(target, hex_target, modifier) {
    updateHex(target, hex_target);
 }
 
-// Check text encoding.  If in Zawgyi, return converted text in Unicode.
+function fillWithLatinTests(target, hex_target, modifier) {
+  var output_text = document.getElementById(target);
+  var outputString = "HD hd HP H] HK UHU ";
+  // Get mapping characters from the Latin map.
+  output_text.innerHTML = outputString;
+  output_text.value = outputString;
+   updateHex(target, hex_target);
+}
+
+// Check text encoding.  If in Latin, return converted text in Unicode.
 function convertLatinToOldOsage(oldIn, newOut) {
   var input_text = document.getElementById(oldIn);
   var output_text = document.getElementById(newOut);

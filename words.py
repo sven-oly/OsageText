@@ -25,6 +25,7 @@ class OsagePhraseDB(db.Model):
     osagePhraseLatin = db.StringProperty(u'')
     osagePhraseUnicode = db.StringProperty(u'')
     status = db.StringProperty('')
+    comment = db.StringProperty('')
 
 
 # Retrieves data at a given index via AJAX. 
@@ -68,10 +69,12 @@ class GetWordsHandler(webapp2.RequestHandler):
       utext = result.osagePhraseUnicode
       english = result.englishPhrase
       status = result.status
+      comment = result.comment
       errorMsg = '' 
     else:
       oldtext = utext = english = status = ''
-      errorMsg = 'No results found' 
+      errorMsg = 'No results found'
+      comment = ''
     obj = {
         'index': index,
         'oldtext': oldtext,
@@ -79,6 +82,7 @@ class GetWordsHandler(webapp2.RequestHandler):
         'english': english,
         'status': status,
         'error': errorMsg,
+        'comment': comment,
     }
     self.response.out.write(json.dumps(obj))
 
@@ -91,6 +95,7 @@ class WordHandler(webapp2.RequestHandler):
       utext = self.request.get('utext', '')
       english = self.request.get('english', '')
       index = int(self.request.get('index', '1'))
+      comment = self.request.get('comment', '')
       status = ''
 
       q = OsagePhraseDB.all()
@@ -105,6 +110,7 @@ class WordHandler(webapp2.RequestHandler):
         utext = result.osagePhraseUnicode
         english = result.englishPhrase
         status = result.status
+        comment = result.comment
       #logging.info('q = %s' % result)
       template_values = {
         'index': index,
@@ -113,7 +119,8 @@ class WordHandler(webapp2.RequestHandler):
         'oldtext': oldtext,
         'utext': utext,
         'english': english,
-        'status': status
+        'comment': comment,
+        'status': status,
       }
       path = os.path.join(os.path.dirname(__file__), 'words.html')
       self.response.out.write(template.render(path, template_values))
@@ -207,15 +214,14 @@ class UpdateStatus(webapp2.RequestHandler):
     index = int(self.request.get('index', '1'))
     newStatus = self.request.get('newStatus', 'Unknown')
     unicodePhrase = self.request.get('unicodePhrase', '')
-
-    #logging.info('UpdateStatus: index = %d, newStatus = >%s<, unicode = %s' %
-    # (index, newStatus, unicodePhrase))
+    comment = self.request.get('comment', '')
 
     q = OsagePhraseDB.all()
     q.filter("index =", index)
     result = q.get()
 
     result.status = newStatus;
+    result.comment = comment
     if unicodePhrase:
       result.osagePhraseUnicode = unicodePhrase
     result.put()
@@ -233,6 +239,7 @@ class AddPhrase(webapp2.RequestHandler):
     oldtext = self.request.get('oldtext', '')
     utext = self.request.get('utext', '')    
     engtext = self.request.get('engtext', '')
+    comment = self.request.get('comment', '')
 
     # Check if this already exists.
     q = OsagePhraseDB.all()
@@ -252,6 +259,7 @@ class AddPhrase(webapp2.RequestHandler):
         englishPhrase=engtext,
         osagePhraseLatin=oldtext,
         osagePhraseUnicode=utext,
+        comment=comment,
         status='Unknown')
       entry.put()
       message = 'New Osage message added at index %s' % entry.index  
@@ -262,7 +270,7 @@ class AddPhrase(webapp2.RequestHandler):
     self.response.out.write(json.dumps(response))
 
 
-# Resets status for given item.
+# Resets items from database.
 class GetPhrases(webapp2.RequestHandler): 
   def get(self):
     filterStatus = self.request.get('filterStatus', '')

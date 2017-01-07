@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
 
-  <title>Testing Osage Unicode and conversion</title>
+  <title>Review Conversion</title>
 
   <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
   <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
@@ -79,6 +79,7 @@
 		  var newIndex = document.getElementById('newIndex');
 		  var status = document.getElementById('status');
 		  var errorMsg = document.getElementById('errorMsg');
+          var comment = document.getElementById('comment');
 		  var json_obj = JSON.parse(returned_json);
           if (json_obj.error) {
             // Warn, and don't change values.
@@ -89,6 +90,7 @@
           newIndex.value = newIndex.innerHTML = json_obj.index;
           oldOsage.value = oldOsage.innerHTML = json_obj.oldtext;
           english.value = english.innerHTML = json_obj.english;
+          comment.value = comment.innerHTML = json_obj.comment;
 
           if (json_obj.utext) {
             unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
@@ -145,9 +147,10 @@
 	
   	// Set up the call with new status.
   	var newStatus = getStatusRadioButton(statusSetter); 
+    var comment = document.getElementById('comment').value;
 	
 	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus +
-	  "&unicodePhrase=" + unicodeData;
+	  "&unicodePhrase=" + unicodeData + "&comment=" + comment;
 	xmlhttp.open("GET", target, true);
 	var size = target.length;
 	xmlhttp.send(null);
@@ -197,12 +200,13 @@
     var oldTextObj = document.getElementById(oldOsageText);
     var uTextObj = document.getElementById(UnicodeOsageText);
     var englishTextObj = document.getElementById(englishText);
+    var comment = document.getElementById('comment');
     var oldText = oldTextObj.value;
     var unicodeText = uTextObj.innerHTML;
     var englishText = englishTextObj.value; 
     
 	var target = "/words/addPhrase/?oldtext=" + oldText + "&utext=" + unicodeText +
-	  "&engtext=" + englishText;
+	  "&engtext=" + englishText + "&comment=" + comment;
 	xmlhttp.open("GET", target, true);
 	var size = target.length;
 	xmlhttp.send(null);
@@ -254,20 +258,26 @@
       <input type="button" value="Update status"
            onclick="updatePhraseStatus('index', 'updateStatus');"/>
       </form>
+      <br />
+      <h4>Comment:</h4>
+      <textarea id="comment" class="default">{{comment}}</textarea>
+      <br />
       <div id='errorMsg'>{{error}}</div>
     </div>
 
     <div class="span-4 last">
       <h3>Total entries: {{numEntries}}</h3>
 
+      <form action="javascript:goTo('newIndex');">
       <input type="button" value="Previous"
            onclick="getPrevious();"/>
       <input type="button" value="Next"
            onclick="getNext();"/>
        <br />
-       <input type="button" value="Go to: "
-           onclick="goTo('newIndex');"/>
+       <input type="submit" value="Go to: "
+          />
       <input id='newIndex' type=text value='{{index}}' size='3'/>
+      </form>
       <br />
       <br />
       <h4>Filter by status:</h4>
@@ -285,7 +295,7 @@
      <input type="button" onclick="addPhraseToDatastore('OldOsage', 'UnicodeOsage', 'English');"
        value="Add new phrase to database">
      <hr />
-     <a href="/words/getPhrases/">View database. </a>       
+     <a href="/words/getPhrases/">View database</a>       
      </div> <!-- end span last -->
   </div> <!-- end container --> 
 </body>
