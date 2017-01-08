@@ -32,25 +32,26 @@
   <body onload="init()">
   <div class="container">
     <h2>Data from approved word list</h2>
-    <div class="span-10 default">
-    Number of entries returned: {{entries|length}}
+    <div class="span-8 default">
+    {{entries|length}} entries returned 
     {% if filter %}
     <br />
-    Filtered by status = "{{filter}}"
+    Status = "{{filter}}"
     {% endif %}
     </div>
-    <div class="span-10 last">
-     <form action="/words/getPhrases/" id="set_status">
-        <input type="submit" value="Filter by status">
-          <br />
-       <input type="radio" name="filterStatus" value="" checked> All phrases
-       <input type="radio" name="filterStatus" value="Unknown"> Unknown 
-        <input type="radio" name="filterStatus" value="Verified"> Verified
-        <br />
-        <input type="radio" name="filterStatus" value="Incorrect"> Incorrect
-        <input type="radio" name="filterStatus" value="Font"> Font
-        <input type="radio" name="filterStatus" value="Other"> Other
-     </form>  
+    <div class="span-14 default last">
+    <form action="/words/getPhrases/" id="set_status">
+
+      <input type="radio" name="filterStatus" value="" checked> All phrases
+      <input type="radio" name="filterStatus" value="Unknown"> Unknown 
+      <input type="radio" name="filterStatus" value="Verified"> Verified
+      <br />
+      <input type="radio" name="filterStatus" value="Incorrect"> Incorrect
+      <input type="radio" name="filterStatus" value="Font"> Font
+      <input type="radio" name="filterStatus" value="Other"> Other
+
+      <input type="submit" value="Filter by status">
+    </form>  
     </div>
   </div> <!-- container -->
   <div class="container">
@@ -59,6 +60,7 @@
     
     <div class="span-20 last">
     <table>
+    <br />
       <tr class="default">
         <th>Index</th>
         <th>Status</th>
