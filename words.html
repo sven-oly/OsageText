@@ -92,16 +92,21 @@
           english.value = english.innerHTML = json_obj.english;
           comment.value = comment.innerHTML = json_obj.comment;
 
+          var warning_box = document.getElementById('warning');
           if (json_obj.utext) {
             unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
             var uText = oldOsageToUnicode(json_obj.oldtext,
               false, true, false);
               if (!(uText === json_obj.utext)) {
-                alert("Warning: store Unicode data different from new conversion.\n\n" +
+                warning_box.style.display = 'block';
+                /*
+                  alert("Warning: stored Unicode data different from new conversion.\n\n" +
                   "Please convert, check, and update status!");
+                 */
               }
           } else {
             // Compute the conversion.
+            warning_box.style.display = 'none';
             convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
           }        
 
@@ -254,6 +259,11 @@
       <textarea id="English" class="default">{{english}}</textarea>
       <br />
       <h4>Status: <span id="status">{{status}}</span></h4>
+      <div id="warning" style="font-size:18px; background-color: orange; ">
+      Warning: The conversion of this data has changed!
+      <br />
+      Please select "Convert to Unicode", check the result, and update status!
+      </div>
       <br>
       <h4>Change status of this phrase:</h4>
       <form action="" id="set_status">
