@@ -428,8 +428,11 @@ var old_osage_chars =
   "[\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|\uf041\uf059|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf07b-\uf07e\uf0b6]|";
 
 function preParseOldOsage(instring) {
-  var combined_chars = old_osage_chars + osage_latin_chars;
-  var regex2 = new RegExp(combined_chars, "gi");
-  var outList = instring.match(regex2);
-  return outList;
+  if (typeof instring == 'string') {
+    var combined_chars = old_osage_chars + osage_latin_chars;
+    var regex2 = new RegExp(combined_chars, "gi");
+    var outList = instring.match(regex2);
+    return outList;
+  }
+  return null;
 }

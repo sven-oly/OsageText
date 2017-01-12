@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
+import main
+
 import csv
 import json
 import logging
@@ -9,6 +11,7 @@ import StringIO
 
 import urllib
 import webapp2
+
 
 # Help from http://nealbuerger.com/2013/12/google-app-engine-import-csv-to-datastore/
 from google.appengine.ext import blobstore
@@ -121,6 +124,7 @@ class WordHandler(webapp2.RequestHandler):
         'english': english,
         'comment': comment,
         'status': status,
+        'fontFamilies': main.OsageFonts,
       }
       path = os.path.join(os.path.dirname(__file__), 'words.html')
       self.response.out.write(template.render(path, template_values))

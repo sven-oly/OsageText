@@ -97,18 +97,21 @@
             unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
             var uText = oldOsageToUnicode(json_obj.oldtext,
               false, true, false);
-              if (!(uText === json_obj.utext)) {
+              if (uText !== json_obj.utext) {
                 warning_box.style.display = 'block';
                 /*
                   alert("Warning: stored Unicode data different from new conversion.\n\n" +
                   "Please convert, check, and update status!");
                  */
               }
+              else {
+                // Compute the conversion.
+                warning_box.style.display = 'none';
+                convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
+              }
           } else {
-            // Compute the conversion.
             warning_box.style.display = 'none';
-            convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
-          }        
+          }       
 
           var newStatus = json_obj.status;
           if (newStatus == "" || newStatus == "unknown") {
@@ -152,8 +155,12 @@
 	{
 	  if(xmlhttp.readyState==4) {
 	      var returned_json = xmlhttp.responseText;
-		  var json_obj = JSON.parse(returned_json);        
-     }
+		  var json_obj = JSON.parse(returned_json);
+		  if (json_obj.status) {
+		    var statusObj = document.getElementById("status"); 
+		    statusObj.value = statusObj.innerHTML = json_obj.status;     
+          }
+        }
 	}
 	
   	// Set up the call with new status.
@@ -223,7 +230,12 @@
 	xmlhttp.send(null);
   }
 
-
+  function onFontSelected(selected) {
+    var output_text = document.getElementById('UnicodeOsage');
+    var fontFam = selected.value;
+    output_text.style.fontFamily = fontFam;
+  }
+  
   // Initialize the page.
   function init() {
     convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
@@ -253,13 +265,19 @@
       <input type="checkbox" name="clearOsageDot" id="clearOsageDot" checked>Clear OldOsage dot?
       <input type="checkbox" name="convertLatin" id="convertLatin" checked>Convert Latin?
       <input type="checkbox" name="lowerCase" id="DoLower">To lower?
-	  <br />
+      Select font: <select onchange="onFontSelected(this);" id="selectKeyboard">
+        {% for font in fontFamilies %}
+        <option value="{{font}}">{{font}}</option>
+        {% endfor %}
+      </select>
+      <br />
 	  <textarea id="UnicodeOsage" class="unicodeOsageText">{{utext}}</textarea>
+
       <br />
       <textarea id="English" class="default">{{english}}</textarea>
       <br />
       <h4>Status: <span id="status">{{status}}</span></h4>
-      <div id="warning" style="font-size:18px; background-color: orange; ">
+      <div id="warning" style="font-size:18px; background-color: orange; display:none;">
       Warning: The conversion of this data has changed!
       <br />
       Please select "Convert to Unicode", check the result, and update status!

@@ -27,6 +27,22 @@
   <script src="/js/osageConverter.js"></script>
   <script src="/js/osage_utils.js"></script>
 
+  <script type="text/javascript" >
+  function init() {
+    var table=document.getElementById("dbTable");
+    var r=1;
+    while(row=table.rows[r++]) {
+      var c=0;
+      var oldOsageText = row.cells[2].innerText;
+      var oldUnicodeText = row.cells[3].innerText;
+      var uText = oldOsageToUnicode(oldOsageText,
+              false, true, false);
+      if (oldUnicodeText && oldUnicodeText != uText) {
+        row.cells[3].style.backgroundColor = "Orange";
+      }
+    }
+  }
+  </script>
   </head>
   
   <body onload="init()">
@@ -59,7 +75,7 @@
     </div>
     
     <div class="span-20 last">
-    <table>
+    <table id="dbTable">
     <br />
       <tr class="default">
         <th>Index</th>
@@ -71,7 +87,7 @@
 	  </tr>
       {% for entry in entries %}
       <tr class="default">
-        <td>{{entry.index}}</td>
+        <td><a href="/words/?index={{entry.index}}" target=_blank>{{entry.index}}</a></td>
         <td>{{entry.status}}</td>
         <td>{{entry.osagePhraseLatin}}</td>
         <td class="unicodeOsageText size18">{{entry.osagePhraseUnicode}}</td>
