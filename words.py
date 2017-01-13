@@ -126,11 +126,12 @@ class WordHandler(webapp2.RequestHandler):
         'status': status,
         'fontFamilies': main.OsageFonts,
       }
+      logging.info('WORDS = %s' % template_values)
       path = os.path.join(os.path.dirname(__file__), 'words.html')
       self.response.out.write(template.render(path, template_values))
 
 
-# TODO: Add approve
+# DONE: Add approve
 # Add controls for loading records
 #     for saving new status
 #     for getting records approved or not

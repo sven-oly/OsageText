@@ -91,27 +91,14 @@
           oldOsage.value = oldOsage.innerHTML = json_obj.oldtext;
           english.value = english.innerHTML = json_obj.english;
           comment.value = comment.innerHTML = json_obj.comment;
+          unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
 
-          var warning_box = document.getElementById('warning');
-          if (json_obj.utext) {
-            unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
-            var uText = oldOsageToUnicode(json_obj.oldtext,
-              false, true, false);
-              if (uText !== json_obj.utext) {
-                warning_box.style.display = 'block';
-                /*
-                  alert("Warning: stored Unicode data different from new conversion.\n\n" +
-                  "Please convert, check, and update status!");
-                 */
-              }
-              else {
-                // Compute the conversion.
-                warning_box.style.display = 'none';
-                convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
-              }
-          } else {
-            warning_box.style.display = 'none';
-          }       
+          var warnStatus = setWarningBox(json_obj.utext, json_obj.oldtext);
+          if (!warnStatus) {
+            // uText is either empty or same as converted.
+            convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
+          }
+          warning_box = document.getElementById('warning');     
 
           var newStatus = json_obj.status;
           if (newStatus == "" || newStatus == "unknown") {
@@ -236,9 +223,35 @@
     output_text.style.fontFamily = fontFam;
   }
   
+  function setWarningBox(oldUText, oldOsageText) {
+    var warning_box = document.getElementById('warning');
+    if (!oldUText) {
+      warning_box.style.display = 'none';
+      return false;
+    }
+    var convertedUText = oldOsageToUnicode(oldOsageText,
+         false, true, false);
+    if (convertedUText !== oldUText) {
+      warning_box.style.display = 'block';
+      return true;
+    }
+    else {
+      warning_box.style.display = 'none';
+      return false;
+    }
+  }
+
   // Initialize the page.
   function init() {
-    convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
+    // Set warning if store is not same as new conversion.
+    var oldOsageText = document.getElementById('OldOsage').value;
+    var uText = document.getElementById('UnicodeOsage').value;
+    var warnStatus = setWarningBox(uText, oldOsageText);
+  
+    if (!warnStatus) {
+      // uText is either empty or same as converted.
+      convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
+    }
     // Set initial status.
     var status = document.getElementById("status").innerHTML;
     setStatusRadioButton("updateStatus", status);
@@ -254,9 +267,7 @@
     <div class="span-1">  
     </div>
     <div class="span-16">
-      Total entries: {{numEntries}}
-      <br />
-      <h3>Index: <span id="index"><strong>{{index}}</strong></span></h3>
+      <h3>Index <span id="index">{{index}}</span> of {{numEntries}}</h3>
       <textarea id="OldOsage" class="oldOsageText" >{{oldtext}}</textarea>
       <br />
       <input type="button" value="Convert to Unicode"
@@ -301,8 +312,19 @@
     </div>
 
     <div class="span-4 last">
-      <h3>Total entries: {{numEntries}}</h3>
-
+    <h4>Osage links</h4>
+    <ul>
+        <li>
+          <a href="/keyboard/">Osage keyboard</a>
+        </li>
+       <li>
+         <a href="/words/getPhrases/">View database</a>       
+          <br />
+          <br />
+       </li>
+      </ul>
+      
+      <h4>Explore phrases:</h4>
       <form action="javascript:goTo('newIndex');">
       <input type="button" value="Previous"
            onclick="getPrevious();"/>
@@ -314,8 +336,7 @@
       <input id='newIndex' type=text value='{{index}}' size='3'/>
       </form>
       <br />
-      <br />
-      <h4>Filter by status:</h4>
+
       <form action="" id="set_status">
         <input type="radio" name="filterStatus" value="All" checked> All phrases (no filter)
         <br />
@@ -331,8 +352,7 @@
      <!-- Add a new value to the data store -->
      <input type="button" onclick="addPhraseToDatastore('OldOsage', 'UnicodeOsage', 'English');"
        value="Add new phrase to database">
-     <hr />
-     <a href="/words/getPhrases/">View database</a>       
+      
      </div> <!-- end span last -->
   </div> <!-- end container --> 
 </body>
