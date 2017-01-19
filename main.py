@@ -91,6 +91,18 @@ class OsageUload(webapp2.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
     self.response.out.write(template.render(path, template_values))
 
+class OsageDownload(webapp2.RequestHandler):
+  def get(self):
+    infile = self.request.get("infile", "")
+    outfile = self.request.get("outfile", "")
+    template_values = {
+      'infile': infile,
+      'outfile': outfile,
+    }
+    
+    path = os.path.join(os.path.dirname(__file__), 'osageDownloads.html')
+    self.response.out.write(template.render(path, template_values))
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -98,6 +110,7 @@ app = webapp2.WSGIApplication([
     ('/OsageConverter/test/', ConverterTestHandler),
     ('/OsageFonts/', OsageFontTest),
     ('/keyboard/', OsageKeyboard), 
+    ('/downloads/', OsageDownload), 
     ('/upload/', OsageUload), 
 
     ('/words/', words.WordHandler),

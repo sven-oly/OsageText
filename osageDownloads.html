@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+
+  <title>Download Osage resources</title>
+
+  <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
+  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
+  <![endif]-->
+
+  <link rel="stylesheet" type="text/css" href="/css/fonts.css">
+
+  <style>
+  textarea {
+    width: 600px;
+	height: 120px;
+	border: 3px solid #cccccc;
+	padding: 5px;
+	font-size: 24px;
+	}
+  {
+    font-family: "Courier New";
+  }
+  </style>
+  <script src="/js/utils.js"></script>
+  <script src="/js/osageConverter.js"></script>
+  <script src="/js/osage_utils.js"></script>
+  <script>
+
+ 
+  
+  function toggle(id, toggle) {
+    var obj = document.getElementById(id);
+    var checkBox = document.getElementById(toggle);
+    var showIt = checkBox.checked;
+    if(showIt)
+      obj.style.display = 'block';
+    else
+      obj.style.display = 'none';
+    }
+
+  function init() {
+    // Fill in if needed.
+    updateHex('old_font_input_text', 'old_hex');
+    updateHex('Unicode_font_output_text', 'new_hex');
+  }
+
+  </script>
+  </head>
+
+  <body onload="init()">
+  <div class="container">
+    <div class="span-1">  
+    </div>
+  <div class="span-16">
+    <h1>Download Osage fonts</h1>
+
+    <ul>
+      <li>
+        <a href="/fonts/osage-fonts-1-10/Avant/Avant.ttf" download
+          class="avant">Avant.ttf (𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟)</a>
+    </li>
+    <li>
+      <a href="/fonts/osage-fonts-1-10/Barnsdall-OsageDejavuSerif/Barnsdall.ttf" download
+        class="barnsdall">Barnsdall.ttf (𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟)</a>
+    </li>
+    <li>
+      <a href="/fonts/osage-fonts-1-10/Nelagoney/Nelagoney.ttf" download
+        class="nelagoney">Nelagoney.ttf (𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟)</a>
+    </li>
+    <li>
+      <a href="/fonts/osage-fonts-1-10/Pawhuska/Pawhuska.ttf" download
+        class="pawhuska">Pawhuska.ttf (𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟)</a>
+    </li>
+    <li>
+      <a href="/fonts/osage-fonts-1-10/Prue/Prue.ttf" download
+        class="prue">Prue.ttf (𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟)</a>
+    </li>
+    <li>
+      <a href="/fonts/osage-fonts-1-10/Wazhazhe-OsageTimes/Wazhazhe.ttf" download
+        class="wazhezhe">Wazhazhe.ttf (𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟)</a>
+    </li>
+    <li>
+      <a href="/fonts/osage-fonts-1-10/Wynona/Wynona.ttf" download
+        class="wynona">Wynona.ttf (𐓏𐓘𐓻𐓘𐓻𐓟 𐒻𐓟)</a>
+    </li>
+    </ul>
+  </div>
+  <div class="span-4 last">
+    <h3>Useful links</h3>
+      <ul>
+        <li>
+          <a href="javascript:toOsageFonts('Unicode_font_output_text', 'old_font_input_text');">Test Osage Fonts</a>
+        </li>
+        <li>
+          <a href="/keyboard/">Osage keyboard</a>
+        </li>
+        <li>
+          <a href="/words/">Review Osage phrases</a>
+       </li>
+       <li>
+         <a href="/words/getPhrases/">View database</a>       
+          <br />
+          <br />
+       </li>
+        <li>
+          <a href="http://www.unicode.org/charts/PDF/U104B0.pdf">Unicode Osage</a>
+        </li>
+        <li>
+           <a href="http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4619.pdf">Osage Unicode proposal</a>
+        </li>
+        <ol>
+    </div>
+  </div> <!-- container -->
+
+</body>
+</html>
