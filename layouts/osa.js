@@ -47,7 +47,7 @@ var OSA_UNICODE_LAYOUT = {
       '': '`{{¡}}™£¢\u221e§¶•{{\u25B8}}°–{{\u2260}}' +
         '{{\ud801\udcda}}{{\ud801\udceb}}{{\ud801\udce0}}{{\ud801\udcf3}}' +
           '{{\ud801\udcf4}}{{\u00a5}}' +
-          '{{}}{{\ud801\udce3\u0358}}{{\ud801\udcea\u0358}}' +
+          '{{\u0328}}{{\ud801\udce3\u0358}}{{\ud801\udcea\u0358}}' +
           '{{\ud801\udced}}{{\u201C}}{{\u2018}}{{\u00ab}}' +
 	  '{{\ud801\udcd9}}{{\ud801\udcef}}{{\ud801\udcf1}}{{}}' + 
 	     '{{\u00a9}}{{\ud801\udce2}}{{\ud801\udcdb\u0358}}' +

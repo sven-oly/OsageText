@@ -28,7 +28,7 @@ from google.appengine.ext.webapp import template
 
 # The Unicode fonts from Osage Nation.
 OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney', 
-  'Prue', 'Wazhezhe']
+  'Prue', 'Wazhezhe', 'Gadugi']
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):

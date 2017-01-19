@@ -50,6 +50,13 @@
       font-style:normal;
     }
     
+   @font-face{ 
+      font-family:'Gadugi';
+      src:url('/fonts/gadugi_116.ttf');
+      font-weight:normal;
+      font-style:normal;
+    }
+
     .unicodeOsageText {
       font-family:'Barnsdall';
       font-size: 32px;
@@ -90,4 +97,8 @@
 	font-size: 32px;
     }
 
+    .gadugi {
+    font-family:"Gadugi";
+    font-size: 32px;
+    }
     
