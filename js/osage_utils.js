@@ -211,4 +211,26 @@ function convertLatinToOldOsage(oldIn, newOut) {
       hex_output.value = hexString;
       hex_output.innerHTML = hexString;
     }
-  }  
+  }
+  
+  function onLayoutSelected(selector, controller, outputId) {
+    var layoutCode = selector.value;
+    controller.activateLayout(layoutCode);
+    document.getElementById(outputId).focus();
+    var vkbox = document.getElementById('kbd');
+
+      if (layoutCode == "osa_traditional") {
+        var field = document.getElementById("t1");
+        field.style.fontFamily = "OldOsage";
+        if (vkbox) {
+          vkbox.style.fontFamily = "OldOsage";
+        }
+      }
+      if (layoutCode == "osa") {
+        var field = document.getElementById("t1");
+        field.style.fontFamily = "Pawhuska";
+        if (vkbox) {
+          vkbox.style.fontFamily = "Pawhuska";
+       }
+      }
+    }

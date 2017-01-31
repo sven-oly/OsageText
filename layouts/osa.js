@@ -23,22 +23,22 @@ var OSA_UNICODE_LAYOUT = {
   'mappings': {
     '': {
       '': '{{\u0301}}1234567890-=' +
-        '{{\ud801\udcd8\u0358}}{{\ud801\udcf7}}{{\ud801\udcdf}}{{\ud801\udcf2}}' +
+        '{{\ud801\udce6}}{{\ud801\udcf7}}{{\ud801\udcdf}}{{\ud801\udcf2}}' +
 	      '{{\ud801\udcf5}}{{\ud801\udcfb}}{{\ud801\udcf6}}{{\ud801\udce3}}' +
 	      '{{\ud801\udcea}}{{\ud801\udcec}}[]\\' +
         '{{\ud801\udcd8}}{{\ud801\udcee}}{{\ud801\udcf0}}{{\u0358}}' +
-	      '{{\ud801\udcf9}}{{\ud801\udce1}}{{\ud801\udcdb}}{{\ud801\udce4}}' +
+	      '{{\ud801\udce2}}{{\ud801\udce1}}{{\ud801\udcdb}}{{\ud801\udce4}}' +
 	      '{{\ud801\udce7}}' + ';\'' +
         '{{\ud801\udcfa}}{{\ud801\udcf8}}{{\ud801\udcdd}}{{\ud801\udcef}}' +
 	      '{{\ud801\udcdc}}{{\ud801\udce9}}{{\ud801\udce8}},./'
     },
     's': {
       '': '{{\u030b}}!@#$%^&*()_+' +
-      '{{\ud801\udcb0\u0358}}{{\ud801\udccf}}{{\ud801\udcb7}}{{\ud801\udcca}}' +
+      '{{\ud801\udcbe}}{{\ud801\udccf}}{{\ud801\udcb7}}{{\ud801\udcca}}' +
 	    '{{\ud801\udccd}}{{\ud801\udcd3}}{{\ud801\udcce}}{{\ud801\udcbb}}' +
 	    '{{\ud801\udcc2}}{{\ud801\udcc4}}{}|' +
       '{{\ud801\udcb0}}{{\ud801\udcc6}}{{\ud801\udcc8}}{{\u0304}}' +
-	    '{{\ud801\udcd1}}{{\ud801\udcb9}}{{\ud801\udcb3}}{{\ud801\udcbc}}' +
+	    '{{\ud801\udcba}}{{\ud801\udcb9}}{{\ud801\udcb3}}{{\ud801\udcbc}}' +
 	    '{{\ud801\udcbf}}:"' +
       '{{\ud801\udcd2}}{{\ud801\udcd0}}{{\ud801\udcb5}}' +
 	    '{{\ud801\udcc7}}{{\ud801\udcb4}}{{\ud801\udcc1}}{{\ud801\udcc0}}<>?'
@@ -50,8 +50,8 @@ var OSA_UNICODE_LAYOUT = {
           '{{\u0328}}{{\ud801\udce3\u0358}}{{\ud801\udcea\u0358}}' +
           '{{\ud801\udced}}{{\u201C}}{{\u2018}}{{\u00ab}}' +
 	  '{{\ud801\udcd9}}{{\ud801\udcef}}{{\ud801\udcf1}}{{}}' + 
-	     '{{\u00a9}}{{\ud801\udce2}}{{\ud801\udcdb\u0358}}' +
-	     '{{\ud801\udce5}}{{\ud801\udce6}}{{\u2026}}{{\u2039}}' +
+	     '{{\u00a9}}{{\ud801\udcf9}}{{\ud801\udcdb\u0358}}' +
+	     '{{\ud801\udce5}}{{\ud801\udcd8\u0358}}{{\u2026}}{{\u2039}}' +
 	  '{{\ud801\udcfb}}{{\u2715}}{{\ud801\udcde}}{{\u2713}}' +
 	     '{{}}{{}}{{}}{{\u2264}}{{\u2265}}{{\u00f7}}'
     },
@@ -61,8 +61,8 @@ var OSA_UNICODE_LAYOUT = {
           '{{\ud801\udccc}}{{}}{{}}{{\ud801\udcbb\u0358}}' +
           '{{\ud801\udcc2\u0358}}{{\ud801\udcc5}}{{\u201d}}{{\u2019}}{{\u00bb}}' +
         '{{\ud801\udcb1}}{{\ud801\udcc7}}{{\ud801\udcc9}}{{}}' + 
-          '{{\u00ae}}{{\ud801\udcba}}{{\ud801\udcb3\u0358}}{{\ud801\udcbd}}' +
-          '{{\ud801\udcbe}}:{{\u203a}}' +
+          '{{\u00ae}}{{\ud801\udcd1}}{{\ud801\udcb3\u0358}}{{\ud801\udcbd}}' +
+          '{{\ud801\udcb0\u0358}}:{{\u203a}}' +
 	    '{{\ud801\udcd3}}{{\u2248}}{{\ud801\udcb6}}{{\u25c7}}' +
 	      '{{}}{{\u03c0}}{{\u03bc}}{{}}' +
 	      '{{}}{{\u00bf}}'

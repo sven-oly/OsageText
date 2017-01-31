@@ -28,6 +28,9 @@
   <script src="/js/utils.js"></script>
   <script src="/js/osageConverter.js"></script>
   <script src="/js/osage_utils.js"></script>
+  
+  <script src="/js/vk-debug.js"></script>
+
   <script>
 
   // When an area is changed, set the hex characters, too.
@@ -83,6 +86,24 @@
       obj.style.display = 'none';
     }
 
+  var controller, visible = true;
+  function initKeyboard(textAreaID) {
+      var input = document.getElementById(textAreaID);
+      controller = new i18n.input.keyboard.Keyboard();
+      controller.loadLayout('osa_traditional');
+      controller.loadLayout('osa');
+      controller.reposition(input, 2, 0, [1, 0, 0, 0]);
+      controller.register(input);
+      controller.addEventListener('kc', function() { visible = false; });
+      input.focus();
+      var selector = document.getElementById('selectKeyboard');
+      onLayoutSelected(selector, controller, textAreaID);
+  }
+
+  function onPageLoaded() {
+    initKeyboard('Unicode_font_output_text');
+  }  
+
   function init() {
     // Fill in if needed.
     updateHex('old_font_input_text', 'old_hex');
@@ -92,7 +113,7 @@
   </script>
   </head>
 
-  <body onload="init()">
+  <body onload="onPageLoaded();">
   <div class="container">
     <div class="span-1">  
     </div>
@@ -157,6 +178,10 @@
       {% for font in fontFamilies %}
       <option value="{{font}}">{{font}}</option>
       {% endfor %}
+    </select>
+    <select onchange="onLayoutSelected(this)" id="selectKeyboard">
+      <option value="osa">Osage Unicode</option>
+      <option value="osa_traditional">Osage Traditional</option>
     </select>
     <input type="checkbox" name="showUTools" id="showUTools"
       onchange="toggle('UnicodeOsageTools', 'showUTools');">Tools?<br />

@@ -30,7 +30,8 @@
 
     var controller, visible = true;
     function onPageLoaded() {
-      var input = document.getElementById('t1');
+      var outputArea = 't1';
+      var input = document.getElementById(outputArea);
       controller = new i18n.input.keyboard.Keyboard();
       controller.loadLayout('osa_traditional');
       controller.loadLayout('osa');
@@ -39,13 +40,13 @@
       controller.addEventListener('kc', function() { visible = false; });
       input.focus();
       var selector = document.getElementById('selectKeyboard');
-      onLayoutSelected(selector);
+      onLayoutSelected(selector, controller, outputArea);
     }
 
-    function onLayoutSelected(selector) {
+    function onLayoutSelected(selector, controller, outputId) {
     var layoutCode = selector.value;
     controller.activateLayout(layoutCode);
-    document.getElementById('t1').focus();
+    document.getElementById(outputId).focus();
     var vkbox = document.getElementById('kbd');
 
       if (layoutCode == "osa_traditional") {
@@ -101,7 +102,7 @@
     <div class="span-1">  
     </div>
   <div class="span-18 last">
-  <select onchange="onLayoutSelected(this)" id="selectKeyboard">
+  <select onchange="onLayoutSelected(this, 't1')" id="selectKeyboard">
     <option value="osa">Osage Unicode</option>
     <option value="osa_traditional">Osage Traditional</option>
   </select>
