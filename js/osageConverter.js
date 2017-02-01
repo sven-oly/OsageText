@@ -37,7 +37,7 @@ var osage_private_use_map = {
   '\uf038': '8',
   '\uf039': '9',
   '\uf03a': ':',
-  '\uf03b': [' ', ' '],  // Character is no longer used.
+  '\uf03b': [String.fromCodePoint(0x104C6) + String.fromCodePoint(0x104BC)],  // Character is no longer used.
   '\uf03c': '<',
   '\uf03d': '=',
   '\uf03e': '>',

@@ -12,42 +12,49 @@
       src:url('/fonts/osage-fonts-1-10/Wynona/Wynona.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
     @font-face{
       font-family:'Pawhuska';
       src:url('/fonts/osage-fonts-1-10/Pawhuska/Pawhuska.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
     @font-face{
       font-family:'Avant';
       src:url('/fonts/osage-fonts-1-10/Avant/Avant.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }   
     @font-face{
       font-family:'Barnsdall';
       src:url('/fonts/osage-fonts-1-10/Barnsdall-OsageDejavuSerif/Barnsdall.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
     @font-face{
       font-family:'Nelagoney';
       src:url('/fonts/osage-fonts-1-10/Nelagoney/Nelagoney.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
     @font-face{
       font-family:'Prue';
       src:url('/fonts/osage-fonts-1-10/Prue/Prue.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
     @font-face{ 
       font-family:'Wazhezhe';
       src:url('/fonts/osage-fonts-1-10/Wazhazhe-OsageTimes/Wazhazhe.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
     
    @font-face{ 
@@ -55,6 +62,7 @@
       src:url('/fonts/gadugi_116.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
 
     .unicodeOsageText {

@@ -32,6 +32,7 @@
       src:url('/fonts/osage-fonts-1-10/Pawhuska/Pawhuska.ttf');
       font-weight:normal;
       font-style:normal;
+      font-variant-ligatures: normal;
     }
     .pawhuska {
       font-family:'Pawhuska';
