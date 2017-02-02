@@ -101,6 +101,16 @@
       onLayoutSelected(selector, controller, textAreaID);
   }
 
+  function onLayoutSelected(selector, this_controller, outputId) {
+    var layoutCode = selector.value;
+    if (this_controller) {
+      this_controller.activateLayout(layoutCode);
+    } else {  // The global.
+      controller.activateLayout(layoutCode);
+    }
+    document.getElementById(outputId).focus();
+  }
+
   function onPageLoaded() {
     initKeyboard('Unicode_font_output_text');
   }  
@@ -180,7 +190,7 @@
       <option value="{{font}}">{{font}}</option>
       {% endfor %}
     </select>
-    <select onchange="onLayoutSelected(this)" id="selectKeyboard">
+    <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
       <option value="osa">Osage Unicode</option>
       <option value="osa_traditional">Osage Traditional</option>
     </select>

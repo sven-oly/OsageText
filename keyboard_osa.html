@@ -18,10 +18,10 @@
     <link rel="stylesheet" type="text/css" href="/css/keyboard.css">
 
     <script type="text/css">
-      .vk-button {font-family:Pawhuska,Osage,Arial;}
+      .vk-button {font-family: Pawhuska, Osage, Arial;}
       .input {font-size:18px;}
       .textarea {font-size:24px;}
-      .t1 {font-family:Pawhuska,Osage,Arial;}
+      .textarea {font-family: Pawhuska, Osage, Arial;}
     </script>
 
   <script src="/js/text_utils.js"></script>
@@ -52,17 +52,14 @@
     }
     document.getElementById(outputId).focus();
     var vkbox = document.getElementById('kbd');
+    var field = document.getElementById(outputId);
 
       if (layoutCode == "osa_traditional") {
-        var field = document.getElementById("t1");
         field.style.fontFamily = "Osage";
         if (vkbox) {
           vkbox.style.fontFamily = "Osage";
         }
-      }
-      if (layoutCode == "osa") {
-        var field = document.getElementById("t1");
-        field.style.fontFamily = "Pawhuska";
+      } else if (layoutCode == "osa") {
         if (vkbox) {
           vkbox.style.fontFamily = "Pawhuska";
        }
