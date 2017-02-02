@@ -87,7 +87,7 @@ var osage_private_use_map = {
   '\uf059\uf05e': [String.fromCodePoint(0x104bb)+combiningDotAboveRight],
   '\uf05a': [String.fromCodePoint(0x104d2)],  // ??
   '\uf05b': [String.fromCodePoint(0x104d3)],  // ??
-  '\uf05c': [' ', ' '],  // Character is no longer used.
+  '\uf05c': [String.fromCodePoint(0x104c6) + String.fromCodePoint(0x104c8)],  // Character is no longer used.
   '\uf05d': [String.fromCodePoint(0x104ca)],  // ??],
   '\uf05e': [combiningDotAboveRight],  // '^',
   '\uf05f': '_',
@@ -225,7 +225,7 @@ var osage_latin_to_unicode_map = {
   'Z':  [String.fromCodePoint(0x104d2), '\uf05a'],
   'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],  
   'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
-  ';':  [";", '\uf03b'],  // ??
+  ';':  [String.fromCodePoint(0x104C6) + String.fromCodePoint(0x104BC), '\uf03b'],  // ??
   '^':  [combiningDotAboveRight, '\uf05e'],
   ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
   '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
@@ -235,8 +235,8 @@ var osage_latin_to_unicode_map = {
   'H\]': [String.fromCodePoint(0x104cb), '\uf048\uf05d'],
   '}': ['}', '\uf05d'],
   '\/': [String.fromCodePoint(0x104be), '\uf03f'],
-  '|': ["|", '\uf05c'],
-  '\\': ["\\", '\uf05c'],
+  '|': [String.fromCodePoint(0x104c6) + String.fromCodePoint(0x104c8), '\uf05c'],
+  '\\': [String.fromCodePoint(0x104c6) + String.fromCodePoint(0x104c8), '\uf05c'],
   '\"': [String.fromCodePoint(0x104be), '\uf056'],
   // TODO: Finish these.
 }
