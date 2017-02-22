@@ -168,6 +168,24 @@ function fillWithLatinTests(target, hex_target, modifier) {
    updateHex(target, hex_target);
 }
 
+function fillWithLatinExtendedTests(target, hex_target, modifier) {
+  var output_text = document.getElementById(target);
+  var outputString = 
+    "A a Ə ə E e I i O o U u\u000a" +
+    "Ą ą Ə̨ ə Į į Ǫ ǫ\u000a" +
+    "Aį aį Eį eį Oį oį\u000a" +
+    "Ai ai Ā ā Ē ē Ī ī Ō ō Ū ū\u000a" +
+    "Ā ą̄ Į̄ ī Ǭ ǭ\u000a" +
+    "Á á É é Í í Ó ó Ú ú\u000a" +
+    "    Ǫ́ ǫ́\u000a" +
+    "Áį áį Éį éį Óį óį Ái ái\u000a" + 
+    "                   \u000a" +
+    "           ";
+  output_text.innerHTML = outputString;
+  output_text.value = outputString;
+   updateHex(target, hex_target);
+}
+
 // Check text encoding.  If in Latin, return converted text in Unicode.
 function convertLatinToOldOsage(oldIn, newOut) {
   var input_text = document.getElementById(oldIn);
