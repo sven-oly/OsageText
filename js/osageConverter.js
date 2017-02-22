@@ -283,9 +283,9 @@ var osage_latin_to_unicode_map = {
   'oį': [String.fromCodePoint(0x104eb), ''],
   // Accent + cedilla
   '\ue0b0': [String.fromCodePoint(0x104b0) + accent + combiningDotAboveRight, ''],
-  'Á\u328': [String.fromCodePoint(0x104b0) + accent + combiningDotAboveRight, ''],
+  'Á\u0328': [String.fromCodePoint(0x104b0) + accent + combiningDotAboveRight, ''],
   '\ue0b2': [String.fromCodePoint(0x104bb) + accent + combiningDotAboveRight, ''],
-  '\u00e1\u328': [String.fromCodePoint(0x104bb) + accent + combiningDotAboveRight, ''],
+  '\u00e1\u0328': [String.fromCodePoint(0x104bb) + accent + combiningDotAboveRight, ''],
   '\ue0b1': [String.fromCodePoint(0x104d8) + accent + combiningDotAboveRight, ''],
   '\ue0b1': [String.fromCodePoint(0x104d8) + accent + combiningDotAboveRight, ''],
   '\ue0b3': [String.fromCodePoint(0x104e3) + accent + combiningDotAboveRight, ''],
@@ -498,7 +498,7 @@ function latinToOldOsage(textIn, convertToLower) {
 // Removed 'uh'
 var osage_latin_chars =
   "\ue0b0|\ue0b1|\ue0b2|\ue0b3|" +
-  "Á\u328|\u00e1\u328|Í\u328|\u00ed\u328|Ó\u328|\u00f3\u0328|"
+  "Á\u0328|\u00e1\u0328|Í\u0328|\u00ed\u0328|Ó\u0328|\u00f3\u0328|"
     "Áį|áį|Éį|éį|Óį|óį|Ái|ái" + 
     "\ue070|\ue071|\ue072|\ue073|\ue074|\ue075|\ue076|\ue077\ue078\ue079|" +
     "\ue090|\ue091|\ue092|\ue093|\ue094|\ue095 " + 
