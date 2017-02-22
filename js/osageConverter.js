@@ -174,7 +174,7 @@ var osage_latin_to_unicode_map = {
   // Upper case input.
   'A': [String.fromCodePoint(0x104b0), '\uf041'],
   'Aa': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
-  'Ā': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
+  '\u0100\u0328': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
   'AA': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
   'A\'': [String.fromCodePoint(0x104b1), '\uf049'],
   'Á': [String.fromCodePoint(0x104b0) + accent, '\uf049'],
@@ -498,11 +498,13 @@ function latinToOldOsage(textIn, convertToLower) {
 // Removed 'uh'
 var osage_latin_chars =
   "\ue0b0|\ue0b1|\ue0b2|\ue0b3|" +
-  "Á\u0328|\u00e1\u0328|Í\u0328|\u00ed\u0328|Ó\u0328|\u00f3\u0328|"
+  "Á\u0328|\u00e1\u0328|Í\u0328|\u00ed\u0328|Ó\u0328|\u00f3\u0328|" +
     "Áį|áį|Éį|éį|Óį|óį|Ái|ái" + 
     "\ue070|\ue071|\ue072|\ue073|\ue074|\ue075|\ue076|\ue077\ue078\ue079|" +
-    "\ue090|\ue091|\ue092|\ue093|\ue094|\ue095 " + 
-    "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Aį|Eį|Oį|Ai|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|aį|eį|oį|ai||h\]|\u0328|" +
+    "\ue090|\ue091|\ue092|\ue093|\ue094|\ue095|" + 
+    "\u0100\u0328|" +
+    "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Aį|Eį|Oį|Ai|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|aį|eį|oį|ai||" +
+    "h\]|\u0328|" +
     "[aeouy]\f05e|aa|ee|ii|oo|uu|yy|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|iu|tsh|t[hs]|t|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
