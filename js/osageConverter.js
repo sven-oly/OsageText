@@ -113,6 +113,7 @@ var osage_latin_to_unicode_map = {
   'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'ā': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
+  'ą̄': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'a\'': [String.fromCodePoint(0x104d9), '\uf049'],
   'b':  [String.fromCodePoint(0x104dc), '\uf042'],
   'br': [String.fromCodePoint(0x104dc), '\uf042'],
@@ -178,6 +179,7 @@ var osage_latin_to_unicode_map = {
   'AA': [String.fromCodePoint(0x104b0)+macron, '\uf041\uf041'], // Macron
   'A\'': [String.fromCodePoint(0x104b1), '\uf049'],
   'Á': [String.fromCodePoint(0x104b0) + accent, '\uf049'],
+  'Ā': [String.fromCodePoint(0x104b0) + macron, '\uf049'],
   'B':  [String.fromCodePoint(0x104b4), '\uf042'],
   'Br': [String.fromCodePoint(0x104b4), '\uf042'],
   'BR': [String.fromCodePoint(0x104b4), '\uf042'],
@@ -497,15 +499,13 @@ function latinToOldOsage(textIn, convertToLower) {
 // vowel + ^, double vowels, dotted, pre-aspirated, single letters, non-letters
 // Removed 'uh'
 var osage_latin_chars =
-  "\ue0b0|\ue0b1|\ue0b2|\ue0b3|" +
-  "Á\u0328|\u00e1\u0328|Í\u0328|\u00ed\u0328|Ó\u0328|\u00f3\u0328|" +
-    "Áį|áį|Éį|éį|Óį|óį|Ái|ái" + 
-    "\ue070|\ue071|\ue072|\ue073|\ue074|\ue075|\ue076|\ue077\ue078\ue079|" +
-    "\ue090|\ue091|\ue092|\ue093|\ue094|\ue095|" + 
-    "\u0100\u0328|" +
-    "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Aį|Eį|Oį|Ai|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|aį|eį|oį|ai||" +
-    "h\]|\u0328|" +
-    "[aeouy]\f05e|aa|ee|ii|oo|uu|yy|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|iu|tsh|t[hs]|t|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
+  "[ÁÍÓ\u00e1\u00ed\u00f3\u0100]\u0328|" +  // Vowel followed by ogonek
+    "[AÁáEÉéOÓó]į|[ÁAáaeo]i" +  // Vowel + i-ogonek or i.
+    "[\ue070-\ue079\ue090-\ue095\ue0b0-\ue0b3]" +  // In private use range.
+    "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
+    "\u0328|" +  // Bare ogonek
+    "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
+    "iu|tsh|t[hs]|t|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}

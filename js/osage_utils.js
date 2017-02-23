@@ -173,8 +173,8 @@ function fillWithLatinExtendedTests(target, hex_target, modifier) {
   var outputString = 
     "A a Ə ə E e I i O o U u\u000a" +
     "Ą ą Ə̨ ə Į į Ǫ ǫ\u000a" +
-    "Aį aį Eį eį Oį oį\u000a" +
-    "Ai ai Ā ā Ē ē Ī ī Ō ō Ū ū\u000a" +
+    "Aį aį Eį eį Oį oį Ai ai\u000a" +
+    "Ā ā Ē ē Ī ī Ō ō Ū ū\u000a" +
     "\u0100\u0328 ą̄ Į̄ ī Ǭ ǭ\u000a" +
     "Á á É é Í í Ó ó Ú ú\u000a" +
     "    Ǫ́ ǫ́\u000a" +
