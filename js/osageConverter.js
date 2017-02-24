@@ -130,10 +130,10 @@ var osage_latin_to_unicode_map = {
   'h':  [String.fromCodePoint(0x104e1), '\uf048'],
   'hd':  [String.fromCodePoint(0x104f1), '\uf048\uf044'],
   'í':  [String.fromCodePoint(0x104e3) + accent, '\uf049'],
-  'i':  [String.fromCodePoint(0x104e3), '\uf049'],
-  'ii': [String.fromCodePoint(0x104e3)+macron, '\uf049\uf054'], // Macron
-  'ī': [String.fromCodePoint(0x104e3)+macron, '\uf049\uf054'], // Macron
-  'iI': [String.fromCodePoint(0x1043e)+macron, '\uf049\uf054'], // Macron
+  'i':  [String.fromCodePoint(0x104d9), '\uf049'],
+  'ii': [String.fromCodePoint(0x104d9)+macron, '\uf049\uf054'], // Macron
+  'ī': [String.fromCodePoint(0x104d9)+macron, '\uf049\uf054'], // Macron
+  'iI': [String.fromCodePoint(0x104d9)+macron, '\uf049\uf054'], // Macron
   'j':  [String.fromCodePoint(0x104db), '\uf04a'],
   'k':  [String.fromCodePoint(0x104e4), '\uf04b'],
   'hk': [String.fromCodePoint(0x104e5), '\uf048\uf04b'],
@@ -200,10 +200,10 @@ var osage_latin_to_unicode_map = {
   'HD': [String.fromCodePoint(0x104c9), '\uf048\uf044'],
   'H]': [String.fromCodePoint(0x104c9), '\uf048\uf044'],
   'HK': [String.fromCodePoint(0x104c3), '\uf048\uf04b'],
-  'Í':  [String.fromCodePoint(0x104bB) + accent, '\uf049'],
-  'I':  [String.fromCodePoint(0x104bB), '\uf049'],
-  'Ī': [String.fromCodePoint(0x104bB)+macron, '\uf049\uf049'], // Macron
-  'II': [String.fromCodePoint(0x104bB)+macron, '\uf049\uf049'], // Macron
+  'Í':  [String.fromCodePoint(0x104b1) + accent, '\uf049'],
+  'I':  [String.fromCodePoint(0x104b1), '\uf049'],
+  'Ī': [String.fromCodePoint(0x104b1)+macron, '\uf049\uf049'], // Macron
+  'II': [String.fromCodePoint(0x104b1)+macron, '\uf049\uf049'], // Macron
   'J':  [String.fromCodePoint(0x104b3), '\uf04a'],
   'K':  [String.fromCodePoint(0x104bc), '\uf04b'],
   'Hk': [String.fromCodePoint(0x104bd), '\uf048\uf04b'],
