@@ -45,11 +45,11 @@ var OSA_UNICODE_LAYOUT = {
     },
    'c': {  // alt-control
       '': '`{{¡}}™£¢\u221e§¶•{{\u25B8}}°–{{\u2260}}' +
-        '{{\ud801\udcda}}{{\ud801\udceb}}{{\ud801\udce0}}{{\ud801\udcf3}}' +
+        '{{\ud801\udcda}}{{}}{{\ud801\udce0}}{{\ud801\udcf3}}' +
           '{{\ud801\udcf4}}{{\u00a5}}' +
-          '{{\u0328}}{{\ud801\udce3\u0358}}{{\ud801\udcea\u0358}}' +
+          '{{\u0328}}{{\ud801\udcd9}}{{\ud801\udceb}}' +
           '{{\ud801\udced}}{{\u201C}}{{\u2018}}{{\u00ab}}' +
-	  '{{\ud801\udcd9}}{{\ud801\udcef}}{{\ud801\udcf1}}{{}}' + 
+	  '{{}}{{\ud801\udcef}}{{\ud801\udcf1}}{{}}' + 
 	     '{{\u00a9}}{{\ud801\udcf9}}{{\ud801\udcdb\u0358}}' +
 	     '{{\ud801\udce5}}{{\ud801\udcd8\u0358}}{{\u2026}}{{\u2039}}' +
 	  '{{\ud801\udcfb}}{{\u2715}}{{\ud801\udcde}}{{\u2713}}' +
@@ -57,10 +57,10 @@ var OSA_UNICODE_LAYOUT = {
     },
    'sc': {  // shift-alt-control
       '': '~/€{{\u00be}}¼½†‡·„‚—±' +
-        '{{\ud801\udcb2}}{{\ud801\udcc3}}{{\ud801\udcb8}}{{\ud801\udccb}}' +
-          '{{\ud801\udccc}}{{}}{{}}{{\ud801\udcbb\u0358}}' +
-          '{{\ud801\udcc2\u0358}}{{\ud801\udcc5}}{{\u201d}}{{\u2019}}{{\u00bb}}' +
-        '{{\ud801\udcb1}}{{\ud801\udcc7}}{{\ud801\udcc9}}{{}}' + 
+        '{{\ud801\udcb2}}{{}}{{\ud801\udcb8}}{{\ud801\udccb}}' +
+          '{{\ud801\udccc}}{{}}{{}}{{\ud801\udcb1}}' +
+          '{{\ud801\udcc3}}{{\ud801\udcc5}}{{\u201d}}{{\u2019}}{{\u00bb}}' +
+        '{{}}{{\ud801\udcc7}}{{\ud801\udcc9}}{{}}' + 
           '{{\u00ae}}{{\ud801\udcd1}}{{\ud801\udcb3\u0358}}{{\ud801\udcbd}}' +
           '{{\ud801\udcb0\u0358}}:{{\u203a}}' +
 	    '{{\ud801\udcd3}}{{\u2248}}{{\ud801\udcb6}}{{\u25c7}}' +
