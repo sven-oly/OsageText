@@ -108,10 +108,11 @@ class OsageDownload(webapp2.RequestHandler):
 class ProcessSlides(webapp2.RequestHandler):
 
   def get(self):
-    slideId = self.request.get("slideID", "")
+    # Default for testing.
+    slideID = self.request.get("slideID", "1ENL72hoOv5dn_YTaT3dSDYH1818uHKndqQaqZa4sThI")
     outfile = self.request.get("outfile", "")
     template_values = {
-      'infile': slideId,
+      'slideID': slideID,
       'outfile': outfile,
     }
     

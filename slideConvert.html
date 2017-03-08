@@ -108,7 +108,8 @@
        */
       function listSlides() {
         gapi.client.slides.presentations.get({
-          presentationId: '1ENL72hoOv5dn_YTaT3dSDYH1818uHKndqQaqZa4sThI'  // Osage sample presentation
+          presentationId: '{{slideID}}' //'1ENL72hoOv5dn_YTaT3dSDYH1818uHKndqQaqZa4sThI'
+          // '1ENL72hoOv5dn_YTaT3dSDYH1818uHKndqQaqZa4sThI'  // Osage sample presentation
           // '1EAYk18WDjIG-zp_0vLm3CsfQh_i8eXc67Jo2O9C6Vuc'  // Sample
         }).then(function(response) {
           var presentation = response.result;
@@ -139,12 +140,13 @@
                 textObj = "NONE";
               }
               appendPre('  ' + j + ' id = ' + elements[j].objectId + ', text = ' + textRaw);
-            }
-            if (true) { // textRaw[0] != ":") {
+            var c= textRaw.substring(0,1);
+            if (textRaw.substring(0,1) != ":") {
               uText = oldOsageToUnicode(textRaw, false, true, true);
               appendPre('    converted = ' + uText);
               }
-          }
+            }
+         }
         }, function(response) {
           appendPre('Error: ' + response.result.error.message);
         });
