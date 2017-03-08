@@ -104,6 +104,21 @@ class OsageDownload(webapp2.RequestHandler):
     self.response.out.write(template.render(path, template_values))
 
 
+## TODO: Finish this.
+class ProcessSlides(webapp2.RequestHandler):
+
+  def get(self):
+    slideId = self.request.get("slideID", "")
+    outfile = self.request.get("outfile", "")
+    template_values = {
+      'infile': slideId,
+      'outfile': outfile,
+    }
+    
+    path = os.path.join(os.path.dirname(__file__), 'slideConvert.html')
+    self.response.out.write(template.render(path, template_values))
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/OsageConverter/', MainHandler),
@@ -120,6 +135,8 @@ app = webapp2.WSGIApplication([
     ('/words/getPhrases/', words.GetPhrases),
     ('/words/startUpload/', words.SolicitUpload),
     ('/words/updateStatus/', words.UpdateStatus),
-    ('/words/upload/', words.ProcessUpload),   
+    ('/words/upload/', words.ProcessUpload),
+    ('/slides/', ProcessSlides),   
+ 
   ], debug=True)
     
