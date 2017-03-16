@@ -21,9 +21,13 @@ from google.appengine.ext import db
 
 from google.appengine.ext.webapp import template
 
+# dbName will allow multiple sets of information to be stored and retrieved by that
+# value. Added 14-Mar-2017
+
 class OsagePhraseDB(db.Model):
     index = db.IntegerProperty()
-    lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True,)
+    dbName = db.StringProperty(u'')
+    lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
     englishPhrase = db.StringProperty(multiline=True)
     osagePhraseLatin = db.StringProperty(u'')
     osagePhraseUnicode = db.StringProperty(u'')
@@ -43,6 +47,7 @@ class GetWordsHandler(webapp2.RequestHandler):
     index = int(self.request.get('index', '1'))
     filterStatus = self.request.get('filterStatus', 'All')
     direction = int(self.request.get('direction', '0'))
+    dbName = self.request.get('dbName', '')
     
     #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
     #   (index, filterStatus, direction))
@@ -68,6 +73,7 @@ class GetWordsHandler(webapp2.RequestHandler):
     #logging.info('RESULT = %s' % (result))
     if result:
       index = result.index
+      dbName = result.dbName
       oldtext = result.osagePhraseLatin
       utext = result.osagePhraseUnicode
       english = result.englishPhrase
@@ -80,6 +86,7 @@ class GetWordsHandler(webapp2.RequestHandler):
       comment = ''
     obj = {
         'index': index,
+        'dbName': dbName,
         'oldtext': oldtext,
         'utext': utext,
         'english': english,
@@ -95,6 +102,7 @@ class WordHandler(webapp2.RequestHandler):
       fontList = []
       index = 1
       oldtext = self.request.get('oldtext', '')
+      dbName = self.request.get('dbName', '')
       utext = self.request.get('utext', '')
       english = self.request.get('english', '')
       index = int(self.request.get('index', '1'))
@@ -110,6 +118,7 @@ class WordHandler(webapp2.RequestHandler):
 
       if result:
         oldtext = result.osagePhraseLatin
+        dbName = result.dbName
         utext = result.osagePhraseUnicode
         english = result.englishPhrase
         status = result.status
@@ -117,6 +126,7 @@ class WordHandler(webapp2.RequestHandler):
       #logging.info('q = %s' % result)
       template_values = {
         'index': index,
+        'dbName': dbName,
         'numEntries': currentEntries,
         'fontFamilies': fontList,
         'oldtext': oldtext,
@@ -217,6 +227,7 @@ class ClearWords(webapp2.RequestHandler):
 class UpdateStatus(webapp2.RequestHandler): 
   def get(self):
     index = int(self.request.get('index', '1'))
+    dbName = self.request.get('dbName', '')
     newStatus = self.request.get('newStatus', 'Unknown')
     unicodePhrase = self.request.get('unicodePhrase', '')
     comment = self.request.get('comment', '')
@@ -242,6 +253,7 @@ class UpdateStatus(webapp2.RequestHandler):
 class AddPhrase(webapp2.RequestHandler): 
   def get(self):
     oldtext = self.request.get('oldtext', '')
+    dbName = self.request.get('dbName', '')
     utext = self.request.get('utext', '')    
     engtext = self.request.get('engtext', '')
     comment = self.request.get('comment', '')
@@ -261,6 +273,7 @@ class AddPhrase(webapp2.RequestHandler):
         if p.index > maxIndex:
           maxIndex = p.index
       entry = OsagePhraseDB(index=maxIndex + 1,
+        dbName=dbName,
         englishPhrase=engtext,
         osagePhraseLatin=oldtext,
         osagePhraseUnicode=utext,
@@ -279,9 +292,11 @@ class AddPhrase(webapp2.RequestHandler):
 class GetPhrases(webapp2.RequestHandler): 
   def get(self):
     filterStatus = self.request.get('filterStatus', '')
+    dbName = self.request.get('dbName', '')
     q = OsagePhraseDB.all()
     if filterStatus:
       q.filter('status =', filterStatus)
+    # TODO: Filter by dbName.
     q.order('index')
     
     numEntries = 0
@@ -340,6 +355,7 @@ def utf_8_encoder(unicode_csv_data):
 def processRow(index, row):
   english, osageLatin = row
   #logging.info('!! index = %d     english= %s' % (index, english))
+  # TODO: dbName
   entry = OsagePhraseDB(index=index,
     englishPhrase=english,
     osagePhraseLatin=osageLatin,
@@ -351,6 +367,7 @@ def processRow(index, row):
 def process_csv(fileInfo):
   stringReader = unicode_csv_reader(StringIO.StringIO(fileInfo))
   entries = []
+  # TODO: dbName
   for row in stringReader:
     english, osageLatin = row
     #logging.info('!!     english= %s' % english)

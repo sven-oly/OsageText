@@ -7,7 +7,6 @@ var firstOsageUpper = 0x104B0;
 var lastOsageUpper = 0x104D3;
 
 // TODO 13-Dec-2016:
-// 1. Simplify lower/upper conversion using the offset above.
 // 2. Create a Python transliteration.
 // 3. Simplify the regular expressions. Mostly done 13-Dec.
 
@@ -155,6 +154,7 @@ var osage_latin_to_unicode_map = {
   'ts': [String.fromCodePoint(0x104f2), '\uf05d'],
   'hts': [String.fromCodePoint(0x104f3), '\uf054'],
   'tsh': [String.fromCodePoint(0x104f4), '\uf054'],
+  'ts\'': [String.fromCodePoint(0x104f4), '\uf054'],
   'ú':  [String.fromCodePoint(0x104f6) + accent, '\uf055'],
   'u':  [String.fromCodePoint(0x104f6), '\uf055'],
   'uh': [String.fromCodePoint(0x104db), '\uf04a'],
@@ -230,6 +230,8 @@ var osage_latin_to_unicode_map = {
   'Hts': [String.fromCodePoint(0x104cb), '\uf054'],
   'HTs': [String.fromCodePoint(0x104cb), '\uf054'],
   'HTS': [String.fromCodePoint(0x104cb), '\uf054'],
+  'Ts\'': [String.fromCodePoint(0x104cc), '\uf054'],
+  'TS\'': [String.fromCodePoint(0x104cc), '\uf054'],
   'Tsh': [String.fromCodePoint(0x104cc), '\uf054'],
   'TSh': [String.fromCodePoint(0x104cc), '\uf054'],
   'TSH': [String.fromCodePoint(0x104cc), '\uf054'],
@@ -505,7 +507,7 @@ var osage_latin_chars =
     "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
     "\u0328|" +  // Bare ogonek
     "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
-    "iu|tsh|t[hs]|t|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
+    "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}
