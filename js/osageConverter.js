@@ -501,7 +501,7 @@ function latinToOldOsage(textIn, convertToLower) {
 // vowel + ^, double vowels, dotted, pre-aspirated, single letters, non-letters
 // Removed 'uh'
 var osage_latin_chars =
-  "[ÁÍÓ\u00e1\u00ed\u00f3\u0100]\u0328|" +  // Vowel followed by ogonek
+  " / |[ÁÍÓ\u00e1\u00ed\u00f3\u0100]\u0328|" +  // Vowel followed by ogonek
     "[AÁáEÉéOÓó]į|[ÁAáaeo]i" +  // Vowel + i-ogonek or i.
     "[\ue070-\ue079\ue090-\ue095\ue0b0-\ue0b3]" +  // In private use range.
     "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
