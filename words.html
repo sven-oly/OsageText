@@ -132,6 +132,7 @@
     var indexObj = document.getElementById(indexArea);
     var index = parseInt(indexObj.innerText);
     var unicodeData = document.getElementById("UnicodeOsage").value;
+    var oldOsageData = document.getElementById("OldOsage").value;
 	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
 	} else { // code for IE6, IE5
@@ -156,7 +157,8 @@
     var comment = document.getElementById('comment').value;
 	
 	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus +
-	  "&unicodePhrase=" + unicodeData + "&comment=" + comment;
+	  "&unicodePhrase=" + unicodeData + "&comment=" + comment +
+	  "&oldOsageData=" + oldOsageData;
 	xmlhttp.open("GET", target, true);
 	var size = target.length;
 	xmlhttp.send(null);
@@ -315,6 +317,9 @@
     <div class="span-4 last">
     <h4>Osage links</h4>
     <ul>
+        <li>
+          <a href="/">Osage Main</a>
+        </li>
         <li>
           <a href="/keyboard/">Osage keyboard</a>
         </li>
