@@ -116,7 +116,20 @@ var OSA_UNICODE_LAYOUT = {
     '\ud801\udce3\ud801\udce3': '\ud801\udce3\u0304',  // ii
     '\ud801\udcce\ud801\udcce': '\ud801\udcce\u0304',  // II
     '\ud801\udcf6\ud801\udcf6': '\ud801\udcf6\u0304',  // ii
-    }
+    
+    '\ud801\udcb0\ud801\udcbb\u0358': '\ud801\udcb2', // AI.
+    '\ud801\udcb7\ud801\udcbb\u0358': '\ud801\udcb8', // EI.
+    '\ud801\udcc2\ud801\udcbb\u0358': '\ud801\udcc3', // OI.
+    '\ud801\udcb0\ud801\udce3\u0358': '\ud801\udcb2', // AI.
+    '\ud801\udcb7\ud801\udce3\u0358': '\ud801\udcb8', // EI.
+    '\ud801\udcc2\ud801\udce3\u0358': '\ud801\udcc3', // OI.
+    '\ud801\udcd8\ud801\udce3\u0358': '\ud801\udcda', // ai.
+    '\ud801\udcdf\ud801\udce3\u0358': '\ud801\udce0', // ei.
+    '\ud801\udcea\ud801\udce3\u0358': '\ud801\udceb', // oi.
+    '\ud801\udcd8\ud801\udcbb\u0358': '\ud801\udcda', // ai.
+    '\ud801\udcdf\ud801\udcbb\u0358': '\ud801\udce0', // ei.
+    '\ud801\udcea\ud801\udcbb\u0358': '\ud801\udceb', // oi.
+   }
 };
 
 // Load the layout and inform the keyboard to switch layout if necessary.
