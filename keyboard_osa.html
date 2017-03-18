@@ -63,7 +63,8 @@
       } else if (layoutCode == "osa") {
         if (vkbox) {
           vkbox.style.fontFamily = "Pawhuska";
-       }
+      }
+      onFontSelected('selectFont', 't1');
     }
   }
 
@@ -91,7 +92,7 @@
 
    function onFontSelected(selected, area) {
      var output_text = document.getElementById(area);
-     var fontFam = selected.value;
+     var fontFam = selected.value + ", Osage";
      output_text.style.fontFamily = fontFam;
    }
   </script>

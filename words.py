@@ -230,7 +230,10 @@ class UpdateStatus(webapp2.RequestHandler):
     dbName = self.request.get('dbName', '')
     newStatus = self.request.get('newStatus', 'Unknown')
     unicodePhrase = self.request.get('unicodePhrase', '')
+    oldOsagePhrase = self.request.get('oldOsageData', '')
     comment = self.request.get('comment', '')
+
+    logging.info('Update index = %d, oldOsage = %s' % (index, oldOsagePhrase))
 
     q = OsagePhraseDB.all()
     q.filter("index =", index)
@@ -238,6 +241,9 @@ class UpdateStatus(webapp2.RequestHandler):
 
     result.status = newStatus;
     result.comment = comment
+    if oldOsagePhrase:
+      result.osagePhraseLatin = oldOsagePhrase
+
     if unicodePhrase:
       result.osagePhraseUnicode = unicodePhrase
     result.put()
@@ -245,7 +251,8 @@ class UpdateStatus(webapp2.RequestHandler):
     # Send update back to client
     obj = {
       'index': index,
-      'status' : result.status,   
+      'status' : result.status,  
+      'osagePhraseLatin' :  oldOsagePhrase,
     }
     self.response.out.write(json.dumps(obj))
 
