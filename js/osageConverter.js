@@ -325,6 +325,9 @@ var osage_latin_to_unicode_map = {
   // Cedilla combining
   '\u0328': [combiningDotAboveRight, ''],
 
+  ",\u000a": ",",
+  ",\u0020": ",",
+  
   // Do I need to consider the Unicode combos of the \ueXXX characters?
   
   // TODO: Finish these.
@@ -505,6 +508,7 @@ var osage_latin_chars =
     "[AÁáEÉéOÓó]į|[ÁAáaeo]i" +  // Vowel + i-ogonek or i.
     "[\ue070-\ue079\ue090-\ue095\ue0b0-\ue0b3]" +  // In private use range.
     "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
+    ",\u000a|,\u0020|" +  // Special cases for comma at end of word.
     "\u0328|" +  // Bare ogonek
     "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
     "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
