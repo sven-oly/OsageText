@@ -25,14 +25,20 @@ from google.appengine.ext.webapp import template
 # value. Added 14-Mar-2017
 
 class OsagePhraseDB(db.Model):
-    index = db.IntegerProperty()
-    dbName = db.StringProperty(u'')
-    lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
-    englishPhrase = db.StringProperty(multiline=True)
-    osagePhraseLatin = db.StringProperty(u'')
-    osagePhraseUnicode = db.StringProperty(u'')
-    status = db.StringProperty('')
-    comment = db.StringProperty('')
+  index = db.IntegerProperty()
+  dbName = db.StringProperty(u'')
+  lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
+  englishPhrase = db.StringProperty(multiline=True)
+  osagePhraseLatin = db.StringProperty(u'')
+  osagePhraseUnicode = db.StringProperty(u'')
+  status = db.StringProperty('')
+  comment = db.StringProperty('')
+
+
+# The set of registered db names.
+class OsageDbName(db.Model):
+  dbName = db.StringProperty(u'')
+  lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
 
 
 # Retrieves data at a given index via AJAX. 
@@ -165,6 +171,8 @@ class SolicitUpload(webapp2.RequestHandler):
   def get(self):
     # upload_url = blobstore.create_upload_url('upload')
     upload_url = '/words/upload/'
+    upload_url = '/words/uploadCSV/'
+
     #logging.info('$$$$$$$$$ upload_url %s' % upload_url)
 
     template_values = {'upload_url':upload_url}
@@ -178,7 +186,7 @@ class ProcessUpload(webapp2.RequestHandler):
     fileInfo = self.request.get('file')
     self.response.out.write(fileInfo)
 
-    #logging.info('$$$$$$$$$ fileInfo = %s' % fileInfo)
+    logging.info('$$$$$$$$$ fileInfo = %s' % fileInfo)
 
     # Update with new data.
     # TODO: check for duplicates
@@ -371,17 +379,109 @@ def processRow(index, row):
   entry.put()
   return entry
 
-def process_csv(fileInfo):
-  stringReader = unicode_csv_reader(StringIO.StringIO(fileInfo))
-  entries = []
-  # TODO: dbName
-  for row in stringReader:
-    english, osageLatin = row
-    #logging.info('!!     english= %s' % english)
-    entry = OsagePhraseDB(englishPhrase=english, osagePhraseLatin=osageLatin,
-      osagePhraseUnicode='',
-      status="Unknown",
-      lastUpdate=None)
-    entry.put()
-    entries.append(entry)
-  return entries
+
+class ProcessCSVUpload(webapp2.RequestHandler): 
+# http://stackoverflow.com/questions/2970599/upload-and-parse-csv-file-with-google-app-engine
+  def post(self):
+
+    self.response.headers['Content-Type'] = 'text/plain'   
+    csv_file = self.request.POST.get('file')
+    logging.info('ProcessCSVUpload csv_file = %s' % csv_file)
+    dbName = self.request.POST.get('dbName', '')
+    osageColumn = self.request.POST.get('osageColumn', 'B')
+    englishColumn = self.request.POST.get('englishColumn', 'A')
+    commentColumn = self.request.POST.get('commentColumn', 'C')
+    unicodeColumn = self.request.POST.get('UnicodeColumn', 'D')
+    skipLines = int(self.request.POST.get('skipLines', '0'))
+
+    self.response.out.write('File %s to dbName: %s \n' % (csv_file, dbName))
+    self.response.out.write('Columns: %s %s %s\n' % (osageColumn, englishColumn, commentColumn))
+    self.response.out.write('Skip lines = %d\n' % skipLines)
+    
+    fileReader = csv.reader(csv_file.file)
+    lineNum = 0
+    numProcessed = 0
+    columnMap = {
+      'A' : 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5 }
+    # TODO: Add Unicode Osage utext
+    utext = ''
+    # TODO: find maxIndex from existing entries in dbNam
+    maxIndex = 0
+
+    for row in fileReader:
+      # row is now a list containing all the column data in that row
+      if lineNum < skipLines:
+        self.response.out.write('Skipping line %d :  %s\n' % (lineNum, row))
+      else:
+        self.response.out.write('%3d: %s \n' % (lineNum, row))
+        
+        try:
+          englishPhrase = row[columnMap[englishColumn]]
+        except:
+          englishPhrase = ''
+        try:
+          osagePhraseLatin = row[columnMap[osageColumn]]
+        except:
+          osagePhraseLatin = ''
+        try:
+          comment = row[columnMap[commentColumn]]
+        except:
+          comment = ''
+        try:
+          utext = row[columnMap[unicodeColumn]]
+        except:
+          utext = ''
+        self.response.out.write('    E>%s<E \n' % (englishPhrase))
+        self.response.out.write('    O>%sO< \n' % (osagePhraseLatin))
+        self.response.out.write('    C>%s<C \n' % (comment))
+        self.response.out.write('    U>%s<Y\n' % (utext))
+
+        try:
+          entry = OsagePhraseDB(
+            index=maxIndex + 1,
+            dbName = dbName,
+            englishPhrase = englishPhrase,
+            osagePhraseLatin = osagePhraseLatin,
+            osagePhraseUnicode = utext,
+            comment = comment,
+            status = 'Unknown')
+          entry.put()
+          numProcessed += 1
+          maxIndex += 1
+        except:
+          self.response.out.write('  Cannot set item %d: %s' % (lineNum, row))
+          
+      lineNum += 1
+
+    self.response.out.write('\n %d lines processed\n' % (numProcessed))
+
+
+class AddDbName(webapp2.RequestHandler):
+  def get(self):
+    newName = self.request.get('dbName', '')
+    clear = self.request.get('clear', '')
+
+    q = OsageDbName.all()
+    if clear:
+      # Wipe out DB
+      for p in q.run():
+        OsageDbName.delete(p)
+      
+    if not newName:
+      nameList = []
+      for p in q.run():
+        nameList.append(p.dbName)
+      self.response.out.write('db Names = %s.\n' % nameList)
+      return
+
+    q.filter("dbName =", newName)
+    result = q.get()
+    
+    if result:
+      self.response.out.write('db Name = %s is already defined.\n' % newName)
+    else:
+      entry = OsageDbName(dbName=newName);
+      entry.put()
+      self.response.out.write('db Name = %s has been added defined.\n' % newName)
+
+        

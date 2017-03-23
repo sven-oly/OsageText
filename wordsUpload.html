@@ -7,6 +7,12 @@
     <form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
         Upload File:
         <input type="file" name="file"> <br>
+        Database name: <input type="text" name="dbName"><br>
+        Osage column: <input type="text" name="osageColumn"><br>
+        English column: <input type="text" name="englishColumn"><br>
+        Comment column: <input type="text" name="commentColumn"><br>
+        Unicode column: <input type="text" name="unicodeColumn"><br>
+        # lines to skip at start: <input type="text" name="skipLines"><br>
         <input type="submit" name="submit" value="Submit">
     </form>
   </body>

@@ -137,6 +137,8 @@ app = webapp2.WSGIApplication([
     ('/words/startUpload/', words.SolicitUpload),
     ('/words/updateStatus/', words.UpdateStatus),
     ('/words/upload/', words.ProcessUpload),
+    ('/words/uploadCSV/', words.ProcessCSVUpload),
+    ('/words/dbName/', words.AddDbName),
     ('/slides/', ProcessSlides),   
  
   ], debug=True)
