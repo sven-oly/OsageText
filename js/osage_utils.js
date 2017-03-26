@@ -252,3 +252,18 @@ function convertLatinToOldOsage(oldIn, newOut) {
        }
       }
     }
+
+  function toOsageFonts(area1, area2) {
+    // Open a comparison window with the resulting text.
+    var area1Elem = document.getElementById(area1);
+    var text1 = area1Elem.value;
+
+    text2 = "";
+    if (area2 != "") {
+      var area2Elem = document.getElementById(area2);
+      var text2= area2Elem.value;
+    }
+    compareUrl = "/OsageFonts/?utext=" + text1 + "&osageText=" + text2;
+
+    window.location=compareUrl;   
+  }

@@ -170,12 +170,17 @@ class GetDataHandler(webapp2.RequestHandler):
 class SolicitUpload(webapp2.RequestHandler):
   def get(self):
     # upload_url = blobstore.create_upload_url('upload')
-    upload_url = '/words/upload/'
     upload_url = '/words/uploadCSV/'
 
     #logging.info('$$$$$$$$$ upload_url %s' % upload_url)
+    q = OsageDbName.all()
+    dbNameList = [p.dbName for p in q.run()]
+    logging.info('dbNameList = %s' % dbNameList)
 
-    template_values = {'upload_url':upload_url}
+    template_values = {
+      'upload_url':upload_url,
+      'dbNames': dbNameList,
+    }
     path = os.path.join(os.path.dirname(__file__), 'wordsUpload.html')
     self.response.out.write(template.render(path, template_values))
 
@@ -384,7 +389,7 @@ class ProcessCSVUpload(webapp2.RequestHandler):
 # http://stackoverflow.com/questions/2970599/upload-and-parse-csv-file-with-google-app-engine
   def post(self):
 
-    self.response.headers['Content-Type'] = 'text/plain'   
+    #self.response.headers['Content-Type'] = 'text/plain'   
     csv_file = self.request.POST.get('file')
     logging.info('ProcessCSVUpload csv_file = %s' % csv_file)
     dbName = self.request.POST.get('dbName', '')
@@ -392,11 +397,13 @@ class ProcessCSVUpload(webapp2.RequestHandler):
     englishColumn = self.request.POST.get('englishColumn', 'A')
     commentColumn = self.request.POST.get('commentColumn', 'C')
     unicodeColumn = self.request.POST.get('UnicodeColumn', 'D')
-    skipLines = int(self.request.POST.get('skipLines', '0'))
+    skipLines = int(self.request.POST.get('skipLines', '1'))
 
-    self.response.out.write('File %s to dbName: %s \n' % (csv_file, dbName))
-    self.response.out.write('Columns: %s %s %s\n' % (osageColumn, englishColumn, commentColumn))
-    self.response.out.write('Skip lines = %d\n' % skipLines)
+    columns = [osageColumn, englishColumn, commentColumn, unicodeColumn]
+
+    #self.response.out.write('File %s to dbName: %s \n' % (csv_file, dbName))
+    #self.response.out.write('Columns: %s %s %s\n' % (osageColumn, englishColumn, commentColumn))
+    #self.response.out.write('Skip lines = %d\n' % skipLines)
     
     fileReader = csv.reader(csv_file.file)
     lineNum = 0
@@ -408,12 +415,15 @@ class ProcessCSVUpload(webapp2.RequestHandler):
     # TODO: find maxIndex from existing entries in dbNam
     maxIndex = 0
 
+    entries = []
     for row in fileReader:
       # row is now a list containing all the column data in that row
       if lineNum < skipLines:
-        self.response.out.write('Skipping line %d :  %s\n' % (lineNum, row))
+        x = 1
+        #self.response.out.write('Skipping line %d :  %s\n' % (lineNum, row))
       else:
-        self.response.out.write('%3d: %s \n' % (lineNum, row))
+        x = 0
+        #self.response.out.write('%3d: %s \n' % (lineNum, row))
         
         try:
           englishPhrase = row[columnMap[englishColumn]]
@@ -431,10 +441,10 @@ class ProcessCSVUpload(webapp2.RequestHandler):
           utext = row[columnMap[unicodeColumn]]
         except:
           utext = ''
-        self.response.out.write('    E>%s<E \n' % (englishPhrase))
-        self.response.out.write('    O>%sO< \n' % (osagePhraseLatin))
-        self.response.out.write('    C>%s<C \n' % (comment))
-        self.response.out.write('    U>%s<Y\n' % (utext))
+        #self.response.out.write('    E>%s<E \n' % (englishPhrase))
+        #self.response.out.write('    O>%sO< \n' % (osagePhraseLatin))
+        #self.response.out.write('    C>%s<C \n' % (comment))
+        #self.response.out.write('    U>%s<Y\n' % (utext))
 
         try:
           entry = OsagePhraseDB(
@@ -446,15 +456,26 @@ class ProcessCSVUpload(webapp2.RequestHandler):
             comment = comment,
             status = 'Unknown')
           entry.put()
+          entries.append(entry)         
           numProcessed += 1
           maxIndex += 1
         except:
-          self.response.out.write('  Cannot set item %d: %s' % (lineNum, row))
-          
+          y = 1
+          #self.response.out.write('  Cannot set item %d: %s' % (lineNum, row))
+
       lineNum += 1
 
-    self.response.out.write('\n %d lines processed\n' % (numProcessed))
+    # self.response.out.write('\n %d lines processed\n' % (numProcessed))
 
+    template_values = {
+      'dbname': dbName,
+      'skipLines': skipLines,
+      'columns': columns,
+      'numberLoaded': numProcessed,
+      'entries': entries,
+    }
+    path = os.path.join(os.path.dirname(__file__), 'DBUploadResults.html')
+    self.response.out.write(template.render(path, template_values))
 
 class AddDbName(webapp2.RequestHandler):
   def get(self):
@@ -466,6 +487,7 @@ class AddDbName(webapp2.RequestHandler):
       # Wipe out DB
       for p in q.run():
         OsageDbName.delete(p)
+      return
       
     if not newName:
       nameList = []

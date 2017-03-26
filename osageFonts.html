@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>Osage Unicode text with fonts
+    <title>{{scriptName}} Unicode text with fonts
    </title>
 
   <link rel="stylesheet" type="text/css" href="/css/fonts.css">
@@ -43,10 +43,42 @@
        output_id.value = input_text;
      }
    }
+   
+   function changeFontSize(selected) {
+     var fontObj = document.getElementById(selected);
+     var fontSize = fontObj.value;
+     {% for fontFam in fontFamilies %}
+       var div = document.getElementById("{{fontFam|lower}}_area");
+       div.style.fontSize = fontSize;
+     {% endfor %}
+   }
 
    function onload() {
      copyToAll("input_area");
    }
+
+  // DRAG FUNCTIONS   
+  function allowDrop(ev) {
+    ev.preventDefault();
+  }
+
+  function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+    ev.dataTransfer.setData("divObj", ev.target);
+    ev.dataTransfer.setData("prev", ev.currentTarget.previousElementSibling);
+  }
+
+  function drop(ev, targetElement) {
+    ev.preventDefault();
+    var movingId = ev.dataTransfer.getData("text");
+    var movingNode = document.getElementById(movingId);
+    var movingDiv = ev.dataTransfer.getData("divObj");
+    var parent = ev.currentTarget.parentNode;
+    var currentId = ev.target.id;
+    var currentTarget = ev.target;
+    parent.insertBefore(movingNode, targetElement); 
+    //ev.target.appendChild(document.getElementById(data));
+  }
    </script>
    
    </head>
@@ -57,43 +89,46 @@
   <div class="span-1">  
   </div>
   <div class="span-18 last">
-  <h2>Testing fonts for Unicode block of Osage script.</h2>
-  <br />
-  <h2>Fonts</h2>
+  <h2>Test Unicode fonts with {{scriptName}} script</h2>
   {% for fontFam in fontFamilies %}
-  <b>{{fontFam}}</b>
-  <br />
-  <text id="{{fontFam|lower}}_area" class="{{fontFam|lower}}" style="font-size:32px" colums="80" rows="2">
-  </text>
-  
-  <br />
-  <br />
+  <div id="{{fontFam}}_div" draggable="true" ondragstart="drag(event)" ondrop="drop(event,this)"
+    ondragover="allowDrop(event)">
+    &#9776;
+    <b>{{fontFam}}</b>
+    <br/>
+      <text id="{{fontFam|lower}}_area" class="{{fontFam|lower}}"
+      style="font-size:32px" colums="80" rows="2">{{utext}}</text>
+    <br />
+  </div>
   {% endfor %}
-  <br />
-    <input type="button"
-           onclick="fillAllWithUnicodeOsage('Unicode_font_output_text',
-                    'new_hex');"
-           value="Insert all Osage Unicode characters" />
-  <br />
-  <br />
-  Input:
-  <br />
-  <textarea id="input_area" class="avant" cols="60" rows="3" 
-    onchanged="copyToAll('input_area', null);">{{utext}}
-  </textarea>
+
+  <div id='osageUnicodeSource'>
+    <textarea id="input_area" class="avant" cols="60" rows="3" 
+      onchanged="copyToAll('input_area', null);">{{utext}}
+    </textarea>
+  </div>
   <input type="button"
            onclick="copyToAll('input_area',
                     null);"
            value="Copy to all" />
-  <br />
-  <br />
-  Old Osage:
-  <br />
-  <textarea id="oldosage_area" class="oldOsageText" cols="60" rows="3">{{osageText}}
-  </textarea>
-  <br />
-    </div>
-    <a href="/">Osage converter</a>    
+  Font size: <select id='fontSize'
+             onChange="changeFontSize('fontSize');">
+             <option value="10pt">10</option>
+             <option value="12pt">12</option>
+             <option value="14pt">14</option>
+             <option value="18pt">18</option>
+             <option value="24pt">24</option>
+             <option value="32pt" selected="selected">32</option>
+             <option value="36pt">36</option>
+             <option value="48pt">48</option>
+             <option value="64pt">64</option>
+           <select/>
+  <input type="button"
+           onclick="fillAllWithUnicodeOsage('Unicode_font_output_text',
+                    'new_hex');"
+           value="Insert all {{scriptName}} Unicode characters" /> 
+           
+  </div>
   </div>
   </body>
 </html>

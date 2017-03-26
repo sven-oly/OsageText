@@ -65,9 +65,22 @@
       font-variant-ligatures: normal;
     }
 
+   @font-face{ 
+      font-family:'NotoSansOsage-Regular';
+      src:url('/fonts/NotoSansOsage.ttf');
+      font-weight:normal;
+      font-style:normal;
+      font-variant-ligatures: normal;
+    }
+
     .unicodeOsageText {
       font-family:'Pawhuska';
       font-size: 32px;
+    }
+
+    .unicodeOsageText12 {
+      font-family:'Pawhuska';
+      font-size: 12px;
     }
 
     /* Classes for these text families */
@@ -109,4 +122,8 @@
     font-family:"Gadugi";
     font-size: 32px;
     }
-    
+
+    .notosansosage {
+    font-family:"NotoSansOsage";
+    font-size: 32px;
+    }

@@ -9,6 +9,7 @@
     <!-- Converting Text to Osage Unicode -->
     <script src="/js/osageConverter.js"></script>
     <script src="/js/osage_utils.js"></script>
+    <script src="/js/utils.js"></script>
 
   </head>
   <body>
@@ -107,6 +108,7 @@
        * https://docs.google.com/presentation/d/1EAYk18WDjIG-zp_0vLm3CsfQh_i8eXc67Jo2O9C6Vuc/edit
        */
       function listSlides() {
+        var regOsage = RegExp("[^a-z][A-Z\^\`\[\ ]+");
         gapi.client.slides.presentations.get({
           presentationId: '{{slideID}}' //'1ENL72hoOv5dn_YTaT3dSDYH1818uHKndqQaqZa4sThI'
           // '1ENL72hoOv5dn_YTaT3dSDYH1818uHKndqQaqZa4sThI'  // Osage sample presentation
@@ -115,19 +117,30 @@
           var presentation = response.result;
           var title = presentation.title;
           var length = presentation.slides.length;
-          appendPre('The presentation has title: ' + title + '. Its locale = ' +
+          appendPre('The presentation\'s title is ' + title + '. Its locale = ' +
             presentation.locale);
           appendPre('The presentation contains ' + length + ' slides:');
-          for (i = 0; i < length; i++) {
+          for (var i = 0; i < length; i++) {
             var slide = presentation.slides[i];
             var elements = slide.pageElements;
             appendPre('- Slide #' + (i + 1) + ' contains ' +
                 elements.length + ' elements.');
+          }
+
+          // For changes.
+          var batch = gapi.client.newBatch();
+
+          for (var i = 0; i < length; i++) {
+          var requests = [];
+            var slide = presentation.slides[i];
+            var elements = slide.pageElements;
+            appendPre('  Slide #' + (i + 1));
             for (j = 0; j < elements.length; j ++) {
               var shape = elements[j].shape;
               var textObj = undefined;
               var textElements = undefined;
               var textRaw = "";
+              var shape_id = elements[j].objectId;
               if (shape != undefined) {
                 textObj = shape.text;
                 textElements = textObj.textElements;
@@ -139,13 +152,39 @@
               } else {
                 textObj = "NONE";
               }
-              appendPre('  ' + j + ' id = ' + elements[j].objectId + ', text = ' + textRaw);
-            var c= textRaw.substring(0,1);
-            if (textRaw.substring(0,1) != ":") {
+              appendPre('  ' + j + ' id = ' + shape_id + ', text = ' + textRaw);
+            var c = textRaw.substring(0,1);
+            var matches = regOsage.exec(textRaw);
+            if (matches) {
               uText = oldOsageToUnicode(textRaw, false, true, true);
               appendPre('    converted = ' + uText);
+              requests.push({
+                'deleteText': {
+                  'objectId': shape_id,
+                  'textRange': {
+                    'type': 'ALL'
+                  }
+                }
+             });
+            requests.push({
+              'insertText': {
+                'objectId': shape_id,
+                'insertionIndex': 0,
+                'text': uText
+               }
+            });
               }
             }
+            appendPre('  End slide #' + (i + 1));
+            var body = {
+              'requests': requests
+            };
+            var response = gapi.client.slides.presentations.batchUpdate(
+               {
+                 'presentationId': '{{slideID}}',
+                 'body': body}
+          ).execute();
+            var x = response;
          }
         }, function(response) {
           appendPre('Error: ' + response.result.error.message);

@@ -4,15 +4,24 @@
   </head>
   
   <body>
+  <h2>Upload CV file to database from CSV file.</h2>
     <form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
-        Upload File:
+        Upload CSV File:
         <input type="file" name="file"> <br>
-        Database name: <input type="text" name="dbName"><br>
-        Osage column: <input type="text" name="osageColumn"><br>
-        English column: <input type="text" name="englishColumn"><br>
-        Comment column: <input type="text" name="commentColumn"><br>
-        Unicode column: <input type="text" name="unicodeColumn"><br>
-        # lines to skip at start: <input type="text" name="skipLines"><br>
+        {% if dbNameList|length > 0 %}
+        Database Name:
+        <select id="selectDatabase">
+          {% for dbName in dbNames %}
+            <option value="{{dbName}}">{{dbName}}</option>
+          {% endfor %}
+        </select><br />
+        {% endif %}
+        <br />
+        Osage column: <input type="text" size=3 name="osageColumn">
+        English column: <input type="text" size=3 name="englishColumn">
+        Comment column: <input type="text" size=3 name="commentColumn">
+        Unicode column: <input type="text" size=3 name="unicodeColumn">>
+        # lines to skip at start: <input type="text" size=3 name="skipLines" value="0"><br />
         <input type="submit" name="submit" value="Submit">
     </form>
   </body>
