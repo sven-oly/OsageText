@@ -122,6 +122,9 @@ class WordHandler(webapp2.RequestHandler):
       q.filter("index =", index)
       result = q.get()
 
+      dbq = OsageDbName.all()
+      dbNameList = [p.dbName for p in dbq.run()]
+
       if result:
         oldtext = result.osagePhraseLatin
         dbName = result.dbName
@@ -133,6 +136,7 @@ class WordHandler(webapp2.RequestHandler):
       template_values = {
         'index': index,
         'dbName': dbName,
+        'dbNameList': dbNameList,
         'numEntries': currentEntries,
         'fontFamilies': fontList,
         'oldtext': oldtext,
@@ -318,7 +322,12 @@ class GetPhrases(webapp2.RequestHandler):
       q.filter('status =', filterStatus)
     # TODO: Filter by dbName.
     q.order('index')
-    
+
+    # All available databases.
+    dbq = OsageDbName.all()
+    dbNameList = [p.dbName for p in dbq.run()]
+    logging.info('dbNameList = %s' % dbNameList)
+
     numEntries = 0
     entries = []
     nullIndexCount = 0
@@ -332,11 +341,10 @@ class GetPhrases(webapp2.RequestHandler):
     # TODO: get them, and sent to client
     template_values = {
       'entries': entries,
+      'dbNameList': dbNameList,
       'filter': filterStatus, 
     }
-    #logging.info('%d entries' % len(entries))
-    #self.response.out.write('!!! %d entries. %d with null index' % (numEntries, nullIndexCount))
-    #self.response.out.write(json.dumps(template_values))
+
     path = os.path.join(os.path.dirname(__file__), 'phrasesList.html')
     self.response.out.write(template.render(path, template_values))
   
