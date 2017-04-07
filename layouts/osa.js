@@ -49,7 +49,7 @@ var OSA_UNICODE_LAYOUT = {
           '{{\ud801\udcf3}}{{\u00a5}}' +
           '{{}}{{\ud801\udcd9}}{{\ud801\udceb}}' +
           '{{\ud801\udced}}{{\u201C}}{{\u2018}}{{\u00ab}}' +
-	  '{{\ud801\udcda}}{{\ud801\udcef}}{{\ud801\udcf1}}{{\u0328}}' + 
+	  '{{\ud801\udcda}}{{\ud801\udcef}}{{\ud801\udcf1}}{{}}' + 
 	     '{{\u00a9}}{{}}{{\ud801\udcdb\u0358}}' +
 	     '{{\ud801\udce5}}{{}}{{\u2026}}{{\u2039}}' +
 	  '{{}}{{\ud801\udcf9}}{{\ud801\udcde}}{{\u2713}}' +

@@ -30,6 +30,8 @@ from google.appengine.ext.webapp import template
 OsageFonts = ['Gadugi', 'NotoSansOsage', 'Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney', 
   'Prue', 'Wazhezhe']
 
+Language = 'Osage'
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
       oldOsageInput = self.request.get("text", "")
@@ -53,6 +55,7 @@ class ConverterTestHandler(webapp2.RequestHandler):
       'fontFamilies': OsageFonts,
       'osageText': osageText,
       'utext': utext,
+      'language': Language,
     }
     
     path = os.path.join(os.path.dirname(__file__), 'testConvert.html')
@@ -67,6 +70,7 @@ class OsageFontTest(webapp2.RequestHandler):
       'fontFamilies': OsageFonts,
       'osageText': osageText,
       'utext': utext,
+      'language': Language,
     }
     
     path = os.path.join(os.path.dirname(__file__), 'osageFonts.html')
@@ -74,7 +78,9 @@ class OsageFontTest(webapp2.RequestHandler):
 
 class OsageKeyboard(webapp2.RequestHandler):
   def get(self):
-    template_values = {'fontFamilies': OsageFonts,
+    template_values = {
+      'fontFamilies': OsageFonts,
+      'language': Language,
     }
     
     path = os.path.join(os.path.dirname(__file__), 'keyboard_osa.html')
@@ -87,6 +93,7 @@ class OsageUload(webapp2.RequestHandler):
     template_values = {
       'infile': infile,
       'outfile': outfile,
+      'language': Language,
     }
     
     path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
@@ -99,6 +106,7 @@ class OsageDownload(webapp2.RequestHandler):
     template_values = {
       'infile': infile,
       'outfile': outfile,
+      'language': Language,
     }
     
     path = os.path.join(os.path.dirname(__file__), 'osageDownloads.html')
@@ -115,6 +123,7 @@ class ProcessSlides(webapp2.RequestHandler):
     template_values = {
       'slideID': slideID,
       'outfile': outfile,
+      'language': Language,
     }
     
     path = os.path.join(os.path.dirname(__file__), 'slideConvert.html')
