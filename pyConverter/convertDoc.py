@@ -22,7 +22,7 @@ UnicodeOsageFont = 'Pawhuska'
 latinOsagePattern2 = ur'[\^A-Z\[\]][A-Zaeo\[\]\^\\\'\/\._`,!]+'
 
 # This identifies traditional Osage private use characters
-traditionalOsageCharacters = ur'([\uf040-\uf05d]+)'
+traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
 
 # To avoid converting English words
 notOsageLatinLower = re.compile(r'[b-df-np-z]')
@@ -105,9 +105,10 @@ def parseDocXML(path_to_doc, saveConversion=False, outpath=None, isString=False)
               if value == OfficialOsageFont:
                 node.attrib[key] = UnicodeOsageFont
           else:
-            print '     %s NOT CONVERTED' % item.text.encode('utf-8')
-      #if True:  # len(textItems):
-      #  print 'rNode %d has %d Osage text items' % (osageNodeCount, len(convertedList))
+            print '     %s NOT CONVERTED (%d)' % (item.text.encode('utf-8'), len(item.text))
+            for c in item.text:
+              print ' code = 0x%4x' % ord(c),
+            print
 
   print '%d text items converted' % convertCount
 
@@ -185,7 +186,6 @@ def main(argv):
 
   paths_to_doc = args.filenames
 
-  print paths_to_doc
   for path in paths_to_doc:
     extension = os.path.splitext(path)[-1]
     if extension == '.docx':

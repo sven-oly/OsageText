@@ -27,7 +27,7 @@ UnicodeOsageFont = 'Pawhuska'
 latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo\[\]\^\\\'\/\._`,!]+'
 
 # This identifies traditional Osage private use characters
-traditionalOsageCharacters = ur'([\uf040-\uf05d]+)'
+traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
 
 # To avoid converting English words
 notOsageLatinLower = re.compile(r'[b-df-np-z]')
