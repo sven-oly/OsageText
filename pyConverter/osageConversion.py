@@ -388,6 +388,7 @@ def oldOsageToUnicode(textIn, convertToLower=False, convertLatin=True,
 
 def testConvertOld():
   # Debug!
+  print '\nOLD OSAGE'
   oldOsageText = u'\uf044\uf041\uf04e\uf059\uf020\uf057\uf041\uf04c\uf059\uf05e'  # u'\'
   expected = u'𐓈𐒰𐓁𐒻 𐓏𐒰𐒿𐒻͘'
 
@@ -397,17 +398,19 @@ def testConvertOld():
     print 'Old Osage = %s' % oldOsageText.encode('utf-8')
     print '** Not converting Old Osage: expected(%d) >%s<. Result(%d) = >%s<' % (len(expected), expected, len(result), result)
 
-    oldOsagePunctuation = u'\uf02d\uf020\uf05e'
-    result = oldOsageToUnicode(oldOsagePunctuation)
-    expected = u'-\u0020^'
-    if result == expected:
-      print 'Punctuation is as expected = %s' % result
-    else:
-      print ' len(expected) = %s vs. len(result) = %s' % (len(expected), len(result))
-      print 'Punctuation is *NOT* as expected(%d) = %s vs. result(%d) = %s' % (
-          len(expected), expected.encode('utf-8'), len(result), result.encode('utf-8'))
+  print '\nOLD OSAGE Punctuation'
+  oldOsagePunctuation = [(u'\uf02d' '-'), (u'\uf020', ' '), (u'\uf05e', '^')]
 
-    
+  for punct in oldOsagePunctuation:
+    result = oldOsageToUnicode(punct[0])
+    expected = punct[1]
+    if result == expected:
+      print '  Punctuation is as expected = %s' % result
+    else:
+      print '  Punctuation is *NOT* as expected(%d) = >%s< vs. result(%d) = >%s<' % (
+          len(expected), expected, len(result), result)
+
+
 def testConvertLatin():
   #intext = u"MYY^O^PA WEDOO ^PA AAIIHT UU oouuaa^iiee a\' A'Áįoi ts\' TS\' A\' \uf048"
   intext = u"] [a\' A'ÁįAįáįÉįÓįOįoi ts\' TS\' A\' \uf048"

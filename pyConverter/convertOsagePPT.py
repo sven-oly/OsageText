@@ -17,7 +17,7 @@ latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo\[\]\^\\\'\/\._`,!-]+'
 notOsageLatinLower = re.compile(r'[b-df-np-z]')
 
 # This identifies traditional Osage private use characters
-traditionalOsageCharacters = ur'([\uf040-\uf05d]+)'
+traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
 
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
@@ -111,7 +111,6 @@ def processOnePresentation(path_to_presentation, outputFont, output_dir=''):
 def main(argv):
   args = convertUtil.parseArgs()
   UnicodeOsageFont = args.font
-  print 'REPLACEMENT FONT = %s' % UnicodeOsageFont
 
   path_to_presentation = args.filenames
 
