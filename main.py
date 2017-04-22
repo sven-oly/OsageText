@@ -24,6 +24,7 @@ import os
 import urllib
 import webapp2
 
+from google.appengine.api import users
 from google.appengine.ext.webapp import template
 
 # The Unicode fonts from Osage Nation.
