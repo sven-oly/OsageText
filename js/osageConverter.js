@@ -327,7 +327,9 @@ var osage_latin_to_unicode_map = {
 
   ",\u000a": ",",
   ",\u0020": ",",
-  
+  ".": "",    // Remove period.
+  ".\u2008": ".",    // Leave period.
+
   // Do I need to consider the Unicode combos of the \ueXXX characters?
   
   // TODO: Finish these.
@@ -374,7 +376,11 @@ function oldOsageToUnicode(textIn, convertToLower, convertLatin, clearOsageDot) 
       if (result == null) {
         out = c;
       } else {
-        out = result[0];
+        if (result.length == 0) {
+          c = result;
+        } else {
+          out = result[0];
+        }
       }
     }
     convertResult += out;
@@ -509,9 +515,10 @@ var osage_latin_chars =
     "[\ue070-\ue079\ue090-\ue095\ue0b0-\ue0b3]" +  // In private use range.
     "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
     ",\u000a|,\u0020|" +  // Special cases for comma at end of word.
+    "\.\u000a|\.\u0020|\.$|\.\u2008|" +  // Special cases for period vs. Osage separator.
     "\u0328|" +  // Bare ogonek
     "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
-    "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
+    "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\.|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}
@@ -530,6 +537,11 @@ function preParseOldOsage(instring) {
   if (typeof instring == 'string') {
     var combined_chars = old_osage_chars + osage_latin_chars;
     var regex2 = new RegExp(combined_chars, "gi");
+    // Hack to avoid removing final period.
+    var lastChar = instring.charAt(instring.length - 1);
+    if (lastChar == ".") {
+      instring = instring + "\u2008";
+    }
     var outList = instring.match(regex2);
     return outList;
   }

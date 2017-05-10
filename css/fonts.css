@@ -66,8 +66,8 @@
     }
 
    @font-face{ 
-      font-family:'NotoSansOsage-Regular';
-      src:url('/fonts/NotoSansOsage.ttf');
+      font-family:'NotoSansOsage';
+      src:url('/fonts/NotoSansOsage-Regular.ttf');
       font-weight:normal;
       font-style:normal;
       font-variant-ligatures: normal;
