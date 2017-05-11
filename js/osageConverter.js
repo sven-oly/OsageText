@@ -254,7 +254,7 @@ var osage_latin_to_unicode_map = {
   'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
   ';':  [String.fromCodePoint(0x104C6) + String.fromCodePoint(0x104BC), '\uf03b'],  // ??
   '^':  [combiningDotAboveRight, '\uf05e'],
-  ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
+  ',':  [String.fromCodePoint(0x104ba), '\uf02c'],
   '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
   '{': ['{', '\uf05b'],
   '\]': [String.fromCodePoint(0x104ca), '\uf05d'],
@@ -377,7 +377,7 @@ function oldOsageToUnicode(textIn, convertToLower, convertLatin, clearOsageDot) 
         out = c;
       } else {
         if (result.length == 0) {
-          c = result;
+          out = result;
         } else {
           out = result[0];
         }
@@ -515,10 +515,11 @@ var osage_latin_chars =
     "[\ue070-\ue079\ue090-\ue095\ue0b0-\ue0b3]" +  // In private use range.
     "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
     ",\u000a|,\u0020|" +  // Special cases for comma at end of word.
-    "\.\u000a|\.\u0020|\.$|\.\u2008|" +  // Special cases for period vs. Osage separator.
+    "[\.]\u000a|" +
+    "[\.]\u0020|\.$|" +  // Special cases for period vs. Osage separator.
     "\u0328|" +  // Bare ogonek
     "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
-    "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\.|\\S|\\s";
+    "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
 // to be converted. E.g., 'htathanh' should give {"ht", "a", "th", "n", "h"}
