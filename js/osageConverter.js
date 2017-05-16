@@ -325,10 +325,10 @@ var osage_latin_to_unicode_map = {
   // Cedilla combining
   '\u0328': [combiningDotAboveRight, ''],
 
-  ",\u000a": ",",
-  ",\u0020": ",",
-  ".": "",    // Remove period.
-  ".\u2008": ".",    // Leave period.
+  ",\u000a": [",\u000a", ''],
+  ",\u0020": [", ", ''],
+  ".": ["", ''],  // Remove period.
+  ".\u2008": [".", ''],   // Leave period.
 
   // Do I need to consider the Unicode combos of the \ueXXX characters?
   
@@ -516,7 +516,7 @@ var osage_latin_chars =
     "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
     ",\u000a|,\u0020|" +  // Special cases for comma at end of word.
     "[\.]\u000a|" +
-    "[\.]\u0020|\.$|" +  // Special cases for period vs. Osage separator.
+    "[\.]\u0020|[\.]\u2008|" +  // Special cases for period vs. Osage separator.
     "\u0328|" +  // Bare ogonek
     "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
     "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";

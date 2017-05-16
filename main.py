@@ -28,8 +28,8 @@ from google.appengine.api import users
 from google.appengine.ext.webapp import template
 
 # The Unicode fonts from Osage Nation.
-OsageFonts = ['Gadugi', 'NotoSansOsage', 'Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney', 
-  'Prue', 'Wazhezhe']
+OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney', 
+  'Prue', 'Wazhezhe', 'Gadugi', 'NotoSansOsage']
 
 Language = 'Osage'
 
