@@ -538,6 +538,9 @@ function preParseOldOsage(instring) {
   if (typeof instring == 'string') {
     var combined_chars = old_osage_chars + osage_latin_chars;
     var regex2 = new RegExp(combined_chars, "gi");
+    // Replace the Old Osage dot and space with ASCII equivalents
+    instring = instring.replace(/\uf02e/gi, '.');
+    instring = instring.replace(/\uf020/gi, ' ');
     // Hack to avoid removing final period.
     var lastChar = instring.charAt(instring.length - 1);
     if (lastChar == ".") {
