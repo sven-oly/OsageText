@@ -263,6 +263,14 @@
       onchange="toggle('latin_area', 'showLatin');">Show Latin<br />
     </div>
   <div class="span-4 last">
+    {% if user_nickname %}
+    <h4>Welcome {{user_nickname}}
+    {% if user_logout %}
+    <a href={{user_logout}}>Logout</a>
+    {% endif %}
+    {% else %}
+    <a href='/login/'>Log in</a>
+    {% endif %}
     <h3>Useful links</h3>
       <ul>
         <li>

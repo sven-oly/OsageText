@@ -109,8 +109,7 @@ var osage_private_use_map = {
 var osage_latin_to_unicode_map = {
   'á': [String.fromCodePoint(0x104d8) + accent, '\uf061'],
   'a': [String.fromCodePoint(0x104b2), '\uf061'],
-  'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
-  'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
+  'aa': [String.fromCodePoint(0x104b2)+macron, '\uf041\uf041'], // Macron
   'ā': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'ą̄': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'a\'': [String.fromCodePoint(0x104d9), '\uf049'],
@@ -122,7 +121,7 @@ var osage_latin_to_unicode_map = {
   'd':  [String.fromCodePoint(0x104f0), '\uf044'],
   'é':  [String.fromCodePoint(0x104df) + accent, '\uf065'],
   'e':  [String.fromCodePoint(0x104b8), '\uf065'],
-  'ee': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
+  'ee': [String.fromCodePoint(0x104b8)+macron, '\uf045\uf045'], // Macron
   'ē': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
   'eE': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
   'g':  [String.fromCodePoint(0x104f9), '\uf059'],
@@ -142,7 +141,7 @@ var osage_latin_to_unicode_map = {
   'n':  [String.fromCodePoint(0x104e9), '\uf04e'],
   'ó': [String.fromCodePoint(0x104ea) + accent, '\uf06f'],
   'o': [String.fromCodePoint(0x104c3), '\uf06f'],
-  'oo': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
+  'oo': [String.fromCodePoint(0x104c3)+macron, '\uf04f\uf04f'], // Macron
   'ō': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
   'oO': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
   'p':  [String.fromCodePoint(0x104ec), '\uf050'],
@@ -518,7 +517,7 @@ var osage_latin_chars =
     "[\.]\u000a|" +
     "[\.]\u0020|[\.]\u2008|" +  // Special cases for period vs. Osage separator.
     "\u0328|" +  // Bare ogonek
-    "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
+    "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkp]|" +
     "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
