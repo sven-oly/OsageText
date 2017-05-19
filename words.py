@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 
 import main
+from users import getUserInfo
 
 import csv
 import json
@@ -12,12 +13,12 @@ import StringIO
 import urllib
 import webapp2
 
+from google.appengine.api import users
 
 # Help from http://nealbuerger.com/2013/12/google-app-engine-import-csv-to-datastore/
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 from google.appengine.ext import db
-
 
 from google.appengine.ext.webapp import template
 
@@ -50,6 +51,7 @@ class GetWordsHandler(webapp2.RequestHandler):
     self.response.out.write('GetWordsHandler received.\n')
 
   def get(self):
+    user_info = getUserInfo(self.request.url)
     index = int(self.request.get('index', '1'))
     filterStatus = self.request.get('filterStatus', 'All')
     direction = int(self.request.get('direction', '0'))
@@ -99,12 +101,16 @@ class GetWordsHandler(webapp2.RequestHandler):
         'status': status,
         'error': errorMsg,
         'comment': comment,
+        'user_nickname': user_info[1],
+        'user_logout': user_info[2],
+        'user_login_url': user_info[3],
     }
     self.response.out.write(json.dumps(obj))
 
 # Show data from word list converted for human verification
 class WordHandler(webapp2.RequestHandler):
     def get(self):
+      user_info = getUserInfo(self.request.url)
       fontList = []
       index = 1
       oldtext = self.request.get('oldtext', '')
@@ -145,8 +151,11 @@ class WordHandler(webapp2.RequestHandler):
         'comment': comment,
         'status': status,
         'fontFamilies': main.OsageFonts,
+        'user_nickname': user_info[1],
+        'user_logout': user_info[2],
+        'user_login_url': user_info[3],
       }
-      logging.info('WORDS = %s' % template_values)
+      # logging.info('WORDS = %s' % template_values)
       path = os.path.join(os.path.dirname(__file__), 'words.html')
       self.response.out.write(template.render(path, template_values))
 
@@ -175,6 +184,8 @@ class SolicitUpload(webapp2.RequestHandler):
   def get(self):
     # upload_url = blobstore.create_upload_url('upload')
     upload_url = '/words/uploadCSV/'
+
+    user_info = getUserInfo(self.request.url)
 
     #logging.info('$$$$$$$$$ upload_url %s' % upload_url)
     q = OsageDbName.all()
@@ -227,6 +238,7 @@ class ProcessUpload(webapp2.RequestHandler):
 # Clear out the entire phrase data store, or part of it (eventually)
 class ClearWords(webapp2.RequestHandler): 
   def get(self):
+    user_info = getUserInfo(self.request.url)
     q = OsagePhraseDB.all()
     numEntries = 0
     nullCount = 0
@@ -315,6 +327,8 @@ class AddPhrase(webapp2.RequestHandler):
 # Resets items from database.
 class GetPhrases(webapp2.RequestHandler): 
   def get(self):
+    user_info = getUserInfo(self.request.url)
+
     filterStatus = self.request.get('filterStatus', '')
     dbName = self.request.get('dbName', '')
     q = OsagePhraseDB.all()
@@ -342,7 +356,10 @@ class GetPhrases(webapp2.RequestHandler):
     template_values = {
       'entries': entries,
       'dbNameList': dbNameList,
-      'filter': filterStatus, 
+      'filter': filterStatus,
+      'user_nickname': user_info[1],
+      'user_logout': user_info[2],
+      'user_login_url': user_info[3],
     }
 
     path = os.path.join(os.path.dirname(__file__), 'phrasesList.html')
@@ -487,6 +504,8 @@ class ProcessCSVUpload(webapp2.RequestHandler):
 
 class AddDbName(webapp2.RequestHandler):
   def get(self):
+    user_info = getUserInfo(self.request.url)
+
     newName = self.request.get('dbName', '')
     clear = self.request.get('clear', '')
 

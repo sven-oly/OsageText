@@ -1,21 +1,8 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 #
-# Copyright 2007 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
 
+from users import getUserInfo
 import words
 
 import json
@@ -35,6 +22,8 @@ Language = 'Osage'
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+      user_info = getUserInfo(self.request.url)
+
       oldOsageInput = self.request.get("text", "")
       unicodeInput = self.request.get("utext", "")
       latinInput = self.request.get("latintext", "")
@@ -44,6 +33,9 @@ class MainHandler(webapp2.RequestHandler):
         'unicodeInput': unicodeInput,
         'latinInput': latinInput,
         'fontFamilies': OsageFonts,
+        'user_nickname': user_info[1],
+        'user_logout': user_info[2],
+        'user_login_url': user_info[3],
       }
       path = os.path.join(os.path.dirname(__file__), 'osage.html')
       self.response.out.write(template.render(path, template_values))     
@@ -64,6 +56,7 @@ class ConverterTestHandler(webapp2.RequestHandler):
 
 class OsageFontTest(webapp2.RequestHandler):
   def get(self):
+    user_info = getUserInfo(self.request.url)
     utext = self.request.get("utext", "")
     osageText = self.request.get("osageText", "")
     template_values = {
@@ -72,6 +65,9 @@ class OsageFontTest(webapp2.RequestHandler):
       'osageText': osageText,
       'utext': utext,
       'language': Language,
+      'user_nickname': user_info[1],
+      'user_logout': user_info[2],
+      'user_login_url': user_info[3],
     }
     
     path = os.path.join(os.path.dirname(__file__), 'osageFonts.html')
@@ -79,9 +75,13 @@ class OsageFontTest(webapp2.RequestHandler):
 
 class OsageKeyboard(webapp2.RequestHandler):
   def get(self):
+    user_info = getUserInfo(self.request.url, self.request.url)
     template_values = {
       'fontFamilies': OsageFonts,
       'language': Language,
+      'user_nickname': user_info[1],
+      'user_logout': user_info[2],
+      'user_login_url': user_info[3],
     }
     
     path = os.path.join(os.path.dirname(__file__), 'keyboard_osa.html')
@@ -89,12 +89,16 @@ class OsageKeyboard(webapp2.RequestHandler):
         
 class OsageUload(webapp2.RequestHandler):
   def get(self):
+    user_info = getUserInfo(self.request.url)
     infile = self.request.get("infile", "")
     outfile = self.request.get("outfile", "")
     template_values = {
       'infile': infile,
       'outfile': outfile,
       'language': Language,
+      'user_nickname': user_info[1],
+      'user_logout': user_info[2],
+      'user_login_url': user_info[3],
     }
     
     path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
@@ -131,6 +135,39 @@ class ProcessSlides(webapp2.RequestHandler):
     self.response.out.write(template.render(path, template_values))
 
 
+class LoginPageHandler(webapp2.RequestHandler):
+  def get(self):
+    user_info = getUserInfo(self.request.url)
+    user = users.get_current_user()
+    #logging.info(' ***** AUTH_DOMAIN = %s' %os.environ.get('AUTH_DOMAIN'))
+    logging.info('UUUUU = %s', user)
+    if user:
+      nickname = user.nickname()
+      logout_url = users.create_logout_url('/')
+      greeting = 'Welcome, {}! (<a href="{}">sign out</a>)'.format(
+        nickname, logout_url)
+      login_url = None
+    else:
+      nickname = None
+      logout_url = None
+      login_url = users.create_login_url('/')
+      greeting = '<a href="{}">Sign in</a>'.format(login_url)
+
+    logging.info('UUUUU greeting = %s', greeting)
+
+    #self.response.write(
+    #  '<html><body>{}</body></html>'.format(greeting))
+
+    template_values = {
+      'user_nickname': user_info[1],
+      'user_logout': user_info[2],
+      'user_login_url': user_info[3],
+      'language': Language,
+    }
+    path = os.path.join(os.path.dirname(__file__), 'login.html')
+    self.response.out.write(template.render(path, template_values))
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/OsageConverter/', MainHandler),
@@ -139,6 +176,8 @@ app = webapp2.WSGIApplication([
     ('/keyboard/', OsageKeyboard), 
     ('/downloads/', OsageDownload), 
     ('/upload/', OsageUload), 
+
+    ('/login/', LoginPageHandler), 
 
     ('/words/', words.WordHandler),
     ('/words/addPhrase/', words.AddPhrase),

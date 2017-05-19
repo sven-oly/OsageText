@@ -319,6 +319,14 @@
     </div>
 
     <div class="span-4 last">
+    {% if user_nickname %}
+    <h4>Welcome {{user_nickname}}
+    {% if user_logout %}
+    <a href={{user_logout}}>Logout</a>
+    {% endif %}
+    {% else %}
+    <a href='{{user_login_url}}'>Log in</a>
+    {% endif %}
     <h4>Osage links</h4>
     <ul>
         <li>
