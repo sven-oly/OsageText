@@ -297,7 +297,16 @@
         <li>
            <a href="http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4619.pdf">Osage Unicode proposal</a>
         </li>
-        <ol>
+
+        </ul>
+         {% if isAdmin %}
+        <hr>
+        <h4>Admin Functions</h4>
+        <ul>
+          <li><a href="/db/manageDB/">Manage Databases</a></li>
+          <li><a href="/db/resetDbEntries/">Reset Database Entries</a>
+        </ul>
+        {% endif %}
     </div>
   </div> <!-- container -->
 

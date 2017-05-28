@@ -2,7 +2,7 @@
 #!/usr/bin/env python
 
 import main
-from users import getUserInfo
+from userDB import getUserInfo
 
 import csv
 import json
@@ -34,15 +34,16 @@ class OsagePhraseDB(db.Model):
   osagePhraseUnicode = db.StringProperty(u'')
   status = db.StringProperty('')
   comment = db.StringProperty('')
+  reference = db.StringProperty('')  # Reference number or other identifier
 
 
 # The set of registered db names.
 class OsageDbName(db.Model):
   dbName = db.StringProperty(u'')
   lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
+  default = db.StringProperty(u'')
 
-
-# Retrieves data at a given index via AJAX. 
+# Retrieves data at a given index and dbName via AJAX. 
 class GetWordsHandler(webapp2.RequestHandler):
   def post(self):
     self.response.headers['Content-Type'] = 'text/plain'   
@@ -56,19 +57,40 @@ class GetWordsHandler(webapp2.RequestHandler):
     filterStatus = self.request.get('filterStatus', 'All')
     direction = int(self.request.get('direction', '0'))
     dbName = self.request.get('dbName', '')
+    databases = self.request.GET.getall('databases')
     
+    logging.info('GetWordsHandler databases = %s' % databases)
     #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
     #   (index, filterStatus, direction))
 
+    qdb = OsageDbName.all()
+    dbNames = [p.dbName for p in qdb.run()]
+
     q = OsagePhraseDB.all()
+
+    selectByDB = True
+    logging.info('GetWordsHandler DBNAME = %s' % dbName)
+    if '*All*' in databases:
+      logging.info('*All* in databases = %s' % databases)
+      selectByDB = False
+
+    if databases:
+      q.filter('dbName IN', databases)
+      logging.info('GetWordsHandler FILTER by databases = %s' % databases)
+
+    logging.info('Index = %s' % index)
+
     if filterStatus == 'All' or filterStatus == 'all':
       # Get the specified index, with no status filter.
-      #logging.info('Going for index = %d' % index)
+      #logging.info('GetWordsHandler Going for index = %d' % index)
       q.filter("index =", index)
     else:
       # Set up to get next phrase with required status and index >= query index.
       #logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
       q.filter('status =', filterStatus)
+      if selectByDB and databases:
+        q.filter('dbName IN', databases) 
+        logging.info('GetWordsHandler FILTER WITH DATABASES: %s' % databases)
       if direction < 0:
         q.filter('index <=', index)
         q.order('-index')
@@ -93,6 +115,8 @@ class GetWordsHandler(webapp2.RequestHandler):
       errorMsg = 'No results found'
       comment = ''
     obj = {
+        'language': main.Language,
+        'dbNames': dbNames,
         'index': index,
         'dbName': dbName,
         'oldtext': oldtext,
@@ -119,6 +143,7 @@ class WordHandler(webapp2.RequestHandler):
       english = self.request.get('english', '')
       index = int(self.request.get('index', '1'))
       comment = self.request.get('comment', '')
+      dbName = self.request.get('dbName', '')
       status = ''
 
       q = OsagePhraseDB.all()
@@ -126,6 +151,9 @@ class WordHandler(webapp2.RequestHandler):
       for p in q.run():
         currentEntries += 1
       q.filter("index =", index)
+      if dbName:
+        logging.info("dbName filter by %s" % dbName)
+        q.filter("dbName", dbName)
       result = q.get()
 
       dbq = OsageDbName.all()
@@ -140,9 +168,10 @@ class WordHandler(webapp2.RequestHandler):
         comment = result.comment
       #logging.info('q = %s' % result)
       template_values = {
+        'language': main.Language,
         'index': index,
         'dbName': dbName,
-        'dbNameList': dbNameList,
+        'dbNames': dbNameList,
         'numEntries': currentEntries,
         'fontFamilies': fontList,
         'oldtext': oldtext,
@@ -154,30 +183,12 @@ class WordHandler(webapp2.RequestHandler):
         'user_nickname': user_info[1],
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
+        'isAdmin': user_info[4],
       }
       # logging.info('WORDS = %s' % template_values)
       path = os.path.join(os.path.dirname(__file__), 'words.html')
       self.response.out.write(template.render(path, template_values))
 
-
-# DONE: Add approve
-# Add controls for loading records
-#     for saving new status
-#     for getting records approved or not
-#     for showing all records.
-
-class GetDataHandler(webapp2.RequestHandler):
-  def get(self):
-    # Get info from client on which item.
-
-    self.response.headers['Content-Type'] = 'application/json'   
-    
-    # TODO: fetch data
-    # TODO: put data into return object  
-    obj = {
-
-    }
-    self.response.out.write(json.dumps(obj))
 
 # Show simple interface for CSV upload.
 class SolicitUpload(webapp2.RequestHandler):
@@ -193,6 +204,7 @@ class SolicitUpload(webapp2.RequestHandler):
     logging.info('dbNameList = %s' % dbNameList)
 
     template_values = {
+      'language': main.Language,
       'upload_url':upload_url,
       'dbNames': dbNameList,
     }
@@ -239,17 +251,32 @@ class ProcessUpload(webapp2.RequestHandler):
 class ClearWords(webapp2.RequestHandler): 
   def get(self):
     user_info = getUserInfo(self.request.url)
+
+    confirmClear = self.request.get('confirmClear', False)
+    dbName = self.request.get('dbName', '')
+    if not confirmClear:
+      self.response.out.write('!!! Clearing DB %s not confirmed. No changes made.' %
+        dbName)
+      return 
+
+    logging.info('CLEAR DB %s' % dbName)
+    
     q = OsagePhraseDB.all()
     numEntries = 0
     nullCount = 0
+    numDeleted = 0
+    # TODO: repeat until all are deleted.
     for p in q.run():
       numEntries += 1
       if not p.index:
         nullCount += 1
-      OsagePhraseDB.delete(p)
-    # TODO: delete them, with message.
-    self.response.out.write('!!! Will delete %d null index entries.' % nullCount)
-    self.response.out.write('!!! Will delete all of the %d entries.' % numEntries)
+      if dbName == '*All*' or p.dbName == dbName:
+        OsagePhraseDB.delete(p)
+        numDeleted += 1
+
+    self.response.out.write('!!! Delete %d null index entries.' % nullCount)
+    self.response.out.write('!!! Deleted %d entries for DB %s total.' % (
+      numDeleted, dbName))
 
 
 # Updates the status of an entry and sets the Unicode field.
@@ -261,6 +288,7 @@ class UpdateStatus(webapp2.RequestHandler):
     unicodePhrase = self.request.get('unicodePhrase', '')
     oldOsagePhrase = self.request.get('oldOsageData', '')
     comment = self.request.get('comment', '')
+    dbName = self.request.get('dbName', '')
 
     logging.info('Update index = %d, oldOsage = %s' % (index, oldOsagePhrase))
 
@@ -270,6 +298,9 @@ class UpdateStatus(webapp2.RequestHandler):
 
     result.status = newStatus;
     result.comment = comment
+    if dbName:
+      result.dbName = dbName
+
     if oldOsagePhrase:
       result.osagePhraseLatin = oldOsagePhrase
 
@@ -279,6 +310,7 @@ class UpdateStatus(webapp2.RequestHandler):
     
     # Send update back to client
     obj = {
+      'language': main.Language,
       'index': index,
       'status' : result.status,  
       'osagePhraseLatin' :  oldOsagePhrase,
@@ -293,6 +325,7 @@ class AddPhrase(webapp2.RequestHandler):
     utext = self.request.get('utext', '')    
     engtext = self.request.get('engtext', '')
     comment = self.request.get('comment', '')
+    dbName = self.request.get('dbName', '')
 
     # Check if this already exists.
     q = OsagePhraseDB.all()
@@ -331,35 +364,66 @@ class GetPhrases(webapp2.RequestHandler):
 
     filterStatus = self.request.get('filterStatus', '')
     dbName = self.request.get('dbName', '')
+    databases = self.request.GET.getall('databases')
+    if databases == '*All*' or '*All*' in databases:
+      selectAllDB = True
+      databases = [] 
+    else:
+      selectAllDB = False
+    
+    logging.info('  **** Databases = %s, selectAllDB = %s' % (databases, selectAllDB)) 
+
     q = OsagePhraseDB.all()
     if filterStatus:
       q.filter('status =', filterStatus)
-    # TODO: Filter by dbName.
+    if not selectAllDB or databases:
+      if type(databases) is not list:
+        databases = [databases]
+      q.filter('dbName IN', databases) 
+      logging.info('FILTER WITH DATABASES: %s' % databases)
     q.order('index')
 
     # All available databases.
     dbq = OsageDbName.all()
-    dbNameList = [p.dbName for p in dbq.run()]
-    logging.info('dbNameList = %s' % dbNameList)
+    dbNames = [p.dbName for p in dbq.run()]
+    dbNameListChecked = []
+    for db in dbNames:
+      setcheck = db in databases
+      dbNameListChecked.append({'dbName':db, 'checked':setcheck})
+    # dbNameListChecked.append({'db':'All', 'checked':selectAllDB})
+
+    logging.info('dbNames = %s' % dbNames)
+    logging.info('dbNameListChecked = %s' % dbNameListChecked)
+    logging.info('dbNameList = %s' % dbNames)
+
+    # TODO: Make this user-specific.
+    defaultDB = dbNames[0]
 
     numEntries = 0
     entries = []
     nullIndexCount = 0
     for p in q.run():
       numEntries += 1
+
       if not p.index:
         nullIndexCount += 1
-      entry = (p.index, p.englishPhrase, p.osagePhraseLatin, p.osagePhraseUnicode,
-        p.status)
+        entry = (p.index, p.englishPhrase, p.osagePhraseLatin, p.osagePhraseUnicode,
+          p.status, p.dbName)
       entries.append(p)
     # TODO: get them, and sent to client
     template_values = {
+      'language': main.Language,
       'entries': entries,
-      'dbNameList': dbNameList,
+      'dbNames': dbNames,
+      'dbNameListChecked': dbNameListChecked,
+      'databases': databases,
+      'dbName': defaultDB,
       'filter': filterStatus,
+      'selectAllDB': selectAllDB,
       'user_nickname': user_info[1],
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
+      'isAdmin': user_info[4],
     }
 
     path = os.path.join(os.path.dirname(__file__), 'phrasesList.html')
@@ -418,27 +482,37 @@ class ProcessCSVUpload(webapp2.RequestHandler):
     csv_file = self.request.POST.get('file')
     logging.info('ProcessCSVUpload csv_file = %s' % csv_file)
     dbName = self.request.POST.get('dbName', '')
+    indexColumn = self.request.POST.get('indexColumn', '')
     osageColumn = self.request.POST.get('osageColumn', 'B')
-    englishColumn = self.request.POST.get('englishColumn', 'A')
-    commentColumn = self.request.POST.get('commentColumn', 'C')
-    unicodeColumn = self.request.POST.get('UnicodeColumn', 'D')
+    englishColumn = self.request.POST.get('englishColumn', 'D')
+    commentColumn = self.request.POST.get('commentColumn', '')
+    unicodeColumn = self.request.POST.get('UnicodeColumn', '')
+    referenceColumn = self.request.POST.get('referenceColumn', '')
     skipLines = int(self.request.POST.get('skipLines', '1'))
-
+    skipEmptyLines = self.request.POST.get('skipEmptyLines', False)
+    maxLines = int(self.request.POST.get('maxLines', -1))
+    
+    logging.info('skip Empty Lines = %s' % skipEmptyLines)
     columns = [osageColumn, englishColumn, commentColumn, unicodeColumn]
 
-    #self.response.out.write('File %s to dbName: %s \n' % (csv_file, dbName))
-    #self.response.out.write('Columns: %s %s %s\n' % (osageColumn, englishColumn, commentColumn))
-    #self.response.out.write('Skip lines = %d\n' % skipLines)
+    self.response.out.write('File %s to dbName: %s \n' % (csv_file, dbName))
+    self.response.out.write('Columns: %s %s %s\n' % (osageColumn, englishColumn, commentColumn))
+    self.response.out.write('Skip lines = %d\n' % skipLines)
+    self.response.out.write('Skip empty lines = %s\n' % skipEmptyLines)
+    self.response.out.write('maxLines = %s\n' % maxLines)
     
     fileReader = csv.reader(csv_file.file)
     lineNum = 0
     numProcessed = 0
+    # Spreadsheet to index map. Update if more than 7 columns
     columnMap = {
-      'A' : 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5 }
-    # TODO: Add Unicode Osage utext
-    utext = ''
+      'A' : 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6,
+      'a' : 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6,
+    }
+
     # TODO: find maxIndex from existing entries in dbNam
     maxIndex = 0
+    emptyLines = 0
 
     entries = []
     for row in fileReader:
@@ -450,6 +524,10 @@ class ProcessCSVUpload(webapp2.RequestHandler):
         x = 0
         #self.response.out.write('%3d: %s \n' % (lineNum, row))
         
+        try:
+          indexValue = int(row[columnMap[indexColumn]])
+        except:
+          indexValue = maxIndex + 1
         try:
           englishPhrase = row[columnMap[englishColumn]]
         except:
@@ -466,19 +544,29 @@ class ProcessCSVUpload(webapp2.RequestHandler):
           utext = row[columnMap[unicodeColumn]]
         except:
           utext = ''
+        try:
+          reference = row[columnMap[referenceColumn]]
+        except:
+          reference = ''
+
         #self.response.out.write('    E>%s<E \n' % (englishPhrase))
         #self.response.out.write('    O>%sO< \n' % (osagePhraseLatin))
         #self.response.out.write('    C>%s<C \n' % (comment))
         #self.response.out.write('    U>%s<Y\n' % (utext))
 
+        if (skipEmptyLines and not englishPhrase and not osagePhraseLatin and 
+          not utext):
+          emptyLines += 1
+          continue
         try:
           entry = OsagePhraseDB(
-            index=maxIndex + 1,
+            index=indexValue,
             dbName = dbName,
             englishPhrase = englishPhrase,
             osagePhraseLatin = osagePhraseLatin,
             osagePhraseUnicode = utext,
             comment = comment,
+            reference = reference,
             status = 'Unknown')
           entry.put()
           entries.append(entry)         
@@ -488,49 +576,22 @@ class ProcessCSVUpload(webapp2.RequestHandler):
           y = 1
           #self.response.out.write('  Cannot set item %d: %s' % (lineNum, row))
 
+        if maxLines > 0 and numProcessed > maxLines:
+          self.response.out.write('\n Stopped after maximum %d processed' % (numProcessed))
+          break
+
       lineNum += 1
 
     # self.response.out.write('\n %d lines processed\n' % (numProcessed))
 
     template_values = {
+      'language': main.Language,
       'dbname': dbName,
       'skipLines': skipLines,
       'columns': columns,
       'numberLoaded': numProcessed,
       'entries': entries,
+      'emptyLines': emptyLines,
     }
     path = os.path.join(os.path.dirname(__file__), 'DBUploadResults.html')
     self.response.out.write(template.render(path, template_values))
-
-class AddDbName(webapp2.RequestHandler):
-  def get(self):
-    user_info = getUserInfo(self.request.url)
-
-    newName = self.request.get('dbName', '')
-    clear = self.request.get('clear', '')
-
-    q = OsageDbName.all()
-    if clear:
-      # Wipe out DB
-      for p in q.run():
-        OsageDbName.delete(p)
-      return
-      
-    if not newName:
-      nameList = []
-      for p in q.run():
-        nameList.append(p.dbName)
-      self.response.out.write('db Names = %s.\n' % nameList)
-      return
-
-    q.filter("dbName =", newName)
-    result = q.get()
-    
-    if result:
-      self.response.out.write('db Name = %s is already defined.\n' % newName)
-    else:
-      entry = OsageDbName(dbName=newName);
-      entry.put()
-      self.response.out.write('db Name = %s has been added defined.\n' % newName)
-
-        

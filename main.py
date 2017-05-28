@@ -2,7 +2,10 @@
 #!/usr/bin/env python
 #
 
-from users import getUserInfo
+from userDB import getUserInfo
+
+import database
+import userDB
 import words
 
 import json
@@ -36,6 +39,7 @@ class MainHandler(webapp2.RequestHandler):
         'user_nickname': user_info[1],
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
+        'isAdmin': user_info[4],
       }
       path = os.path.join(os.path.dirname(__file__), 'osage.html')
       self.response.out.write(template.render(path, template_values))     
@@ -188,8 +192,15 @@ app = webapp2.WSGIApplication([
     ('/words/updateStatus/', words.UpdateStatus),
     ('/words/upload/', words.ProcessUpload),
     ('/words/uploadCSV/', words.ProcessCSVUpload),
-    ('/words/dbName/', words.AddDbName),
+    ('/db/manageDB/', words.SolicitUpload),
+    ('/db/handleDB/', database.ManageDbName),
+    ('/db/resetDbEntries/', database.ResetDBEntries),
     ('/slides/', ProcessSlides),   
- 
+
+    ('/users/', userDB.showUsers),
+    ('/users/manage/', userDB.manageUsers),
+    ('/users/add/', userDB.addUser),
+    ('/users/clear/', userDB.clearUsers),
+
   ], debug=True)
     

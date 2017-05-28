@@ -8,29 +8,41 @@
   
   Hello, {{user_nickname}}
   <br />
+  <h3>Exising users</h3>
+  {{userlist|length}} in user list. <br />
   {% for user in userlist %}
   <p>User: {{user.userEmail}} {{user.userPrivileges}} {{user.lastUpdate}}
   {% endfor %}
   
-  <form action="/addUser/" method="POST" enctype="multipart/form-data">
-        Add User:
+  <form action="/users/add/" method="GET" enctype="multipart/form-data">
+        <h3>Add User:</h3>
           <p>{{userEmail}} Email: <input type="text" size=30 name="userEmail">
+          <p>{{userName}} Name: <input type="text" size=30 name="name">
+           <!--
            <p>{{userPassword}} Password: <input type="text" size=20 name="userPassword">
-           <p>{{userPrivileges}} Privileges:
-           <div>
-              <input type="checkbox" id="admin" name="privileges" value="admin">
-              <label for="admin">Adminstrator</label>
-           </div>
-           <div>
-              <input type="checkbox" id="reviewer" name="privileges" value="reviewer">
-              <label for="reviewer">Reviewer</label>
-           </div>
-           <div>
-              <input type="checkbox" id="viewer" name="privileges" value="viewer">
-              <label for="viewer">Viewer</label>
-           </div>
-           <!-- TODO: Add check list -->
-           
+            -->
+           <p>{{userPrivileges}} Privileges:<br />
+           {% for role in roleList %}
+           <input type="checkbox" id="{{role}}" name="privileges" value="{{role}}">
+           <label for="{{role}}">{{role}}</label>
+           {% endfor %}
+                         
+        <p><input type="submit" name="submit" value="Submit">
+    </form>
+
+  <form action="/users/remove/" method="GET" enctype="multipart/form-data">
+        <h3>Remove User:</h3>
+          {% for user in userlist %}
+          <p>{{user.userEmail}}, {{user.userName}}
+          <input type="checkbox" name="userDelete"
+             value="{{user.id}}">
+             </p>
+          {% endfor %}
+
+           Confirm delete: <input type="checkbox" id="confirmDelete" name="confirmDelete"
+             value="confirmDelete">
+           {% endfor %}
+                         
         <p><input type="submit" name="submit" value="Submit">
     </form>
   </body>

@@ -65,9 +65,24 @@
       <input type="radio" name="filterStatus" value="Incorrect"> Incorrect
       <input type="radio" name="filterStatus" value="Font"> Font
       <input type="radio" name="filterStatus" value="Other"> Other
-
-      <input type="submit" value="Filter by status">
-    </form>  
+      <br />
+      Databases:
+        {% for db in dbNameListChecked %}
+          <input type="checkbox" name="databases" value="{{db.dbName}}"
+          {% if db.checked %}
+           checked
+          {% endif %}
+          />{{db.dbName}}
+        {% endfor %}
+        <input type="checkbox" name="databases" value="*All*"
+          {% if selectAllDB %}
+           checked
+          {% endif %}
+          >All<br />
+      </select>
+       <input type="submit" value="Select">
+   </form>
+           
     </div>
     <div class="span-4 last">
   
@@ -95,16 +110,18 @@
         <th>Unicode</th>
         <th>English</th>
         <th>Comment</th>
+        <th>DB</th>
 	  </tr>
       {% for entry in entries %}
       <tr class="default">
-        <td><a href="/words/?index={{entry.index}}" target=_blank>{{entry.index}}</a></td>
+        <td><a href="/words/?index={{entry.index}}&dbName={{entry.dbName}}" target=_blank>{{entry.index}}</a></td>
         <td>{{entry.status}}</td>
         <td>{{entry.osagePhraseLatin}}</td>
         <td class="unicodeOsageText size18">{{entry.osagePhraseUnicode}}</td>
         <td>{{entry.englishPhrase}}</td>
         <td>{{entry.comment}}</td>
-     </tr>
+        <td>{{entry.dbName}}</td>
+      </tr>
       {% endfor %}
     </table>
     </div>
