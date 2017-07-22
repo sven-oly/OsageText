@@ -94,7 +94,18 @@ var osage_private_use_map = {
   '\uf05f': '_',
   '\uf060': '`',
   '\uf061': [String.fromCodePoint(0x104b2)],  // ??
+  '\uf062': " ",
+  '\uf063': " ",
+  '\uf064': " ",
   '\uf065': [String.fromCodePoint(0x104b8)],  // ??
+  '\uf066': " ",
+  '\uf067': " ",
+  '\uf068': " ",
+  '\uf069': " ",
+  '\uf06a': " ",
+  '\uf06c': " ",
+  '\uf06d': " ",
+  '\uf06e': " ",
   '\uf06f': [String.fromCodePoint(0x104c3)],  // ??
   '\uf07b': '{',
   '\uf07c': '|',
@@ -109,8 +120,7 @@ var osage_private_use_map = {
 var osage_latin_to_unicode_map = {
   'á': [String.fromCodePoint(0x104d8) + accent, '\uf061'],
   'a': [String.fromCodePoint(0x104b2), '\uf061'],
-  'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
-  'aa': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
+  'aa': [String.fromCodePoint(0x104b2)+macron, '\uf041\uf041'], // Macron
   'ā': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'ą̄': [String.fromCodePoint(0x104d8)+macron, '\uf041\uf041'], // Macron
   'a\'': [String.fromCodePoint(0x104d9), '\uf049'],
@@ -122,7 +132,7 @@ var osage_latin_to_unicode_map = {
   'd':  [String.fromCodePoint(0x104f0), '\uf044'],
   'é':  [String.fromCodePoint(0x104df) + accent, '\uf065'],
   'e':  [String.fromCodePoint(0x104b8), '\uf065'],
-  'ee': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
+  'ee': [String.fromCodePoint(0x104b8)+macron, '\uf045\uf045'], // Macron
   'ē': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
   'eE': [String.fromCodePoint(0x104df)+macron, '\uf045\uf045'], // Macron
   'g':  [String.fromCodePoint(0x104f9), '\uf059'],
@@ -142,7 +152,7 @@ var osage_latin_to_unicode_map = {
   'n':  [String.fromCodePoint(0x104e9), '\uf04e'],
   'ó': [String.fromCodePoint(0x104ea) + accent, '\uf06f'],
   'o': [String.fromCodePoint(0x104c3), '\uf06f'],
-  'oo': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
+  'oo': [String.fromCodePoint(0x104c3)+macron, '\uf04f\uf04f'], // Macron
   'ō': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
   'oO': [String.fromCodePoint(0x104ea)+macron, '\uf04f\uf04f'], // Macron
   'p':  [String.fromCodePoint(0x104ec), '\uf050'],
@@ -254,7 +264,7 @@ var osage_latin_to_unicode_map = {
   'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
   ';':  [String.fromCodePoint(0x104C6) + String.fromCodePoint(0x104BC), '\uf03b'],  // ??
   '^':  [combiningDotAboveRight, '\uf05e'],
-  ',':  [String.fromCodePoint(0x104b9), '\uf02c'],
+  ',':  [String.fromCodePoint(0x104ba), '\uf02c'],
   '\[': [String.fromCodePoint(0x104d3), '\uf05b'],
   '{': ['{', '\uf05b'],
   '\]': [String.fromCodePoint(0x104ca), '\uf05d'],
@@ -325,9 +335,11 @@ var osage_latin_to_unicode_map = {
   // Cedilla combining
   '\u0328': [combiningDotAboveRight, ''],
 
-  ",\u000a": ",",
-  ",\u0020": ",",
-  
+  ",\u000a": [",\u000a", ''],
+  ",\u0020": [", ", ''],
+  ".": ["", ''],  // Remove period.
+  ".\u2008": [".", ''],   // Leave period.
+
   // Do I need to consider the Unicode combos of the \ueXXX characters?
   
   // TODO: Finish these.
@@ -374,7 +386,11 @@ function oldOsageToUnicode(textIn, convertToLower, convertLatin, clearOsageDot) 
       if (result == null) {
         out = c;
       } else {
-        out = result[0];
+        if (result.length == 0) {
+          out = result;
+        } else {
+          out = result[0];
+        }
       }
     }
     convertResult += out;
@@ -509,8 +525,10 @@ var osage_latin_chars =
     "[\ue070-\ue079\ue090-\ue095\ue0b0-\ue0b3]" +  // In private use range.
     "Á|É|Í|Ó|Ú|Ā|Ē|Ī|Ō|Ū|Ǫ|Į|Ə̨|Ə|Ą|" +
     ",\u000a|,\u0020|" +  // Special cases for comma at end of word.
+    "[\.]\u000a|" +
+    "[\.]\u0020|[\.]\u2008|" +  // Special cases for period vs. Osage separator.
     "\u0328|" +  // Bare ogonek
-    "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|" +
+    "[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkp]|" +
     "iu|tsh|t[hs]|ts\'|zh|[a-eg-pst-z]|[\'\|\\/\;,\\^]|\\|/|6|\;|,|\\S|\\s";
 
 // Use regular expression to greedily process input string, producing list of strings
@@ -530,8 +548,21 @@ function preParseOldOsage(instring) {
   if (typeof instring == 'string') {
     var combined_chars = old_osage_chars + osage_latin_chars;
     var regex2 = new RegExp(combined_chars, "gi");
+    // Replace the Old Osage dot and space with ASCII equivalents
+    instring = instring.replace(/\uf02e/gi, '.');
+    instring = instring.replace(/\uf020/gi, ' ');
+    // Hack to avoid removing final period.
+    var lastChar = instring.charAt(instring.length - 1);
+    if (lastChar == ".") {
+      instring = instring + "\u2008";
+    }
     var outList = instring.match(regex2);
     return outList;
   }
   return null;
+}
+
+// TODO: Write regression tests.
+function conversionRegressionTests() {
+  return true;
 }

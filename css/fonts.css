@@ -59,15 +59,31 @@
     
    @font-face{ 
       font-family:'Gadugi';
-      src:url('/fonts/gadugi_116.ttf');
+      src:url('/fonts/gadugi_116.ttf');.
       font-weight:normal;
       font-style:normal;
       font-variant-ligatures: normal;
     }
 
    @font-face{ 
-      font-family:'NotoSansOsage-Regular';
-      src:url('/fonts/NotoSansOsage.ttf');
+      font-family:'GadugiBeta';
+      src:url('/fonts/gadugibeta.ttf');
+      font-weight:normal;
+      font-style:normal;
+      font-variant-ligatures: normal;
+    }
+   @font-face{ 
+      font-family:'GadugiBoldBeta';
+      src:url('/fonts/gadugibbeta.ttf');
+      font-weight:normal;
+      font-style:normal;
+      font-variant-ligatures: normal;
+    }
+
+
+   @font-face{ 
+      font-family:'NotoSansOsage';
+      src:url('/fonts/NotoSansOsage-Regular.ttf');
       font-weight:normal;
       font-style:normal;
       font-variant-ligatures: normal;
@@ -123,7 +139,30 @@
     font-size: 32px;
     }
 
+    .gadugibeta {
+    font-family:"GadugiBeta";
+    font-size: 32px;
+    }
+
+    .gadugiboldbeta {
+    font-family:"GadugiBoldBeta";
+    font-size: 32px;
+    }
+
     .notosansosage {
     font-family:"NotoSansOsage";
+    font-size: 32px;
+    }
+
+    @font-face{ 
+	font-family:'NotoSansOsage_alpha';
+	src:url('/fonts/NotoSansOsage-Regular_alpha_20170718.ttf');
+	font-weight:normal;
+	font-style:normal;
+	font-variant-ligatures: normal;
+    }
+
+    .notosansosage_alpha {
+    font-family:"NotoSansOsage_alpha";
     font-size: 32px;
     }

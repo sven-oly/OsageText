@@ -12,6 +12,17 @@ indexes:
 
 - kind: OsagePhraseDB
   properties:
+  - name: dbName
+  - name: index
+
+- kind: OsagePhraseDB
+  properties:
+  - name: dbName
+  - name: status
+  - name: index
+
+- kind: OsagePhraseDB
+  properties:
   - name: status
   - name: index
 

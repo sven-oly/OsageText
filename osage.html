@@ -60,7 +60,7 @@
 
   function onFontSelected(selected) {
     var output_text = document.getElementById('Unicode_font_output_text');
-     var fontFam = selected.value + ", Osage, Arial";
+     var fontFam = selected.value + ", Arial, Osage";
     output_text.style.fontFamily = fontFam;
   }
   
@@ -177,7 +177,7 @@
    </div>
    <div id="unicode_area">
     <h3>Unicode Osage font data</h3>
-    <textarea class="oldOsageText unicodeOsageText" id="Unicode_font_output_text" 
+    <textarea class="oldOsageText, unicodeOsageText" id="Unicode_font_output_text" 
      onchange="updateHex('Unicode_font_output_text', 'new_hex');"
               cols="50" rows="3" style="font-size: 28px;">{{unicodeInput}}</textarea>
     <br />
@@ -263,6 +263,15 @@
       onchange="toggle('latin_area', 'showLatin');">Show Latin<br />
     </div>
   <div class="span-4 last">
+    {% if user_nickname %}
+    <h4>Welcome {{user_nickname}}
+    {% if user_logout %}
+    <a href={{user_logout}}>Logout</a>
+    {% endif %}
+    {% else %}
+    <a href='{{user_login_url}}'>Log in</a>
+    {% endif %}
+
     <h3>Useful links</h3>
       <ul>
         <li>
@@ -288,7 +297,16 @@
         <li>
            <a href="http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4619.pdf">Osage Unicode proposal</a>
         </li>
-        <ol>
+
+        </ul>
+         {% if isAdmin %}
+        <hr>
+        <h4>Admin Functions</h4>
+        <ul>
+          <li><a href="/db/manageDB/">Manage Databases</a></li>
+          <li><a href="/db/resetDbEntries/">Reset Database Entries</a>
+        </ul>
+        {% endif %}
     </div>
   </div> <!-- container -->
 
