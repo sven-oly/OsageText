@@ -9,6 +9,9 @@
   <body>
   <h1>Upload CV file to database from CSV file.</h1>
   <h2>{{numberLoaded}} entries were added to database {{dbname}}</h2>
+  {% if emptyLines %}
+  <h3>{{emptyLines}} empty lines were skipped</h3>
+  {% endif %}
   
   {% for entry in entries %}
     <p class="unicodeOsageText12">{{entry.index}} {{entry.osagePhraseLatin}} {{entry.englishPhrase}} {{entry.osagePhraseUnicode}} {{entry.comment}}</p>
