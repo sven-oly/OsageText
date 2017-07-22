@@ -80,8 +80,13 @@
 		  var newIndex = document.getElementById('newIndex');
 		  var status = document.getElementById('status');
 		  var errorMsg = document.getElementById('errorMsg');
+<<<<<<< HEAD
           var comment = document.getElementById('comment');
           var dbName = document.getElementById('dbName');
+=======
+      var comment = document.getElementById('comment');
+      var dbName = document.getElementById('dbName');
+>>>>>>> 58bd5051e6ec05f9705338331db631f4f13e062d
 
 		  var json_obj = JSON.parse(returned_json);
           if (json_obj.error) {
@@ -362,8 +367,12 @@
       Please select "Convert to Unicode", check the result, and update status!
       </div>
       <br>
+<<<<<<< HEAD
       <h4>Status: <span id="status">{{status}}
       {% if editOrAdmin %}. Change status of this phrase:{% endif %}</h4>
+=======
+      <h4>Status: <span id="status">{{status}}. Change status of this phrase:</h4>
+>>>>>>> 58bd5051e6ec05f9705338331db631f4f13e062d
       <form action="" id="set_status">
         <input type="radio" name="updateStatus" value="Unknown"> Unknown 
         <input type="radio" name="updateStatus" value="Verified"> Verified 
@@ -457,7 +466,10 @@
         <input type="radio" name="filterStatus" value="Font"> Font
         <br />
         <input type="radio" name="filterStatus" value="Other"> Other
+<<<<<<< HEAD
         <input type="hidden" name="phraseKey" value="{{phraseKey}}">
+=======
+>>>>>>> 58bd5051e6ec05f9705338331db631f4f13e062d
         <br />
       </form>
 
