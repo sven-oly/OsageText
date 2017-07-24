@@ -20,7 +20,8 @@ from google.appengine.ext.webapp import template
 
 # The Unicode fonts from Osage Nation.
 OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney',
-              'Prue', 'Wazhezhe', 'Gadugi', 'GadugiBeta', 'GadugiBoldBeta', 'NotoSansOsage_alpha', 'NotoSansOsage']
+              'Prue', 'Wazhezhe', 'GadugiBeta2', 'GadugiBoldBeta2', 'Gadugi116',
+              'NotoSansOsage_alpha', 'NotoSansOsage']
 
 Language = 'Osage'
 

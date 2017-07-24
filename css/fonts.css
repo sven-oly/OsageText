@@ -58,23 +58,24 @@
     }
     
    @font-face{ 
-      font-family:'Gadugi';
-      src:url('/fonts/gadugi_116.ttf');.
+      font-family:'GadugiBeta2';
+      src:url('/fonts/gadugibeta2.ttf');
       font-weight:normal;
       font-style:normal;
       font-variant-ligatures: normal;
     }
 
    @font-face{ 
-      font-family:'GadugiBeta';
-      src:url('/fonts/gadugibeta.ttf');
+      font-family:'GadugiBoldBeta2';
+      src:url('/fonts/gadugib_beta2.ttf');
       font-weight:normal;
       font-style:normal;
       font-variant-ligatures: normal;
     }
+
    @font-face{ 
-      font-family:'GadugiBoldBeta';
-      src:url('/fonts/gadugibbeta.ttf');
+      font-family:'Gadugi116';
+      src:url('/fonts/gadugi_116.ttf');.
       font-weight:normal;
       font-style:normal;
       font-variant-ligatures: normal;
