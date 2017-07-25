@@ -47,6 +47,7 @@ var osage_private_use_map = {
   '\uf041\uf041': [String.fromCodePoint(0x104b0)+macron],
   '\uf041': [String.fromCodePoint(0x104b0)],
 
+  '\uf041^': [String.fromCodePoint(0x104b1)],
   '\uf041\uf059': [String.fromCodePoint(0x104b1)],
   '\uf042': [String.fromCodePoint(0x104b4)],
   '\uf043': [String.fromCodePoint(0x104b5)],
@@ -54,6 +55,7 @@ var osage_private_use_map = {
   '\uf045\uf045': [String.fromCodePoint(0x104b7)+macron],
   '\uf045': [String.fromCodePoint(0x104b7)],
 
+  '\uf045^': [String.fromCodePoint(0x104b7)+combiningDotAboveRight],
   '\uf045\uf05e': [String.fromCodePoint(0x104b7)+combiningDotAboveRight],
   '\uf048': [String.fromCodePoint(0x104b9),],
   // The eh-consonants
@@ -71,12 +73,14 @@ var osage_private_use_map = {
   '\uf04e': [String.fromCodePoint(0x104c1)],
   '\uf04f\uf04f': [String.fromCodePoint(0x104c2)+macron],
   '\uf04f': [String.fromCodePoint(0x104c2)],
+  '\uf04f^': [String.fromCodePoint(0x104c2)+combiningDotAboveRight],
   '\uf04f\uf05e': [String.fromCodePoint(0x104c2)+combiningDotAboveRight],
   '\uf050': [String.fromCodePoint(0x104c4)],
   '\uf053': [String.fromCodePoint(0x104c6)],
   '\uf054': [String.fromCodePoint(0x104cd)],
   '\uf055\uf055': [String.fromCodePoint(0x104ce)+macron],
   '\uf055': [String.fromCodePoint(0x104ce)],
+  '\uf055^': [String.fromCodePoint(0x104ce)+combiningDotAboveRight],
   '\uf055\uf05e': [String.fromCodePoint(0x104ce)+combiningDotAboveRight],
   '\uf056': [String.fromCodePoint(0x104c7)],
   '\uf057': [String.fromCodePoint(0x104cf)],
@@ -84,7 +88,6 @@ var osage_private_use_map = {
   '\uf059\uf059': [String.fromCodePoint(0x104bb)+macron],
   '\uf059': [String.fromCodePoint(0x104bb)],
   '\uf059^': [String.fromCodePoint(0x104bb)+combiningDotAboveRight],
-  '\uf059\uf059': [String.fromCodePoint(0x104bb)+macron],
   '\uf059\uf05e': [String.fromCodePoint(0x104bb)+combiningDotAboveRight],
   '\uf05a': [String.fromCodePoint(0x104d2)],  // ??
   '\uf05b': [String.fromCodePoint(0x104d3)],  // ??
@@ -260,8 +263,8 @@ var osage_latin_to_unicode_map = {
   'Yy':  [String.fromCodePoint(0x104bb)+macron, '\uf05a\uf05a'],
   'YY':  [String.fromCodePoint(0x104bb)+macron, '\uf05a\uf05a'],
   'Z':  [String.fromCodePoint(0x104d2), '\uf05a'],
-  'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],  
-  'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
+  'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],
+  'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],
   ';':  [String.fromCodePoint(0x104C6) + String.fromCodePoint(0x104BC), '\uf03b'],  // ??
   '^':  [combiningDotAboveRight, '\uf05e'],
   ',':  [String.fromCodePoint(0x104ba), '\uf02c'],
