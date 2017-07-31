@@ -34,38 +34,89 @@ from google.appengine.ext import db
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import msgprop
 
+
+# Reference: https://cloud.google.com/appengine/docs/standard/python/blobstore/#Python_Uploading_a_blob
 class CreateAndReadFileHandler(webapp2.RequestHandler):
     def get(self):
-      user_info = getUserInfo(self.request.url)
+        user_info = getUserInfo(self.request.url)
 
-      bucket = app_identify.get_default_gcs_bucket_name()
+        bucket_name = app_identity.get_default_gcs_bucket_name()
 
-      # Cloud Storage file names are in the format /bucket/object.
-      filename = '/{}/blobstore_demo'.format(bucket)
+        upload_url = blobstore.create_upload_url('/sound/upload/', gs_bucket_name=bucket_name)
+        logging.info('CreateAndReadFileHandler bucket_name: %s' % bucket_name)
+        logging.info('CreateAndReadFileHandler upload_url: %s' % upload_url)
 
-      # Create a file in Google Cloud Storage and write something to it.
-      with gcs.open(filename, 'w') as filehandle:
-        filehandle.write('abcde\n')
+        self.response.out.write("""
+       <html><body>
+       <form action="{0}" method="POST" enctype="multipart/form-data">
+         Upload File: <input type="file" name="file"><br>
+         <input type="input" value="test what's passed to blob upload">
+         <input type="submit" name="submit" value="Submit">
+       </form>
+       <p>Debug: upload_url = {0}
+       </body></html>""".format(upload_url, upload_url))
 
-        # In order to read the contents of the file using the Blobstore API,
-        # you must create a blob_key from the Cloud Storage file name.
-        # Blobstore expects the filename to be in the format of:
-        # /gs/bucket/object
-        blobstore_filename = '/gs{}'.format(filename)
-        blob_key = blobstore.create_gs_key(blobstore_filename)
+        # [START SoundUploadHandler]
 
-        # Read the file's contents using the Blobstore API.
-        # The last two parameters specify the start and end index of bytes we
-        # want to read.
-        data = blobstore.fetch_data(blob_key, 0, 6)
+class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+    def post(self):
+          try:
+            logging.info('SOUND UPLOAD handler!')
+            upload_list = self.get_uploads()
+            logging.info(' get_uploads = (%d) %s' % (len(upload_list), upload_list))
+            upload = upload_list[0]
+            logging.info(' upload =  %s' % (upload))
+            logging.info(' ####### upload key =  %s' % (upload.key()))
+            logging.info(' ####### upload content type =  %s' % (upload.content_type))
+            logging.info(' upload type =  %s' % (type(upload)))
+            logging.info(' upload gs_object_name =  %s' % (upload.gs_object_name))
 
-        # Write the contents to the response.
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(data)
+            filename = upload.filename
+            logging.info(' upload filename =  %s' % (filename))
+            logging.info(' FFFFFFFFF upload fields =  %s' % (upload.__dict__()))
+            try:
+              public_url = upload.gs_object_name
+              logging.info('%%% public_url = %s!' % public_url)
+            except:
+              logging.info('SOUND UPLOAD handler. Cannot get public_url!')
 
-        # Delete the file from Google Cloud Storage using the blob_key.
-        blobstore.delete(blob_key)
+            url = "https://osagelanguagetools.appspot.com.storage.googleapis.com/" + filename
 
+            self.response.out.write("""
+                   <html><body>
+                   <h2>Uploaded key = {0}
+                   <form action="{0}" method="GET" enctype="multipart/form-data">
+                     Upload File: <input type="file" name="file"><br>
+                     <input type="input" value="test what's passed to blob upload">
+                     <input type="submit" name="submit" value="Submit">
+                   </form>
+                   <p>
+                   </body></html>""".format(upload.key(), upload_url))
+            try:
+              user = users.get_current_user().user_id(),
+              logging.info('SOUND UPLOAD: upload = %s, user = %s, key=%s' %
+                           (upload, user, upload.key()))
+            except:
+              logging.info('SOUND UPLOAD handler. Cannot get user!')
+
+
+            try:
+              user_sound = UserSound(
+                user=users.get_current_user().user_id(),
+                blob_key=upload.key())
+              user_sound.put()
+
+            except:
+              logging.info('SOUND UPLOAD handler. Cannot create UserSound!')
+
+            self.redirect('/sound/view/' % upload.key())
+
+          except:
+            self.error(500)
+            # [END SoundUploadHandler]
+
+
+#-------------------------------------------
 
 # This handler creates a file in Cloud Storage using the cloudstorage
 # client library and then serves the file back using the Blobstore API.
@@ -115,35 +166,13 @@ class SoundUploadFormHandler(webapp2.RequestHandler):
     # and enctype must be set to "multipart/form-data".
     self.response.out.write("""
 <html><body>
+<h2>Sound Upload</h2>
 <form action="{0}" method="POST" enctype="multipart/form-data">
   Upload File: <input type="file" name="file"><br>
   <input type="submit" name="submit" value="Submit">
 </form>
 </body></html>""".format(upload_url))
     # [END upload_form]
-
-
-    # [START SoundUploadHandler]
-class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
-  def post(self):
-    try:
-      logging.info('SOUND UPLOAD handler!')
-      logging.info(' get_uploads = %s' % self.get_uploads())
-      upload = self.get_uploads()[0]
-      user=users.get_current_user().user_id(),
-      logging.info('SOUND UPLOAD: upload = %s, user = %s, key=%s' %
-                   (upload, user, upload.key()))
-
-      user_sound = UserSound(
-          user=users.get_current_user().user_id(),
-          blob_key=upload.key())
-      user_sound.put()
-
-      self.redirect('/sound/view/' % upload.key())
-
-    except:
-      self.error(500)
-# [END SoundUploadHandler]
 
 
 # [START ViewSoundHandler]

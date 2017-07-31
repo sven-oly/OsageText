@@ -48,6 +48,14 @@ class OsageDbName(db.Model):
   default = db.StringProperty(u'')
   isTestDB = db.StringProperty('')
 
+
+# Sound file info uploaded.
+class UserSound(db.Model):
+  lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
+  user = db.StringProperty('')
+  blob_key = db.StringProperty('')
+
+
 # Retrieves data at a given index and dbName via AJAX.
 class GetWordsHandler(webapp2.RequestHandler):
   def post(self):

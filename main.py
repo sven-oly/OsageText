@@ -206,11 +206,13 @@ app = webapp2.WSGIApplication([
     ('/users/clear/', userDB.clearUsers),
 
     ('/sound/showupload/', blobstorage.SoundUploadFormHandler),
-    ('/sound/upload/', blobstorage.SoundUploadHandler),
     ('/sound/view/', blobstorage.ViewSoundHandler),
     ('/sound/listall/', blobstorage.SoundListHandler),
     ('/sound/viewall/', blobstorage.SoundDataViewerHandler),
     ('/sound/uploadtodbitem/', blobstorage.SoundUploadUI),
     ('/sound/uploadSoundForPhrase/', blobstorage.SoundFileUploadHandler),
+
+    ('/sound/start/', blobstorage.CreateAndReadFileHandler),
+    ('/sound/upload/', blobstorage.SoundUploadHandler),
 
 ], debug=True)
