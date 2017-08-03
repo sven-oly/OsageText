@@ -72,7 +72,7 @@ class GetWordsHandler(webapp2.RequestHandler):
     dbName = self.request.get('dbName', '')
     databases = self.request.GET.getall('databases')
 
-    logging.info('GetWordsHandler databases = %s' % databases)
+    #logging.info('GetWordsHandler databases = %s' % databases)
     #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
     #   (index, filterStatus, direction))
 
@@ -82,16 +82,14 @@ class GetWordsHandler(webapp2.RequestHandler):
     q = OsagePhraseDB.all()
 
     selectByDB = True
-    logging.info('GetWordsHandler DBNAME = %s' % dbName)
+    #logging.info('GetWordsHandler DBNAME = %s' % dbName)
     if '*All*' in databases:
       logging.info('*All* in databases = %s' % databases)
       selectByDB = False
 
     if databases:
       q.filter('dbName IN', databases)
-      logging.info('GetWordsHandler FILTER by databases = %s' % databases)
-
-    logging.info('Index = %s' % index)
+      # logging.info('GetWordsHandler FILTER by databases = %s' % databases)
 
     if filterStatus == 'All' or filterStatus == 'all':
       # Get the specified index, with no status filter.
@@ -123,13 +121,14 @@ class GetWordsHandler(webapp2.RequestHandler):
       status = result.status
       comment = result.comment
       errorMsg = ''
-      phraseKey = result.key()
+      phraseKey = str(result.key())
     else:
-      oldtext = utext = english = status = ''
-      errorMsg = 'No results found'
-      comment = ''
+      errorMsg = 'No phrase found'
       phraseKey = ''
+      oldtext = utext = english = status = ''
+      comment = ''
 
+    # logging.info('PHRASE KEY = %s ' % phraseKey)
     obj = {
         'language': main.Language,
         'dbNames': dbNames,
@@ -146,6 +145,7 @@ class GetWordsHandler(webapp2.RequestHandler):
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
     }
+    # logging.info('^^^^^^^ obj = %s' % obj)
     self.response.out.write(json.dumps(obj))
 
 # Show data from word list converted for human verification
@@ -352,12 +352,24 @@ class UpdateStatus(webapp2.RequestHandler):
     dbName = self.request.get('dbName', '')
     phraseKey = self.request.get('phraseKey', '')
 
-    logging.info('Update index = %d, oldOsage = %s' % (index, oldOsagePhrase))
+    logging.info("_+_+_+ Update phraseKey = %s" % phraseKey)
+    # To get the database object more easily
+    if phraseKey:
+      keyForPhrase = db.Key(encoded=phraseKey)
+    else:
+      keyForPhrase = None
 
-    q = OsagePhraseDB.all()
-    q.filter("index =", index)
-    result = q.get()
+    logging.info('_+_+_+_+_+_+_+ Update index = %d, oldOsage = %s' % (index, oldOsagePhrase))
 
+    if keyForPhrase:
+      result = db.get(keyForPhrase)
+      logging.info('+++ Got object from key')
+    else:
+      q = OsagePhraseDB.all()
+      q.filter("index =", index)
+      result = q.get()
+
+    # TODO: Check for null result
     result.status = newStatus;
     result.comment = comment
     if dbName:

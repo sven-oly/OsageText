@@ -180,11 +180,13 @@
   	var newStatus = getStatusRadioButton(statusSetter); 
     var comment = document.getElementById("comment").value;
     var dbName = document.getElementById("dbName").value;
+    var phraseKey = document.getElementById("updatePhraseKey").value;
 	
 	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus +
 	  "&unicodePhrase=" + unicodeData + "&comment=" + comment +
 	  "&oldOsageData=" + oldOsageData +
-	  "&dbName=" + dbName;
+	  "&dbName=" + dbName +
+	  "&phraseKey=" + phraseKey;
 	
 	xmlhttp.open("GET", target, true);
 	var size = target.length;
@@ -362,12 +364,8 @@
       Please select "Convert to Unicode", check the result, and update status!
       </div>
       <br>
-<<<<<<< HEAD
       <h4>Status: <span id="status">{{status}}
       {% if editOrAdmin %}. Change status of this phrase:{% endif %}</h4>
-=======
-      <h4>Status: <span id="status">{{status}}. Change status of this phrase:</h4>
->>>>>>> 58bd5051e6ec05f9705338331db631f4f13e062d
       <form action="" id="set_status">
         <input type="radio" name="updateStatus" value="Unknown"> Unknown 
         <input type="radio" name="updateStatus" value="Verified"> Verified 
@@ -377,7 +375,7 @@
         {% if editOrAdmin %}
         <input type="button" value="Update status"
            onclick="updatePhraseStatus('index', 'updateStatus');"/>
-        <input type="hidden" name="phraseKey" value="{{phraseKey}}">
+        <input type="hidden" id="updatePhraseKey" name="phraseKey" value="{{phraseKey}}">
         {% endif %}
       </form>
       <br />
@@ -461,10 +459,7 @@
         <input type="radio" name="filterStatus" value="Font"> Font
         <br />
         <input type="radio" name="filterStatus" value="Other"> Other
-<<<<<<< HEAD
         <input type="hidden" name="phraseKey" value="{{phraseKey}}">
-=======
->>>>>>> 58bd5051e6ec05f9705338331db631f4f13e062d
         <br />
       </form>
 
