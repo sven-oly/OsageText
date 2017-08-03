@@ -80,15 +80,10 @@
 		  var newIndex = document.getElementById('newIndex');
 		  var status = document.getElementById('status');
 		  var errorMsg = document.getElementById('errorMsg');
-<<<<<<< HEAD
           var comment = document.getElementById('comment');
           var dbName = document.getElementById('dbName');
-=======
-      var comment = document.getElementById('comment');
-      var dbName = document.getElementById('dbName');
->>>>>>> 58bd5051e6ec05f9705338331db631f4f13e062d
 
-		  var json_obj = JSON.parse(returned_json);
+          var json_obj = JSON.parse(returned_json);
           if (json_obj.error) {
             // Warn, and don't change values.
             alert(json_obj.error);
@@ -383,7 +378,7 @@
         <input type="button" value="Update status"
            onclick="updatePhraseStatus('index', 'updateStatus');"/>
         <input type="hidden" name="phraseKey" value="{{phraseKey}}">
-      {% endif %}
+        {% endif %}
       </form>
       <br />
       <h4>Comment:</h4>

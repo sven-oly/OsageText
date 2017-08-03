@@ -214,5 +214,6 @@ app = webapp2.WSGIApplication([
 
     ('/sound/start/', blobstorage.CreateAndReadFileHandler),
     ('/sound/upload/', blobstorage.SoundUploadHandler),
+    ('/sound/uploadresults/', blobstorage.SoundUploadResults),
 
 ], debug=True)

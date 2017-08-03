@@ -42,7 +42,10 @@ class CreateAndReadFileHandler(webapp2.RequestHandler):
 
         bucket_name = app_identity.get_default_gcs_bucket_name()
 
-        upload_url = blobstore.create_upload_url('/sound/upload/', gs_bucket_name=bucket_name)
+        param = 'general_parameter_1234'
+        upload_url = '/sound/upload/'  # ?parameter=%s' % param
+        upload_url = blobstore.create_upload_url(upload_url,
+                                                 gs_bucket_name=bucket_name)
         logging.info('CreateAndReadFileHandler bucket_name: %s' % bucket_name)
         logging.info('CreateAndReadFileHandler upload_url: %s' % upload_url)
 
@@ -64,6 +67,14 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             logging.info('SOUND UPLOAD handler!')
             upload_list = self.get_uploads()
             logging.info(' get_uploads = (%d) %s' % (len(upload_list), upload_list))
+            # Other parameters?
+            try:
+              other = self.post('parameter', 'NONE FOUND')
+              logging.info('@#@#@# parameter = %s' % other)
+            except:
+              other = 'NONE'
+              logging.info('@#@#@# Cannot get parameter from self.')
+
             upload = upload_list[0]
             logging.info(' upload =  %s' % (upload))
             logging.info(' ####### upload key =  %s' % (upload.key()))
@@ -71,27 +82,31 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             logging.info(' upload type =  %s' % (type(upload)))
             logging.info(' upload gs_object_name =  %s' % (upload.gs_object_name))
 
-            filename = upload.filename
-            logging.info(' upload filename =  %s' % (filename))
-            logging.info(' FFFFFFFFF upload fields =  %s' % (upload.__dict__()))
+            try:
+              filename = upload.filename
+              logging.info(' upload filename =  %s' % (filename))
+            except:
+              logging.info(' Cannot get filename from upload.')
+
+            #try:
+            #  logging.info(' FFFFFFFFF upload fields =  %s' % (
+            #      upload.__dict__()))
+            #except:
+            #  logging.info('  CANNOT get upload fields %s' % upload);
+
+            logging.info('ABOUT TO DO PUBLIC URL')
             try:
               public_url = upload.gs_object_name
               logging.info('%%% public_url = %s!' % public_url)
             except:
               logging.info('SOUND UPLOAD handler. Cannot get public_url!')
 
-            url = "https://osagelanguagetools.appspot.com.storage.googleapis.com/" + filename
+            try:
+              my_url = "https://osagelanguagetools.appspot.com.storage.googleapis.com/%s" % filename
+              logging.info(' PUBLIC URL% %s' % my_url)
+            except:
+              logging.info(' Cannot make my url')
 
-            self.response.out.write("""
-                   <html><body>
-                   <h2>Uploaded key = {0}
-                   <form action="{0}" method="GET" enctype="multipart/form-data">
-                     Upload File: <input type="file" name="file"><br>
-                     <input type="input" value="test what's passed to blob upload">
-                     <input type="submit" name="submit" value="Submit">
-                   </form>
-                   <p>
-                   </body></html>""".format(upload.key(), upload_url))
             try:
               user = users.get_current_user().user_id(),
               logging.info('SOUND UPLOAD: upload = %s, user = %s, key=%s' %
@@ -99,22 +114,37 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             except:
               logging.info('SOUND UPLOAD handler. Cannot get user!')
 
-
             try:
-              user_sound = UserSound(
-                user=users.get_current_user().user_id(),
-                blob_key=upload.key())
-              user_sound.put()
-
+              logging.info('Trying redirect!')
+              redirect_target = '/sound/uploadresults/%s?%s' % (
+                  upload.key(), 'parameter=%s' % other)
+              logging.info('Target = %s' % redirect_target)
+              self.redirect(redirect_target)
             except:
               logging.info('SOUND UPLOAD handler. Cannot create UserSound!')
 
-            self.redirect('/sound/view/' % upload.key())
+            self.redirect('/sound/uploadresults/' % upload.key())
 
           except:
             self.error(500)
             # [END SoundUploadHandler]
 
+
+class SoundUploadResults(blobstore_handlers.BlobstoreDownloadHandler):
+    def get(self, sound_key):
+      logging.info('@@@@@@@ SoundUploadResults: %s' % sound_key)
+      try:
+        parameter = self.get('parameter', 'NO PARAMETER')
+        logging.info('PARAMETER = %s' % parameter)
+      except:
+        logging.info('NO PARAMETER')
+
+      # TODO:(ccornelius) can anything else be done with this?
+      if not blobstore.get(sound_key):
+        logging.info('ERROR!!!')
+        self.error(404)
+      else:
+        self.sendblob(sound_key)
 
 #-------------------------------------------
 
@@ -178,6 +208,7 @@ class SoundUploadFormHandler(webapp2.RequestHandler):
 # [START ViewSoundHandler]
 class ViewSoundHandler(blobstore_handlers.BlobstoreDownloadHandler):
   def get(self, sound_key):
+    logging.info(' VIEW SOUND HANDLER: %s' % sound_key)
     if not blobstore.get(sound_key):
       self.error(404)
     else:

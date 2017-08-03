@@ -461,7 +461,10 @@ class GetPhrases(webapp2.RequestHandler):
     logging.info('dbNameList = %s' % dbNames)
 
     # TODO: Make this user-specific.
-    defaultDB = dbNames[0]
+    try:
+      defaultDB = dbNames[0]
+    except:
+      defaultDB = None
 
     numEntries = 0
     entries = []
