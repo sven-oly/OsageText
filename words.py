@@ -39,7 +39,7 @@ class OsagePhraseDB(db.Model):
   # Pointing to sound files by URL:
   soundFemaleLink = db.TextProperty('');
   soundMaleLink = db.TextProperty('');
-
+  soundLinks = db.ListProperty(str, verbose_name='sound_files', default=[])
 
 # The set of registered db names.
 class OsageDbName(db.Model):

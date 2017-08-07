@@ -241,7 +241,7 @@
     var oldText = oldTextObj.value;
     var unicodeText = uTextObj.innerHTML;
     var englishText = englishTextObj.value; 
-    var dbName = document.getElementById(englishText).value;
+    var dbName = document.getElementById("dbName").value;
     
 	var target = "/words/addPhrase/?oldtext=" + oldText + "&utext=" + unicodeText +
 	  "&engtext=" + englishText + "&comment=" + comment + "&dbName=" + dbName;
@@ -304,6 +304,7 @@
     }
     }
 
+
   // Initialize the page.
   function init() {
     // Set warning if store is not same as new conversion.
@@ -318,6 +319,7 @@
     // Set initial status.
     var status = document.getElementById("status").innerHTML;
     setStatusRadioButton("updateStatus", status);
+
   }
 
   </script>
@@ -395,13 +397,14 @@
       </span>
 
       {% if editOrAdmin %}
-        <form action="/sound/uploadtodbitem/" id="add_sound_file">
-        <input type="submit" value="Upload sound"/>
+      <hr>
+      <h4>Upload sound file for this phrase:</h4>
+      <form action="/sound/start/" method="GET" enctype="multipart/form-data">
+        <input type="submit" name="submit" value="Upload sound file">
+        <input type="hidden" id="updatePhraseKey" name="phraseKey" value="{{phraseKey}}">
+      </form>
 
-         <input type="hidden" name="phraseKey" value="{{phraseKey}}">
-
-        </form>
-      {% endif %}
+       {% endif %}
 
         {% endif %}
     </div>

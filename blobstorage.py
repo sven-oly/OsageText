@@ -50,16 +50,33 @@ class CreateAndReadFileHandler(webapp2.RequestHandler):
         logging.info('CreateAndReadFileHandler bucket_name: %s' % bucket_name)
         logging.info('CreateAndReadFileHandler upload_url: %s' % upload_url)
 
-        self.response.out.write("""
-       <html><body>
-       <form action="{0}" method="POST" enctype="multipart/form-data">
-         Upload File: <input type="file" name="file"><br>
-         <input type="input" name="parameter" value="test what's passed to blob upload">
-         <input type="input" name="app_id" value="{1}">
-         <input type="submit" name="submit" value="Submit">
-       </form>
-       <p>Debug: app_id = {1}
-       </body></html>""".format(upload_url, app_id))
+        selectVoice = self.request.get('selectVoice', '')
+        phraseKey = self.request.get('phraseKey', '')
+        filename = self.request.get('file', '')
+
+        if phraseKey:
+          keyForPhrase = db.Key(encoded=phraseKey)
+          logging.info('+++ Key for Phrase = %s' % keyForPhrase)
+        else:
+          keyForPhrase = None
+
+        result = None
+        if keyForPhrase:
+          result = db.get(keyForPhrase)
+          logging.info('+++ Got object from key %s' % result)
+          logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
+
+
+        template_values = {
+          'upload_url': upload_url,
+          'filename': filename,
+          'phraseKey': phraseKey,
+          'phrase_record': result,
+          'app_id': app_id,
+          'voice': selectVoice,
+        }
+        path = os.path.join(os.path.dirname(__file__), 'addSound.html')
+        self.response.out.write(template.render(path, template_values))
 
         # [START SoundUploadHandler]
 
@@ -73,19 +90,25 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler, webapp2.Requ
             # Other parameters?
             items = self.request.POST.items()
             logging.info('ITEMS = %s' % items)
-            app_id = self.request.POST['app_id']
-            logging.info('APP_ID = %s' % app_id)
+            try:
+              app_id = self.request.POST.items['app_id']
+              logging.info('APP_ID = %s' % app_id)
+            except Exception as err:
+              app_id = 'no app_id'
+              logging.info('SOUND UPLOAD handler app_id. err = %s!' % err)
 
             # This is the BlobInfo object
-            upload = upload_list[0]
-            logging.info(' upload =  %s' % (upload))
-            logging.info(' ####### upload key =  %s' % (upload.key()))
-            logging.info(' ####### upload content type =  %s' % (upload.content_type))
-            logging.info('      filename =  %s' % (upload.filename))
-            logging.info('      type =  %s' % (type(upload)))
-            logging.info('      gs_object_name =  %s' % (upload.gs_object_name))
-            public_url = upload.gs_object_name
-
+            try:
+              upload = upload_list[0]
+              logging.info(' upload =  %s' % (upload))
+              logging.info(' ####### upload key =  %s' % (upload.key()))
+              logging.info(' ####### upload content type =  %s' % (upload.content_type))
+              logging.info('      filename =  %s' % (upload.filename))
+              logging.info('      type =  %s' % (type(upload)))
+              logging.info('      gs_object_name =  %s' % (upload.gs_object_name))
+              public_url = upload.gs_object_name
+            except Exception as err:
+              logging.info('SOUND UPLOAD handler upload block. err = %s!' % err)
             try:
               user = users.get_current_user().user_id(),
               logging.info('SOUND UPLOAD: upload = %s, user = %s, key=%s' %
