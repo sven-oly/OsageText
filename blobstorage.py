@@ -91,11 +91,29 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler, webapp2.Requ
             items = self.request.POST.items()
             logging.info('ITEMS = %s' % items)
             try:
-              app_id = self.request.POST.items['app_id']
+              app_id = self.request.POST['app_id']
               logging.info('APP_ID = %s' % app_id)
             except Exception as err:
               app_id = 'no app_id'
               logging.info('SOUND UPLOAD handler app_id. err = %s!' % err)
+
+            try:
+              phrase_key = self.request.POST['phraseKey']
+            except Exception as err:
+              phrase_key = None
+              logging.info('SOUND UPLOAD handler phrase_key. err = %s!' % err)
+
+            if phraseKey:
+              keyForPhrase = db.Key(encoded=phraseKey)
+              logging.info('+++ Key for Phrase = %s' % keyForPhrase)
+            else:
+              keyForPhrase = None
+
+            result = None
+            if keyForPhrase:
+              result = db.get(keyForPhrase)
+              logging.info('+++ Got object from key %s' % result)
+              logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
 
             # This is the BlobInfo object
             try:
@@ -121,7 +139,8 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler, webapp2.Requ
               self.redirect('/sound/uploadresults/?key=%s&public_url=%s&%s&%s' %
                             (upload.key(),  public_url,
                              'filename=%s' % upload.filename,
-                             'app_id=%s' % app_id))
+                             'app_id=%s' % app_id,
+                             'phrase_key=%s' % phrase_key))
             except Exception as err:
               logging.info('SOUND UPLOAD fail redirect: %s' % err)
 
