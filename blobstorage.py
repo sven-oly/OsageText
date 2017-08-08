@@ -106,7 +106,7 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler,
             logging.info('ITEMS = %s' % items)
 
             app_id = app_identity.get_application_id()
-            logging.info('APP_ID = %s' % app_id)
+            logging.info('+++++++++++ APP_ID = %s' % app_id)
 
             selectVoice = self.request.POST['selectVoice']
 
@@ -191,14 +191,16 @@ class SoundUploadResults(webapp2.RequestHandler):
 
       selectVoice = self.request.get('voice', None)
 
-      public_obj_name = self.request.get('public_object_name=%s', None)
+      public_obj_name = self.request.get('public_objetc_name=%s', None)
+      logging.info('+++ public_obj_name = %s' % public_obj_name)
 
       baseSoundURL = 'https://osagelanguagetools.appspot.com.storage.googleapis.com'
       # Add info to the phrase and sound objects.
       if public_obj_name:
         soundURL = '%s/%s' % (baseSoundURL, public_obj_name)
       else:
-        soundURL = ''
+        soundURL = 'NONE'
+      logging.info('!!!!!!!!!!!!!!!! soundURL = %s' % soundURL)
 
       if phraseKey:
         keyForPhrase = db.Key(encoded=phraseKey)
@@ -215,10 +217,13 @@ class SoundUploadResults(webapp2.RequestHandler):
 
           if selectVoice is u'male_voice':
             result.soundMaleLink = soundURL
+            logging.info(' FFFF update %s' % result.soundMaleLink)
+            result.put()
           else:
             result.soundFemaleLink = soundURL
+            logging.info(' FFFF update %s' % result.soundFemaleLink)
+            result.put()
 
-      #
       if not blobstore.get(sound_key):
         logging.info('ERROR!!!')
         self.error(404)

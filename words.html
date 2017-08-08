@@ -394,14 +394,20 @@
       <div id='errorMsg'>{{error}}</div>
 
       {% if showSounds %}
-       <!-- <img src="/images/Speaker_Icon_gray.svg" style="width:40px;height:35px;"> -->
+      {% if soundMaleLine %}
+      <a href= "{{soundMaleLink}}">
       <span id="maleVoice">
         Male: <img src="/images/Speaker_Icon.svg" style="width:40px;height:35px;">
+        </a>
       </span>
+      {% endif %}
+      {% if soundFemaleLink %}
       <span  id="femaleVoice">
        <!-- <img src="/images/Speaker_Icon_gray.svg" style="width:40px;height:35px;"> -->
-       Female: <img src="/images/Speaker_Icon.svg" style="width:40px;height:35px;">
+       <a href="{{soundFemaleLink}}">
+       Female: <img src="/images/Speaker_Icon.svg" style="width:40px;height:35px;"></a<>
       </span>
+      {% endif %}
 
       {% if editOrAdmin %}
       <hr>

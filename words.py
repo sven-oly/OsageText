@@ -130,6 +130,9 @@ class GetWordsHandler(webapp2.RequestHandler):
       comment = ''
 
     # logging.info('PHRASE KEY = %s ' % phraseKey)
+    logging.info('soundMaleLink: %s' % result.soundMaleLink)
+    logging.info('soundFemaleLink: %s' % result.soundFemaleLink)
+
     obj = {
         'language': main.Language,
         'dbNames': dbNames,
@@ -145,6 +148,8 @@ class GetWordsHandler(webapp2.RequestHandler):
         'user_nickname': user_info[1],
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
+        'soundMaleLink': result.soundMaleLink,
+        'soundFemaleLink': result.soundFemaleLink,
     }
     # logging.info('^^^^^^^ obj = %s' % obj)
     self.response.out.write(json.dumps(obj))
@@ -189,6 +194,8 @@ class WordHandler(webapp2.RequestHandler):
         comment = result.comment
         soundFemaleLink = result.soundFemaleLink
         soundMaleLink = result.soundMaleLink
+        logging.info('LINKS LINKS FFFF: %s' % soundFemaleLink)
+        logging.info('LINKS LINKS MMMM: %s' % soundMaleLink)
         phraseKey = result.key()
 
       editOrAdmin = user_info[4]
