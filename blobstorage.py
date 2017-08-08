@@ -37,8 +37,20 @@ from google.appengine.ext import ndb
 from google.appengine.ext.ndb import msgprop
 
 
+# Sound datastore objects.
+class SoundUploadDB(db.Model):
+  lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
+  soundKey = db.StringProperty(u'')
+  phraseDBkey = db.StringProperty(u'')
+  uploadingUser = db.StringProperty(u'')
+  filename = db.StringProperty(u'')
+  public_url = db.StringProperty(u'')
+  selectVoice = db.StringProperty(u'')
+
+
 # Reference: https://cloud.google.com/appengine/docs/standard/python/blobstore/#Python_Uploading_a_blob
 class CreateAndReadFileHandler(webapp2.RequestHandler):
+
     def get(self):
         user_info = getUserInfo(self.request.url)
 
@@ -65,6 +77,7 @@ class CreateAndReadFileHandler(webapp2.RequestHandler):
           result = db.get(keyForPhrase)
           logging.info('+++ Got object from key %s' % result)
           logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
+          logging.info('            Osage = %s' % (result.osagePhraseUnicode))
 
 
         template_values = {
@@ -81,27 +94,27 @@ class CreateAndReadFileHandler(webapp2.RequestHandler):
         # [START SoundUploadHandler]
 
 # Key idea: inherit from both, so other parameters can be obtained.
-class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler, webapp2.RequestHandler):
+class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler,
+                         webapp2.RequestHandler):
     def post(self):
           try:
             logging.info('SOUND UPLOAD handler!')
             upload_list = self.get_uploads()
-            logging.info(' get_uploads = (%d) %s' % (len(upload_list), upload_list))
-            # Other parameters?
+            logging.info(' get_uploads = (%d) %s' %
+                         (len(upload_list), upload_list))
             items = self.request.POST.items()
             logging.info('ITEMS = %s' % items)
-            try:
-              app_id = self.request.POST['app_id']
-              logging.info('APP_ID = %s' % app_id)
-            except Exception as err:
-              app_id = 'no app_id'
-              logging.info('SOUND UPLOAD handler app_id. err = %s!' % err)
+
+            app_id = app_identity.get_application_id()
+            logging.info('APP_ID = %s' % app_id)
+
+            selectVoice = self.request.POST['selectVoice']
 
             try:
-              phrase_key = self.request.POST['phraseKey']
+              phraseKey = self.request.POST['phraseKey']
             except Exception as err:
-              phrase_key = None
-              logging.info('SOUND UPLOAD handler phrase_key. err = %s!' % err)
+              phraseKey = None
+              logging.info('SOUND UPLOAD handler phraseKey. err = %s!' % err)
 
             if phraseKey:
               keyForPhrase = db.Key(encoded=phraseKey)
@@ -109,11 +122,16 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler, webapp2.Requ
             else:
               keyForPhrase = None
 
+            logging.info('Getting phrase from key %s' % keyForPhrase)
             result = None
-            if keyForPhrase:
-              result = db.get(keyForPhrase)
-              logging.info('+++ Got object from key %s' % result)
-              logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
+            try:
+              if keyForPhrase:
+                result = db.get(keyForPhrase)
+                logging.info('+++ Got object from key %s' % result)
+                logging.info('  index %d, English = %s' % (
+                    result.index, result.englishPhrase))
+            except:
+              logging.info('---- Cannot get object from key %s' % result)
 
             # This is the BlobInfo object
             try:
@@ -124,53 +142,103 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler, webapp2.Requ
               logging.info('      filename =  %s' % (upload.filename))
               logging.info('      type =  %s' % (type(upload)))
               logging.info('      gs_object_name =  %s' % (upload.gs_object_name))
-              public_url = upload.gs_object_name
+              public_object_name = upload.gs_object_name
             except Exception as err:
               logging.info('SOUND UPLOAD handler upload block. err = %s!' % err)
+
             try:
               user = users.get_current_user().user_id(),
               logging.info('SOUND UPLOAD: upload = %s, user = %s, key=%s' %
                            (upload, user, upload.key()))
             except Exception as err:
-              logging.info('SOUND UPLOAD handler. err = %s!' % err)
+              user = None
+              logging.info('SOUND UPLOAD get user error. err = %s!' % err)
               user = 'default_user'
 
             try:
-              self.redirect('/sound/uploadresults/?key=%s&public_url=%s&%s&%s' %
-                            (upload.key(),  public_url,
+              self.redirect('/sound/uploadresults/' +
+                            '?%s&%s&%s&%s&%s&%s&%s' %
+                            ('key=%s' % upload.key(),
+                             'public_object_name=%s' % public_object_name,
                              'filename=%s' % upload.filename,
                              'app_id=%s' % app_id,
-                             'phrase_key=%s' % phrase_key))
+                             'phraseKey=%s' % phraseKey,
+                             'voice=%s' % selectVoice,
+                             'user=%s' % user))
             except Exception as err:
               logging.info('SOUND UPLOAD fail redirect: %s' % err)
+              self.error(500)
 
-          except:
+          except Exception as err:
+            logging.info('SOUND UPLOAD top failure: %s' % err)
             self.error(500)
             # [END SoundUploadHandler]
 
 
 class SoundUploadResults(webapp2.RequestHandler):
     def get(self):
+      logging.info('@@@@@@@ SoundUploadResults: all params=%s' %
+                   self.request.GET)
       sound_key = self.request.get('key', "NO_KEY")
-      logging.info('@@@@@@@ SoundUploadResults: %s' % sound_key)
-      try:
-        parameter = self.request.get('parameter', 'NO PARAMETER')
-        logging.info('PARAMETER = %s' % PARAMETER)
-      except:
-        logging.info('NO PARAMETER')
-      public_url = self.request.get('public_url', 'NO URL')
+      logging.info('@@@@@@@ SoundUploadResults: key=%s' % sound_key)
+
+      phraseKey = self.request.get('phraseKey', None)
+      user = self.request.get('user', None)
+      logging.info('phraseKey = %s' % phraseKey)
+
       app_id = self.request.get('app_id', 'NO APP_ID')
       filename = self.request.get('filename', 'NO FILENAME')
-      # TODO:(ccornelius) can anything else be done with this?
+
+      selectVoice = self.request.get('voice', None)
+
+      public_obj_name = self.request.get('public_object_name=%s', None)
+
+      baseSoundURL = 'https://osagelanguagetools.appspot.com.storage.googleapis.com'
+      # Add info to the phrase and sound objects.
+      if public_obj_name:
+        soundURL = '%s/%s' % (baseSoundURL, public_obj_name)
+      else:
+        soundURL = ''
+
+      if phraseKey:
+        keyForPhrase = db.Key(encoded=phraseKey)
+        logging.info('+++ Key for Phrase = %s' % keyForPhrase)
+      else:
+        # Update the phrase database object
+        keyForPhrase = None
+        result = None
+        if keyForPhrase:
+          result = db.get(keyForPhrase)
+          logging.info('+++ Got object from key %s' % result)
+          logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
+          logging.info('            Osage = %s' % (result.osagePhraseUnicode))
+
+          if selectVoice is u'male_voice':
+            result.soundMaleLink = soundURL
+          else:
+            result.soundFemaleLink = soundURL
+
+      #
       if not blobstore.get(sound_key):
         logging.info('ERROR!!!')
         self.error(404)
 
+      # Keep track of these
+      newSound = SoundUploadDB(soundKey=sound_key,
+                               phraseDBkey=phraseKey,
+                               uploadingUser=user,
+                               filename=filename,
+                               public_url=soundURL,
+                               selectVoice=selectVoice)
+      newSound.put()
+
       template_values = {
-        'public_url': public_url,
+        'public_obj_name': public_obj_name,
+        'public_url': soundURL,
         'sound_key': sound_key,
-        'parameter': parameter,
         'filename': filename,
+        'selectVoice': selectVoice,
+        'user': user,
         'app_id': app_id,
       }
       path = os.path.join(os.path.dirname(__file__), 'soundResults.html')
@@ -334,4 +402,20 @@ class SoundFileUploadHandler(webapp2.RequestHandler):
     path = os.path.join(os.path.dirname(__file__), 'phraseSoundSelector.html')
     self.response.out.write(template.render(path, template_values))
 # [END SoundUploadHandler]
-SoundFileUploadHandler
+
+
+# show all the sounds registered.
+class AllSoundsDB(webapp2.RequestHandler):
+  def get(self):
+    q = SoundUploadDB.all()
+    sounds = q.run()
+    count = 0
+    for s in sounds:
+      count += 1
+    template_values = {
+        'count': count,
+        'sounds': q,
+    }
+
+    path = os.path.join(os.path.dirname(__file__), 'allsounds.html')
+    self.response.out.write(template.render(path, template_values))

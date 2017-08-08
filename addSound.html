@@ -46,7 +46,9 @@
 
   function onSoundLoaded(evt)
   {
-    document.getElementById('audio_out').src = evt.target.result;
+    var audio_out = document.getElementById("audio_out");
+    audio_out.src = evt.target.result;
+    audio_out.controls = "true";
     // document.getElementById('audio_out').play();
   }
 
@@ -80,23 +82,23 @@
 
 <h4>Upload sound file for this phrase:</h4>
 <form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
-    Upload File: <input type="file" id="uploadFile" name="file">
-      <button type="button" id="playSoundButton" onclick="playSelectedSound()">Play selected sound file:</button>
-
-    <br /> <br />
-    <input type="radio" name="selectVoice" value="male_voice"> Male voice
-    <input type="radio" name="selectVoice" value="female_voice"> Female voice
-    <input type="hidden" id="updatePhraseKey" name="phraseKey" value="{{phraseKey}}"><br />
-    <br />
-    <input type="submit" name="submit" value="Upload sound file">
-</form>
-
-<br />
-<p>
+    <input type="file" id="uploadFile" name="file">
+      <button type="button" id="playSoundButton" onclick="playSelectedSound()">Play selected sound file</button>
+    <p>
       <audio id="audio_out">
       <source  src="" type="audio/wav">
         Your browser does not support the audio element.
       </audio>
+
+    <br /> <br />
+    <input type="hidden" id="updatePhraseKey" name="phraseKey" value="{{phraseKey}}"><br />
+    <br />
+    <input type="radio" name="selectVoice" value="male_voice" required> Male voice
+    <input type="radio" name="selectVoice" value="female_voice" required> Female voice
+    <input type="submit" name="submit" value="Upload sound file">
+</form>
+
+<br />
 
 </body>
 </html>

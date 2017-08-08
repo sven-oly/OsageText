@@ -82,6 +82,8 @@
 		  var errorMsg = document.getElementById('errorMsg');
           var comment = document.getElementById('comment');
           var dbName = document.getElementById('dbName');
+          var updatePhraseKey1 = document.getElementById('updatePhraseKeyStatus');
+          var updatePhraseKey2 = document.getElementById('updatePhraseKeyUpload');
 
           var json_obj = JSON.parse(returned_json);
           if (json_obj.error) {
@@ -96,6 +98,10 @@
           comment.value = comment.innerHTML = json_obj.comment;
           unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
           dbName.value = json_obj.dbName
+
+          updatePhraseKeyStatus.value = json_obj.phraseKey;
+          updatePhraseKeyUpload.value = json_obj.phraseKey;
+
           var warnStatus = setWarningBox(json_obj.utext, json_obj.oldtext);
           if (json_obj.oldtext && !warnStatus) {
             // uText is either empty or same as converted.
@@ -180,8 +186,9 @@
   	var newStatus = getStatusRadioButton(statusSetter); 
     var comment = document.getElementById("comment").value;
     var dbName = document.getElementById("dbName").value;
-    var phraseKey = document.getElementById("updatePhraseKey").value;
-	
+    var phraseKey =
+        document.getElementById("updatePhraseKeyStatus").value;
+
 	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus +
 	  "&unicodePhrase=" + unicodeData + "&comment=" + comment +
 	  "&oldOsageData=" + oldOsageData +
@@ -377,7 +384,7 @@
         {% if editOrAdmin %}
         <input type="button" value="Update status"
            onclick="updatePhraseStatus('index', 'updateStatus');"/>
-        <input type="hidden" id="updatePhraseKey" name="phraseKey" value="{{phraseKey}}">
+        <input type="hidden" id="updatePhraseKeyStatus" name="phraseKey" value="{{phraseKey}}">
         {% endif %}
       </form>
       <br />
@@ -401,7 +408,7 @@
       <h4>Upload sound file for this phrase:</h4>
       <form action="/sound/start/" method="GET" enctype="multipart/form-data">
         <input type="submit" name="submit" value="Upload sound file">
-        <input type="hidden" id="updatePhraseKey" name="phraseKey" value="{{phraseKey}}">
+        <input type="hidden" id="updatePhraseKeyUpload" name="phraseKey" value="{{phraseKey}}">
       </form>
 
        {% endif %}
