@@ -59,7 +59,7 @@
     }
   }
   
-  // Code to request Osage data at index with optional filter.
+  // Code to request {{language}} data at index with optional filter.
   // Direction indicates previous (-1) or next (+1)
   function dataRequest(index, direction) {
     // Prepare for the call to the backendvar xmlhttp;
@@ -234,7 +234,13 @@
 	  if (xmlhttp.readyState==4) {
 	    var returned_json = xmlhttp.responseText;
 		var json_obj = JSON.parse(returned_json);
-
+        if (json_obj.new_index) {
+          // Update index value.
+          var indexObj = document.getElementById("index");
+          indexObj.innerHTML = indexObj.value = json_obj.new_index;
+          var numEntries = document.getElementById("numEntries");
+          numEntries.innerHTML = numEntries.value = json_obj.new_index;
+        }
         // Set up alert for results.
         alert(json_obj.message);       
       }
@@ -339,7 +345,7 @@
     <div class="span-1">  
     </div>
     <div class="span-16">
-      <h3>Index <span id="index">{{index}}</span> of {{numEntries}}</h3>
+      <h3>Index <span id="index">{{index}}</span> of <span id="numEntries">{{numEntries}}</span></h3>
       <textarea id="OldOsage" class="oldOsageText" >{{oldtext}}</textarea>
       <br />
       <input type="button" value="Convert to Unicode"

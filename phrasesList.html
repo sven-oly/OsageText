@@ -37,7 +37,8 @@
       var oldUnicodeText = row.cells[3].innerText;
       var uText = oldOsageToUnicode(oldOsageText,
               false, true, false);
-      if (oldUnicodeText && oldUnicodeText != uText) {
+      if (oldOsageText !="" && oldUnicodeText != uText) {
+        // Only if there is old text to be converted.
         row.cells[3].style.backgroundColor = "Orange";
       }
     }

@@ -436,6 +436,7 @@ class AddPhrase(webapp2.RequestHandler):
       message = 'New Osage message added at index %s' % entry.index
 
     response = {
+      'new_index': entry.index,
       'message': message,
     }
     self.response.out.write(json.dumps(response))

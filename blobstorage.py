@@ -282,7 +282,7 @@ class CreateAndServeFileHandler(blobstore_handlers.BlobstoreDownloadHandler):
   lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
   # TODO
 
-class UserSound(ndb.Model):
+class UserSound(db.Model):
   user = ndb.StringProperty()
   blob_key = ndb.BlobKeyProperty()
   lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
