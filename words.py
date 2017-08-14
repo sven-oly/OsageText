@@ -207,9 +207,7 @@ class WordHandler(webapp2.RequestHandler):
         comment = result.comment
         soundFemaleLink = result.soundFemaleLink
         soundMaleLink = result.soundMaleLink
-        logging.info('LINKS LINKS FFFF: %s' % soundFemaleLink)
-        logging.info('LINKS LINKS MMMM: %s' % soundMaleLink)
-        phraseKey = result.key()
+        phraseKey = str(result.key())
 
       editOrAdmin = user_info[4]
 

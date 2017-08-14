@@ -197,10 +197,14 @@ class SoundUploadResults(webapp2.RequestHandler):
       public_obj_name = self.request.get('public_object_name', None)
       logging.info('+++ public_obj_name = %s' % public_obj_name)
 
+      logging.info('+++ BASENAME = %s' % os.path.basename(public_obj_name))
+
+      baseName = os.path.basename(public_obj_name)
+
       baseSoundURL = 'https://osagelanguagetools.appspot.com.storage.googleapis.com'
       # Add info to the phrase and sound objects.
-      if public_obj_name:
-        soundURL = '%s%s' % (baseSoundURL, public_obj_name)
+      if baseName:
+        soundURL = '%s/%s' % (baseSoundURL, baseName)
       else:
         soundURL = 'NONE'
       logging.info('!!!!!!!!!!!!!!!! soundURL = %s' % soundURL)
