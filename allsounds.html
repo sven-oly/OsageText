@@ -43,12 +43,12 @@
 {% for sound in sounds %}
 When: {{sound.lastUpdate}}
 Who: {{sound.uploadingUser}}<br />
-What: {{sound.filename}}<br />
+File name: {{sound.filename}}<br />
 Voice: {{sound.selectVoice}}<br />
-Phrase key: {{sound.phraseDBkey}}<br />
+<a href="/words/?phraseKey={{phraseKey}}">Show phrase</a>
+Uploading user: {{sound.uploadingUser}}<br />
 Sound key: {{sound.soundKey}}<br />
-URL: <a href="{{sound.public_url}}">Link</a>
-{{sound.public_url}}
+URL: <a href="{{sound.public_url}}">Link to public URL</a>
  <hr>
 {% endfor%}
 

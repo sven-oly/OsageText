@@ -81,6 +81,7 @@ class CreateAndReadFileHandler(webapp2.RequestHandler):
 
 
         template_values = {
+          'language': main.Language,
           'upload_url': upload_url,
           'filename': filename,
           'phraseKey': phraseKey,
@@ -187,42 +188,43 @@ class SoundUploadResults(webapp2.RequestHandler):
       logging.info('phraseKey = %s' % phraseKey)
 
       app_id = self.request.get('app_id', 'NO APP_ID')
+      logging.info('app_id = %s' % app_id)
+
       filename = self.request.get('filename', 'NO FILENAME')
+      selectVoice = self.request.get('selectVoice', None)
+      logging.info('selectVoice = %s' % selectVoice)
 
-      selectVoice = self.request.get('voice', None)
-
-      public_obj_name = self.request.get('public_objetc_name=%s', None)
+      public_obj_name = self.request.get('public_object_name', None)
       logging.info('+++ public_obj_name = %s' % public_obj_name)
 
       baseSoundURL = 'https://osagelanguagetools.appspot.com.storage.googleapis.com'
       # Add info to the phrase and sound objects.
       if public_obj_name:
-        soundURL = '%s/%s' % (baseSoundURL, public_obj_name)
+        soundURL = '%s%s' % (baseSoundURL, public_obj_name)
       else:
         soundURL = 'NONE'
       logging.info('!!!!!!!!!!!!!!!! soundURL = %s' % soundURL)
 
+      keyForPhrase = None
+      result = None
       if phraseKey:
         keyForPhrase = db.Key(encoded=phraseKey)
         logging.info('+++ Key for Phrase = %s' % keyForPhrase)
-      else:
-        # Update the phrase database object
-        keyForPhrase = None
-        result = None
-        if keyForPhrase:
-          result = db.get(keyForPhrase)
-          logging.info('+++ Got object from key %s' % result)
-          logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
-          logging.info('            Osage = %s' % (result.osagePhraseUnicode))
 
-          if selectVoice is u'male_voice':
-            result.soundMaleLink = soundURL
-            logging.info(' FFFF update %s' % result.soundMaleLink)
-            result.put()
-          else:
-            result.soundFemaleLink = soundURL
-            logging.info(' FFFF update %s' % result.soundFemaleLink)
-            result.put()
+      if keyForPhrase:  # Update the phrase database object
+        result = db.get(keyForPhrase)
+        logging.info('+++ Got object from key %s' % result)
+        logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
+        logging.info('            Osage = %s' % (result.osagePhraseUnicode))
+
+        if selectVoice == u'male_voice':
+          result.soundMaleLink = soundURL
+          logging.info(' MMMM update >%s<' % result.soundMaleLink)
+          result.put()
+        else:
+          result.soundFemaleLink = soundURL
+          logging.info(' FFFF update >%s<' % result.soundFemaleLink)
+          result.put()
 
       if not blobstore.get(sound_key):
         logging.info('ERROR!!!')
@@ -236,11 +238,14 @@ class SoundUploadResults(webapp2.RequestHandler):
                                public_url=soundURL,
                                selectVoice=selectVoice)
       newSound.put()
+      logging.info('SSSS new sound key = %s' % newSound.key())
 
       template_values = {
+        'phraseKey': phraseKey,
         'public_obj_name': public_obj_name,
         'public_url': soundURL,
         'sound_key': sound_key,
+        'soundDBkey': newSound.key(),
         'filename': filename,
         'selectVoice': selectVoice,
         'user': user,

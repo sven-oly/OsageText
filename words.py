@@ -73,44 +73,57 @@ class GetWordsHandler(webapp2.RequestHandler):
     dbName = self.request.get('dbName', '')
     databases = self.request.GET.getall('databases')
 
-    #logging.info('GetWordsHandler databases = %s' % databases)
-    #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
-    #   (index, filterStatus, direction))
-
-    qdb = OsageDbName.all()
-    dbNames = [p.dbName for p in qdb.run()]
-
-    q = OsagePhraseDB.all()
-
-    selectByDB = True
-    #logging.info('GetWordsHandler DBNAME = %s' % dbName)
-    if '*All*' in databases:
-      logging.info('*All* in databases = %s' % databases)
-      selectByDB = False
-
-    if databases:
-      q.filter('dbName IN', databases)
-      # logging.info('GetWordsHandler FILTER by databases = %s' % databases)
-
-    if filterStatus == 'All' or filterStatus == 'all':
-      # Get the specified index, with no status filter.
-      #logging.info('GetWordsHandler Going for index = %d' % index)
-      q.filter("index =", index)
+    phraseKey = self.request.get('phraseKey', None)
+    logging.info('phraseKey = %s' % phraseKey)
+    if phraseKey:
+      keyForPhrase = db.Key(encoded=phraseKey)
     else:
-      # Set up to get next phrase with required status and index >= query index.
-      #logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
-      q.filter('status =', filterStatus)
-      if selectByDB and databases:
-        q.filter('dbName IN', databases)
-        logging.info('GetWordsHandler FILTER WITH DATABASES: %s' % databases)
-      if direction < 0:
-        q.filter('index <=', index)
-        q.order('-index')
-      else:
-        q.filter('index >=', index)
-        q.order('index')
+      keyForPhrase = None
 
-    result = q.get()  # Use get_multi for more than one?
+    if keyForPhrase:
+      # Get the pharse result from the key.
+      result = db.get(keyForPhrase)
+      logging.info('+++ Got object from key')
+    else:
+      #logging.info('GetWordsHandler databases = %s' % databases)
+      #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
+      #   (index, filterStatus, direction))
+
+      qdb = OsageDbName.all()
+      dbNames = [p.dbName for p in qdb.run()]
+
+      q = OsagePhraseDB.all()
+
+      selectByDB = True
+      #logging.info('GetWordsHandler DBNAME = %s' % dbName)
+      if '*All*' in databases:
+        logging.info('*All* in databases = %s' % databases)
+        selectByDB = False
+
+      if databases:
+        q.filter('dbName IN', databases)
+        # logging.info('GetWordsHandler FILTER by databases = %s' % databases)
+
+      if filterStatus == 'All' or filterStatus == 'all':
+        # Get the specified index, with no status filter.
+        #logging.info('GetWordsHandler Going for index = %d' % index)
+        q.filter("index =", index)
+      else:
+        # Set up to get next phrase with required status and index >= query index.
+        #logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
+        q.filter('status =', filterStatus)
+        if selectByDB and databases:
+          q.filter('dbName IN', databases)
+          logging.info('GetWordsHandler FILTER WITH DATABASES: %s' % databases)
+        if direction < 0:
+          q.filter('index <=', index)
+          q.order('-index')
+        else:
+          q.filter('index >=', index)
+          q.order('index')
+
+      result = q.get()  # Use get_multi for more than one?
+      # END OF QUERY FOR RESULT.
 
     #logging.info('RESULT = %s' % (result))
     if result:
@@ -413,6 +426,7 @@ class AddPhrase(webapp2.RequestHandler):
     q = OsagePhraseDB.all()
     q.filter('osagePhraseLatin =', oldtext)
     result = q.get()
+
     if result:
       # It's a duplicate. Return warning.
       message = 'This Osage message already exists at index %s' % result.index
