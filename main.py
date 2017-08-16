@@ -200,9 +200,9 @@ app = webapp2.WSGIApplication([
     ('/db/resetDbEntries/', database.ResetDBEntries),
     ('/slides/', ProcessSlides),
 
-    ('/users/', userDB.showUsers),
-    ('/users/manage/', userDB.manageUsers),
+    ('/users/', userDB.manageUsers),
     ('/users/add/', userDB.addUser),
+    ('/users/remove/', userDB.deleteUser),
     ('/users/clear/', userDB.clearUsers),
 
     ('/sound/showupload/', blobstorage.SoundUploadFormHandler),
