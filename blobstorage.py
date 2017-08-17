@@ -110,6 +110,7 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler,
             logging.info('+++++++++++ APP_ID = %s' % app_id)
 
             selectVoice = self.request.POST['selectVoice']
+            logging.info('selectVoice = >%s<' % items)
 
             try:
               phraseKey = self.request.POST['phraseKey']
@@ -164,7 +165,7 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler,
                              'filename=%s' % upload.filename,
                              'app_id=%s' % app_id,
                              'phraseKey=%s' % phraseKey,
-                             'voice=%s' % selectVoice,
+                             'selectVoice=%s' % selectVoice,
                              'user=%s' % user))
             except Exception as err:
               logging.info('SOUND UPLOAD fail redirect: %s' % err)

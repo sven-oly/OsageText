@@ -83,16 +83,13 @@
 <h4>Upload sound file for this phrase:</h4>
 <form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
     <input type="file" id="uploadFile" name="file">
-      <button type="button" id="playSoundButton" onclick="playSelectedSound()">Play selected sound file</button>
     <p>
       <audio id="audio_out">
       <source  src="" type="audio/wav">
         Your browser does not support the audio element.
       </audio>
 
-    <br /> <br />
     <input type="hidden" id="updatePhraseKey" name="phraseKey" value="{{phraseKey}}"><br />
-    <br />
     <input type="radio" name="selectVoice" value="male_voice" required> Male voice
     <input type="radio" name="selectVoice" value="female_voice" required> Female voice
     <input type="submit" name="submit" value="Upload sound file">

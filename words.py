@@ -185,20 +185,32 @@ class WordHandler(webapp2.RequestHandler):
       soundFemaleLink = ''
       soundMaleLink = ''
 
-      q = OsagePhraseDB.all()
+      if phraseKey:
+        keyForPhrase = db.Key(encoded=phraseKey)
+        logging.info('+++ Key for Phrase = %s' % keyForPhrase)
+      else:
+        keyForPhrase = None
+
+      result = None
       currentEntries = 0
-      for p in q.run():
-        currentEntries += 1
-      q.filter("index =", index)
-      if dbName:
-        logging.info("dbName filter by %s" % dbName)
-        q.filter("dbName", dbName)
-      result = q.get()
+      if keyForPhrase:
+        result = db.get(keyForPhrase)
+      else:
+        # No phraseKey found. Need to search
+        q = OsagePhraseDB.all()
+        for p in q.run():
+          currentEntries += 1
+        q.filter("index =", index)
+        if dbName:
+          logging.info("dbName filter by %s" % dbName)
+          q.filter("dbName", dbName)
+        result = q.get()
 
       dbq = OsageDbName.all()
       dbNameList = [p.dbName for p in dbq.run()]
 
       if result:
+        index = result.index
         oldtext = result.osagePhraseLatin
         dbName = result.dbName
         utext = result.osagePhraseUnicode
