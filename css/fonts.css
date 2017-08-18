@@ -164,3 +164,18 @@
     font-family:"NotoSansOsage_alpha";
     font-size: 32px;
     }
+
+    @font-face{ 
+	font-family:'NotoSansOsage_20170818';
+	src:url('/fonts/NotoSansOsage-Regular_20170818.ttf');
+	font-weight:normal;
+	font-style:normal;
+	font-variant-ligatures: normal;
+    }
+
+    .notosansosage_20170818 {
+    font-family:"NotoSansOsage_20170818";
+    font-size: 32px;
+    }
+
+    

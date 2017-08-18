@@ -110,6 +110,9 @@ var osage_private_use_map = {
   '\uf06d': " ",
   '\uf06e': " ",
   '\uf06f': [String.fromCodePoint(0x104c3)],  // ??
+  '\uf078': ' ',
+  '\uf079': ' ',
+  '\uf07a': ' ',
   '\uf07b': '{',
   '\uf07c': '|',
   '\uf07d': '}',
@@ -179,7 +182,7 @@ var osage_latin_to_unicode_map = {
   'uU': [String.fromCodePoint(0x104f6)+macron, '\uf055\uf055'], // Macron
   'v':  [String.fromCodePoint(0x104ef), '\uf056'],
   'w':  [String.fromCodePoint(0x104f7), '\uf057'],
-  'x':  [String.fromCodePoint(0x104f8), '\uf058'],
+  'x':  [' ', '\uf078'], // OLD: String.fromCodePoint(0x104f8), '\uf058'],
   'y':  [String.fromCodePoint(0x104e3), '\uf059'],
   'yy':  [String.fromCodePoint(0x104e3)+macron, '\uf059\uf059'],
   'yY':  [String.fromCodePoint(0x104e3)+macron, '\uf059\uf059'],
@@ -545,7 +548,7 @@ function preParseLatin(instring) {
 // For converting input to sets of connected characters.
 // Vowels + ^, double vowels, pre-aspirated consonants, single characters.
 var old_osage_chars =
-  "[\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|\uf041\uf059|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf07b-\uf07e\uf0b6]|";
+  "[\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|\uf041\uf059|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf078-\uf07e\uf0b6]|";
 
 function preParseOldOsage(instring) {
   if (typeof instring == 'string') {
