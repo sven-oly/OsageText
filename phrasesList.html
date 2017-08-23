@@ -106,22 +106,26 @@
     <br />
       <tr class="default">
         <th>Index</th>
-        <th>Status</th>
-        <th>Old Osage</th>
+        <th>Voice</th>
         <th>Unicode</th>
         <th>English</th>
+        <th>Old Osage</th>
         <th>Comment</th>
+        <th>Status</th>
         <th>DB</th>
 	  </tr>
       {% for entry in entries %}
       <tr class="default">
         <td><a href="/words/?index={{entry.index}}&dbName={{entry.dbName}}" target=_blank>{{entry.index}}</a></td>
-        <td>{{entry.status}}</td>
-        <td class="oldOsageText size18">{{entry.osagePhraseLatin}}</td>
+        <td>{%if entry.soundMaleLink%}<a href="{{entry.soundMaleLink}}">M</a>{%endif%}
+          {% if entry.soundFemaleLink%}<a href="{{entry.soundFemaleLink}}">F</a>{%endif%}</td>
         <td class="unicodeOsageText size18">{{entry.osagePhraseUnicode}}</td>
         <td>{{entry.englishPhrase}}</td>
+        <td class="oldOsageText size18">{{entry.osagePhraseLatin}}</td>
         <td>{{entry.comment}}</td>
+        <td>{{entry.status}}</td>
         <td>{{entry.dbName}}</td>
+
       </tr>
       {% endfor %}
     </table>
