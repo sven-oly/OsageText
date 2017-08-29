@@ -408,11 +408,9 @@
 
       {% if showSounds %}
       {% if soundMaleLink %}
-      <a href= "{{soundMaleLink}}">
       <span id="maleVoice">
-
-        Male: <img src="/images/Speaker_Icon.svg" style="width:40px;height:35px;"></a>
-       <audio id="audio_out_male">
+        Male:
+       <audio id="audio_out_male" controls="controls">
          <source  src="{{soundMaleLink}}" type="audio/wav">
           Your browser does not support the audio element.
         </audio>
@@ -420,10 +418,8 @@
       {% endif %}
       {% if soundFemaleLink %}
       <span  id="femaleVoice">
-       <!-- <img src="/images/Speaker_Icon_gray.svg" style="width:40px;height:35px;"> -->
-       <a href="{{soundFemaleLink}}">
        Female: <img src="/images/Speaker_Icon.svg" style="width:40px;height:35px;"></a>
-         <audio id="audio_out_female">
+         <audio id="audio_out_female" controls="controls">
            <source  src="{{soundFemaleLink}}" type="audio/wav">
             Your browser does not support the audio element.
           </audio>
