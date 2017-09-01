@@ -21,6 +21,43 @@
    .size18 {
 	 font-size: 18px;
    }
+
+   .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+}
   </style>
 
   <script src="/js/utils.js"></script>
@@ -43,6 +80,27 @@
       }
     }
   }
+
+  function openSoundModal(maleLink, femaleLink, index, unicodePhrase) {
+    var modal = document.getElementById('myModal');
+    modal.style.display = "block";
+    var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+  window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+  // Fill the sound file, index, unicode fields.
+  }
+
+
+
+
 
   function init(hilight) {
     if (hilight) {
@@ -113,17 +171,6 @@
       <br />
 
       
-    <!-- Try popup for the sound display -->
-    <div class="popup" onclick="popupFunction()" style:"visibility:none">
-      show audio + text
-      <audio controls="controls">
-        <source src="" type="">
-          Your browser does not support this type of sound file.
-      </audio>
-
-    </div>
-
-
       <tr class="default">
         <th>Index</th>
         <th>Voice</th>
@@ -137,7 +184,10 @@
       {% for entry in entries %}
       <tr class="default">
         <td><a href="/words/?index={{entry.index}}&dbName={{entry.dbName}}" target=_blank>{{entry.index}}</a></td>
-        <td>{%if entry.soundMaleLink%}<a href="{{entry.soundMaleLink}}">M</a>{%endif%}
+        <td>{%if entry.soundMaleLink or entry.soundFemaleLink%}
+          <button id="myBtn" onclick="openSoundModal('{{entry.soundMaleLink}}', '{{entry.soundFemaleLink}}', {{entry.index}}, '{{entry.osagePhraseUnicode}}');">Play</button>
+          {% endif %}
+          {%if entry.soundMaleLink%}<a href="{{entry.soundMaleLink}}">M</a>{%endif%}
           {% if entry.soundFemaleLink%}<a href="{{entry.soundFemaleLink}}">F</a>{%endif%}</td>
         <td class="unicodeOsageText size18">{{entry.osagePhraseUnicode}}</td>
         <td>{{entry.englishPhrase}}</td>
@@ -152,5 +202,25 @@
     </div>
 
   </div>  <!-- of container -->
+  <!-- The Modal -->
+  <div id="myModal" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p>Index = <span id="modalIndex"></span>
+    <p>Phrase: <span id="modalUnicode"></span>
+    </p>
+    <audio id="male">
+      <source src="" controls>
+    </audio>
+    <audio id="female">
+      <source src="" controls>
+    </audio>
+    <p>Some text in the Modal..</p>
+  </div>
+
+</div>
+
   </body>
 </html>
