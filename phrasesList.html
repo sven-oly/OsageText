@@ -28,7 +28,7 @@
   <script src="/js/osage_utils.js"></script>
 
   <script type="text/javascript" >
-  function init() {
+  function hilightUnconverted() {
     var table=document.getElementById("dbTable");
     var r=1;
     while(row=table.rows[r++]) {
@@ -43,12 +43,18 @@
       }
     }
   }
+
+  function init(hilight) {
+    if (hilight) {
+      hilightUnconverted();
+    }
+  }
   </script>
   </head>
-  
-  <body onload="init()">
+
+  <body onload="init(false)">
   <div class="container">
-    <h2>Data from approved word list</h2>
+    <h2>Data from database</h2>
     <div class="span-6 default">
     {{entries|length}} entries returned 
     {% if filter %}
@@ -56,6 +62,7 @@
     Status = "{{filter}}"
     {% endif %}
     </div>
+
     <div class="span-14 default ">
     <form action="/words/getPhrases/" id="set_status">
 
@@ -103,7 +110,20 @@
     
     <div class="span-20 last">
     <table id="dbTable">
-    <br />
+      <br />
+
+      
+    <!-- Try popup for the sound display -->
+    <div class="popup" onclick="popupFunction()" style:"visibility:none">
+      show audio + text
+      <audio controls="controls">
+        <source src="" type="">
+          Your browser does not support this type of sound file.
+      </audio>
+
+    </div>
+
+
       <tr class="default">
         <th>Index</th>
         <th>Voice</th>
