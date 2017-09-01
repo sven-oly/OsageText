@@ -99,8 +99,8 @@
           unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
           dbName.value = json_obj.dbName
 
-          updatePhraseKeyStatus.value = json_obj.phraseKey;
-          updatePhraseKeyUpload.value = json_obj.phraseKey;
+          if (updatePhraseKey1) updatePhraseKey1.value = json_obj.phraseKey;
+          if (updatePhraseKey2) updatePhraseKey2.value = json_obj.phraseKey;
 
           var warnStatus = setWarningBox(json_obj.utext, json_obj.oldtext);
           if (json_obj.oldtext && !warnStatus) {
@@ -120,16 +120,21 @@
 
           // Handle voice icons
           var isMaleVoice = json_obj.soundMaleLink;
+          var sound = document.getElementById("audio_out_male");
           if (isMaleVoice) {
             setDisplayState('maleVoice', 'block');
+            if (sound) sound.src = isMaleVoice;
           } else {
              setDisplayState('maleVoice', 'none');
+             if (sound) sound.src = null;
          }
           var isFemaleVoice = json_obj.soundFemaleLink;
-          // TODO: Set icons and links for sound output.
+          sound = document.getElementById("audio_out_female");
           if (isFemaleVoice) {
+            if (sound) sound.src = isFemaleVoice;
             setDisplayState('femaleVoice', 'block');
           } else {
+            if (sound) sound.src = null;
             setDisplayState('femaleVoice', 'none');
           }
         }
@@ -340,6 +345,19 @@
     var status = document.getElementById("status").innerHTML;
     setStatusRadioButton("updateStatus", status);
 
+    // Reset the sound file display.
+    var sound = document.getElementById("audio_out_female");
+    if (sound.currentSrc) {
+      setDisplayState('femaleVoice', 'block');
+    } else {
+      setDisplayState('femaleVoice', 'none');
+    }
+    sound = document.getElementById("audio_out_male");
+    if (sound.currentSrc) {
+      setDisplayState('maleVoice', 'block');
+    } else {
+      setDisplayState('maleVoice', 'none');
+    }
   }
 
   </script>
@@ -407,24 +425,21 @@
       <div id='errorMsg'>{{error}}</div>
 
       {% if showSounds %}
-      {% if soundMaleLink %}
       <span id="maleVoice">
-        Male:
+        M:
        <audio id="audio_out_male" controls="controls">
-         <source  src="{{soundMaleLink}}" type="audio/wav">
+         <source src="{{soundMaleLink}}" type="audio/wav">
           Your browser does not support the audio element.
         </audio>
       </span>
-      {% endif %}
-      {% if soundFemaleLink %}
+      <br />
       <span  id="femaleVoice">
-       Female: <img src="/images/Speaker_Icon.svg" style="width:40px;height:35px;"></a>
+       F:
          <audio id="audio_out_female" controls="controls">
-           <source  src="{{soundFemaleLink}}" type="audio/wav">
+           <source src="{{soundFemaleLink}}" type="audio/wav">
             Your browser does not support the audio element.
           </audio>
         </span>
-      {% endif %}
 
       {% if editOrAdmin %}
       <hr>
