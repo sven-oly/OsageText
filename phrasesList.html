@@ -173,7 +173,6 @@
            checked
           {% endif %}
           >All<br />
-      </select>
        <input type="submit" value="Select">
    </form>
            
@@ -181,7 +180,7 @@
     <div class="span-4 last">
   
     {% if user_nickname %}
-    <h4>Welcome {{user_nickname}}
+      <h4>Welcome {{user_nickname}}</h4>
       {% if user_logout %}
         <a href={{user_logout}}>Logout</a>
       {% endif %}

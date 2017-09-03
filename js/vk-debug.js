@@ -7654,14 +7654,7 @@ i18n.input.keyboard.Standalone.prototype.commitText = function $i18n$input$keybo
           from -= 1;  // It leaves the first part of a supplementary character. Remove it, too.
         }
       }
-//      var part3 = value.slice(to);
-//      var first3 = part1.substr(0);
-//      if (first3) {
-//        var codep3 = first3.charCodeAt();
-//        if (codep3 >= 0xdc00 && codep3 <= 0xdfff) {
-//          fix = true;
-//        }
-//      }
+
       this.activeInput_.value = value.slice(0, from) + text + value.slice(to);
       from += text.length;
       this.activeInput_.setSelectionRange(from, from);
