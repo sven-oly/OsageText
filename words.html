@@ -121,7 +121,7 @@
           // Handle voice icons
           var isMaleVoice = json_obj.soundMaleLink;
           var sound = document.getElementById("audio_out_male");
-          if (isMaleVoice) {
+          if (isMaleVoice && isMaleVoice != "None") {
             setDisplayState('maleVoice', 'block');
             if (sound) sound.src = isMaleVoice;
           } else {
@@ -130,7 +130,7 @@
          }
           var isFemaleVoice = json_obj.soundFemaleLink;
           sound = document.getElementById("audio_out_female");
-          if (isFemaleVoice) {
+          if (isFemaleVoice && isFemaleVoice != "None") {
             if (sound) sound.src = isFemaleVoice;
             setDisplayState('femaleVoice', 'block');
           } else {

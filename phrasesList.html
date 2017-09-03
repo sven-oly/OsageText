@@ -106,7 +106,7 @@
     // Fill the sound file, index, unicode fields.
     var sound = document.getElementById("male_sound");
     region = document.getElementById("male_audio");
-    if (sound && maleLink) {
+    if (sound && maleLink && maleLink != "None") {
       sound.src = maleLink;
       region.style.display = "block";
     } else {
@@ -114,7 +114,7 @@
     }
     sound = document.getElementById("female_sound");
     region = document.getElementById("female_audio");
-    if (sound && femaleLink) {
+    if (sound && femaleLink  && femaleLink != "None") {
       sound.src = femaleLink;
       region.style.display = "block";
     } else {
