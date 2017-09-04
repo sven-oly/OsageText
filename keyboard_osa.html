@@ -84,7 +84,7 @@
 
     function showCodePoints() {
       var src_field = document.getElementById('t1');
-      var code_text = uplus(src_field.value);
+      var code_text = uplus(src_field.value, " ");
       var dest_field = document.getElementById('codepoints');
       dest_field.value = code_text;
       document.getElementById('t1').focus();

@@ -263,37 +263,6 @@ class SoundUploadResults(webapp2.RequestHandler):
       self.response.out.write(template.render(path, template_values))
 #-------------------------------------------
 
-# This handler creates a file in Cloud Storage using the cloudstorage
-# client library and then serves the file back using the Blobstore API.
-class CreateAndServeFileHandler(blobstore_handlers.BlobstoreDownloadHandler):
-
-  def get(self):
-    # Get the default Cloud Storage Bucket name and create a file name for
-    # the object in Cloud Storage.
-    bucket = app_identity.get_default_gcs_bucket_name()
-
-    # Cloud Storage file names are in the format /bucket/object.
-    filename = '/{}/blobstore_serving_demo'.format(bucket)
-
-    # Create a file in Google Cloud Storage and write something to it.
-    with gcs.open(filename, 'w') as filehandle:
-      filehandle.write('abcde\n')
-
-    # In order to read the contents of the file using the Blobstore API,
-    # you must create a blob_key from the Cloud Storage file name.
-    # Blobstore expects the filename to be in the format of:
-    # /gs/bucket/object
-    blobstore_filename = '/gs{}'.format(filename)
-    blob_key = blobstore.create_gs_key(blobstore_filename)
-
-    # BlobstoreDownloadHandler serves the file from Google Cloud Storage to
-    # your computer using blob_key.
-    self.send_blob(blob_key)
-
-
-# This datastore model keeps track of which users uploaded which sounds.
-  lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
-  # TODO
 
 class UserSound(db.Model):
   user = ndb.StringProperty()
@@ -498,8 +467,7 @@ class RemoveSoundHandler(webapp2.RequestHandler):
       name_parts = old_sound_link.split(baseSoundURL)
       logging.info('Old sound file name = %s' % name_parts[1])
 
-
-      # TODO: Complete this.
+      # TODO: 4-Sept. Complete this.
 
     # Send update back to client
     obj = {

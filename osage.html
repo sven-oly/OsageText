@@ -26,6 +26,7 @@
     font-family: "Courier New";
   }
   </style>
+  <script src="/js/text_utils.js"></script>
   <script src="/js/utils.js"></script>
   <script src="/js/osageConverter.js"></script>
   <script src="/js/osage_utils.js"></script>
@@ -33,12 +34,13 @@
   <script src="/js/vk-debug.js"></script>
 
   <script>
+  var diff_list = [];
 
   // When an area is changed, set the hex characters, too.
   function updateHex(inArea, outArea) {
     var inText = document.getElementById(inArea).value;
     var hex_output = document.getElementById(outArea);
-    var hexString = charsToHexString(inText);
+    var hexString = uplus(inText, "");
     if (hex_output != null) {
       hex_output.value = hexString;
       hex_output.innerHTML = hexString;
