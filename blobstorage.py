@@ -36,6 +36,9 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb import msgprop
 
+# Global
+baseSoundURL = 'https://osagelanguagetools.appspot.com.storage.googleapis.com'
+
 
 # Sound datastore objects.
 class SoundUploadDB(db.Model):
@@ -75,9 +78,9 @@ class CreateAndReadFileHandler(webapp2.RequestHandler):
         result = None
         if keyForPhrase:
           result = db.get(keyForPhrase)
-          logging.info('+++ Got object from key %s' % result)
-          logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
-          logging.info('            Osage = %s' % (result.osagePhraseUnicode))
+          #logging.info('+++ Got object from key %s' % result)
+          #logging.info('  index %d, English = %s' % (result.index, result.englishPhrase))
+          #logging.info('            Osage = %s' % (result.osagePhraseUnicode))
 
 
         template_values = {
@@ -434,3 +437,76 @@ class AllSoundsDB(webapp2.RequestHandler):
 
     path = os.path.join(os.path.dirname(__file__), 'allsounds.html')
     self.response.out.write(template.render(path, template_values))
+
+
+# Deletes reference to sound file from phrase obj, and removes sound file.
+class RemoveSoundHandler(webapp2.RequestHandler):
+  def get(self):
+    logging.info('Remove SOUND handler!')
+
+    phraseKey = self.request.get('phraseKey', None)
+    gender = self.request.get('gender', None)
+
+    delete_status = True
+    error_msg = 'No error'
+
+    if phraseKey:
+      keyForPhrase = db.Key(encoded=phraseKey)
+      logging.info('+++ Key for Phrase = %s' % keyForPhrase)
+    else:
+      delete_status = False
+      error_msg = 'Bad phrase key'
+      keyForPhrase = None
+
+    logging.info('Getting phrase from key %s' % keyForPhrase)
+    result = None
+    try:
+      if keyForPhrase:
+        result = db.get(keyForPhrase)
+        logging.info('+++ Got object from key %s' % result)
+        logging.info('  index %d, English = %s' % (
+            result.index, result.englishPhrase))
+    except:
+      delete_status = False
+      error_msg = 'Cannot find phrase'
+      logging.info('---- Cannot get object from key %s' % result)
+
+    # Get the corresponding URL and extract the storage file name.
+    if not result:
+      delete_status = False
+      error_msg = 'Cannot find phrase in DB'
+    else:
+      if gender == 'male':
+        # Get current link
+        old_sound_link = result.soundMaleLink
+        result.soundMaleLink = None
+        result.put()
+      elif gender == 'female':
+        old_sound_link = result.soundFemaleLink
+        result.soundFemaleLink = None
+        result.put()
+      else:
+        old_sound_link = None
+        delete_status = False
+        error_msg = 'Bad gender data'
+
+    #
+    #  TODO: Look at old_sound_link to remove the file.
+    if old_sound_link:
+      # Get the file name from the link
+      bucket_name = app_identity.get_default_gcs_bucket_name()
+      name_parts = old_sound_link.split(baseSoundURL)
+      logging.info('Old sound file name = %s' % name_parts[1])
+
+
+      # TODO: Complete this.
+
+    # Send update back to client
+    obj = {
+      'phraseKey': phraseKey,
+      'status': delete_status,
+      'gender': gender,
+      'errorMsg': error_msg,
+    }
+    self.response.out.write(json.dumps(obj))
+  # [END RemoveSoundHandler]

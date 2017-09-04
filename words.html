@@ -321,6 +321,61 @@
     // document.getElementById('audio_out').play();
   }
 
+  function removeSoundFile(genderOfRecording) {
+    var phraseKey =
+      document.getElementById("updatePhraseKeyStatus").value;
+    if (!phraseKey) {
+      window.alert("Problem getting the phrase Key. The recording is unchanged.");
+    }
+    result = window.confirm("Really delete the " + genderOfRecording + " voice recording?");
+    if (!result == true) {
+      window.alert("You pressed Cancel. The recording is unchanged.");
+      return;
+    }
+
+    // Send phrase key and gender to backend.
+    // Handle result.
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	} else { // code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+
+    // Deal with the results
+    xmlhttp.onreadystatechange=function()
+	{
+	  if(xmlhttp.readyState==4) {
+	      var returned_json = xmlhttp.responseText;
+		  var json_obj = JSON.parse(returned_json);
+
+		  if (json_obj.status) {
+		    var status = document.getElementById("status");
+            var errorMsg = json_obj.errorMsg;
+            var retGender = json_obj.gender;
+
+           if (status) {
+             // Turn off the appropriate sound visual.
+             var sound;
+             if (retGender == "female") {
+               sound = document.getElementById("femaleVoice");
+             } else {
+               sound = document.getElementById("maleVoice");
+             }
+             sound.style.display = 'none';
+           }
+         }
+       }
+	}
+
+  	// Set up the call with new status.
+
+	var target = "/sound/delete/?phraseKey=" + phraseKey + "&gender=" + genderOfRecording;
+
+	xmlhttp.open("GET", target, true);
+	var size = target.length;
+	xmlhttp.send(null);
+  }
+
   // Update to toggle region on/off.
   function setDisplayState(id, newstate) {  // block or none
     var obj = document.getElementById(id);
@@ -431,15 +486,23 @@
          <source src="{{soundMaleLink}}" type="audio/wav">
           Your browser does not support the audio element.
         </audio>
+        {% if editOrAdmin %}
+          <input type="button" value="Remove recording?"
+           onclick="removeSoundFile('male');"/>
+        {% endif %}
       </span>
       <br />
-      <span  id="femaleVoice">
+      <span id="femaleVoice">
        F:
          <audio id="audio_out_female" controls="controls">
            <source src="{{soundFemaleLink}}" type="audio/wav">
             Your browser does not support the audio element.
           </audio>
-        </span>
+        {% if editOrAdmin %}
+          <input type="button" value="Remove recording?"
+           onclick="removeSoundFile('female');"/>
+        {% endif %}
+      </span>
 
       {% if editOrAdmin %}
       <hr>
