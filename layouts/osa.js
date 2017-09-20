@@ -19,7 +19,7 @@
 
 var OSA_UNICODE_LAYOUT = {
   'id': 'osa',
-  'title': 'Osage Unicode',
+  'title': '\ud801\udccf\ud801\udcd8\ud801\udcfb\ud801\udcd8\ud801\udcfb\ud801\udcdf \ud801\udcbb\ud801\udcdf',
   'mappings': {
     '': {
       '': '{{\u0301}}1234567890-=' +
