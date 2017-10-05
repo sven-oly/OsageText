@@ -82,7 +82,12 @@
 
 <h4>Upload sound file for this phrase:</h4>
 <form action="{{upload_url}}" method="POST" enctype="multipart/form-data">
+  Microphone: <input type="file" id="uploadFile" name="file" accept="audio/*"
+         capture="microphone">
+
+  <!--
     <input type="file" id="uploadFile" name="file">
+    -->
     <p>
       <audio id="audio_out">
       <source  src="" type="audio/wav">

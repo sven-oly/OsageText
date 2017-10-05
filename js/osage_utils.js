@@ -1,6 +1,8 @@
 // Fills the input with all the characters in the new Unicode Osage range.
-var unicodeVowels = [0x104b0, 0x104b7, 0x104bb, 0x104c2, 0x104ce,
-  0x104d8, 0x104df, 0x104e3, 0x104ea, 0x104f6];
+var unicodeVowels = [0x104b0, 0x104b3, 0x104b7, 0x104bb, 0x104c2, 0x104ce,
+		     0x104d8, 0x104db, 0x104df, 0x104e3, 0x104ea, 0x104f6];
+var unicodeVowelSubset = [0x104b0, 0x104b3, 0x104bb, 0x104c2,
+			  0x104d8, 0x104db, 0x104e3, 0x104ea];
 
   // Fills the input with all the characters in the old Osage range.
   function fillWithOldOsage(target, hex_target) {
@@ -104,12 +106,6 @@ function fillWithUnicodeOsageDotted(target, hex_target) {
 function fillWithUnicodeOsageStringAppended(target, stringToAppend, hex_target) {
   var output_text = document.getElementById(target);
   var outputString = "";
-  String.fromCodePoint(0x104b0) + String.fromCodePoint(0x104b7) +
-  String.fromCodePoint(0x104bb) + String.fromCodePoint(0x104c2) +
-  String.fromCodePoint(0x104ce) +
-  String.fromCodePoint(0x104d8) + String.fromCodePoint(0x104df) +
-  String.fromCodePoint(0x104ce3) + String.fromCodePoint(0x104ea) +
-  String.fromCodePoint(0x104f6);
   for (var index in unicodeVowels) {
   //for (var codePt = 0x104b0; codePt <= 0x104d3; codePt++) {
     outputString += getUnicodeCharacter(unicodeVowels[index]); //getUnicodeCharacter(codePt);
@@ -121,6 +117,19 @@ function fillWithUnicodeOsageStringAppended(target, stringToAppend, hex_target) 
     outputString += stringToAppend;
   }
   */
+  output_text.innerHTML = outputString;
+  output_text.value = outputString;
+
+  updateHex(target, hex_target);
+}
+
+function fillWithUnicodeOsageVowelSubsetAppended(target, stringToAppend, hex_target) {
+  var output_text = document.getElementById(target);
+  var outputString = "";
+  for (var index in unicodeVowelSubset) {
+    outputString += getUnicodeCharacter(unicodeVowelSubset[index]); //getUnicodeCharacter(codePt);
+    outputString += stringToAppend;
+  }
   output_text.innerHTML = outputString;
   output_text.value = outputString;
 
