@@ -4,6 +4,7 @@
 import main
 from userDB import getUserInfo
 
+import codecs
 import csv
 import json
 import logging
@@ -104,28 +105,29 @@ class GetWordsHandler(webapp2.RequestHandler):
         q.filter('dbName IN', databases)
         # logging.info('GetWordsHandler FILTER by databases = %s' % databases)
 
-      if filterStatus == 'All' or filterStatus == 'all':
-        # Get the specified index, with no status filter.
-        #logging.info('GetWordsHandler Going for index = %d' % index)
-        q.filter("index =", index)
-      else:
+      if filterStatus != 'All' and filterStatus != 'all':
         # Set up to get next phrase with required status and index >= query index.
         #logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
         q.filter('status =', filterStatus)
-        if selectByDB and databases:
-          q.filter('dbName IN', databases)
-          logging.info('GetWordsHandler FILTER WITH DATABASES: %s' % databases)
-        if direction < 0:
-          q.filter('index <=', index)
-          q.order('-index')
-        else:
-          q.filter('index >=', index)
-          q.order('index')
+      if selectByDB and databases:
+        q.filter('dbName IN', databases)
+        logging.info('GetWordsHandler FILTER WITH DATABASES: %s' % databases)
+      if direction < 0:
+        q.filter('index <=', index)
+        q.order('-index')
+      else:
+        q.filter('index >=', index)
+        q.order('index')
 
-      result = q.get()  # Use get_multi for more than one?
+      results = q.run()  # Use get_multi for more than one?
+      logging.info(' RESULTS ITERATOR = %s' % results)
+      try:
+        result = results.next()
+        logging.info(' RESULT = %s' % result)
+      except:
+        result = None
       # END OF QUERY FOR RESULT.
 
-    #logging.info('RESULT = %s' % (result))
     if result:
       index = result.index
       dbName = result.dbName
@@ -149,6 +151,7 @@ class GetWordsHandler(webapp2.RequestHandler):
     obj = {
         'language': main.Language,
         'dbNames': dbNames,
+        'entry': result,  # All the data in one place
         'index': index,
         'dbName': dbName,
         'phraseKey': phraseKey,
@@ -164,7 +167,6 @@ class GetWordsHandler(webapp2.RequestHandler):
         'soundMaleLink': result.soundMaleLink,
         'soundFemaleLink': result.soundFemaleLink,
     }
-    # logging.info('^^^^^^^ obj = %s' % obj)
     self.response.out.write(json.dumps(obj))
 
 # Show data from word list converted for human verification
@@ -570,6 +572,9 @@ def processRow(index, row):
   entry.put()
   return entry
 
+def utf_8_encoder(unicode_csv_data):
+  for line in unicode_csv_data:
+    yield line.encode('utf-8')
 
 class ProcessCSVUpload(webapp2.RequestHandler):
 # http://stackoverflow.com/questions/2970599/upload-and-parse-csv-file-with-google-app-engine
@@ -621,7 +626,7 @@ class ProcessCSVUpload(webapp2.RequestHandler):
         #self.response.out.write('Skipping line %d :  %s\n' % (lineNum, row))
       else:
         x = 0
-        #self.response.out.write('%3d: %s \n' % (lineNum, row))
+        # self.response.out.write('%3d: %s \n' % (lineNum, row))
 
         try:
           indexValue = int(row[columnMap[indexColumn]])
@@ -698,3 +703,109 @@ class ProcessCSVUpload(webapp2.RequestHandler):
     }
     path = os.path.join(os.path.dirname(__file__), 'DBUploadResults.html')
     self.response.out.write(template.render(path, template_values))
+
+
+# Return entries based on the criteria given.
+def getDBItemsFiltered(databases, selectAllDB, filterStatus, orderBy=None):
+  logging.info('!!! getDBItemsFiltered selectAllDB %s' % selectAllDB)
+
+  q = OsagePhraseDB.all()
+  if filterStatus:
+    logging.info('!!! getDBItemsFiltered filterStatus %s' % filterStatus)
+    q.filter('status =', filterStatus)
+  if not selectAllDB or databases:
+    logging.info('!!! getDBItemsFiltered databases %s' % databases)
+    if type(databases) is not list:
+      databases = [databases]
+    q.filter('dbName IN', databases)
+  if orderBy:
+    logging.info('!!! getDBItemsFiltered orderBy %s' % orderBy)
+    q.order(orderBy)
+
+  numEntries = 0
+  entries = []
+  nullIndexCount = 0
+  for p in q.run():
+    numEntries += 1
+
+    if not p.index:
+      nullIndexCount += 1
+
+    entries.append(p)
+
+  logging.info('!!! getDBItemsFiltered has %d entries' % numEntries)
+  return entries
+
+
+# Returns items from database as CSV file or TSV file.
+class DownloadPhrasesCSV(webapp2.RequestHandler):
+  def get(self):
+    user_info = getUserInfo(self.request.url)
+    logging.info('GetPhrasesCSV')
+
+    filterStatus = self.request.get('filterStatus', '')
+    sortCriteria = self.request.get('sortCriteria', 'index')
+    outfileName = self.request.get('outfileName', 'database.csv')
+
+    delimiter = self.request.get('delimiter', ',')  # This may set up TSV or other types.
+
+    databases = self.request.GET.getall('databases')
+
+
+    if databases == None or databases == '*All*' or '*All*' in databases:
+      selectAllDB = True
+      databases = []
+    else:
+      selectAllDB = False
+
+    logging.info('filterStatus = %s' % filterStatus)
+    logging.info('sortCriteria = %s' % sortCriteria)
+    logging.info('outfileName = %s' % outfileName)
+    logging.info('delimiter = %s' % delimiter)
+    logging.info('databases = %s' % databases)
+
+    if sortCriteria == 'alpha':
+      sortCriteria = 'osagePhraseUnicode'
+    entries = getDBItemsFiltered(databases, selectAllDB, filterStatus, sortCriteria)
+    logging.info('GetPh rasesCSV WRITING %s entries' % entries)
+
+    output_type = 'csv'
+    if delimiter == 'comma':
+      delimiter = ','
+    if delimiter == 'tab':
+      delimiter='\t'
+      output_type = 'tsv'
+    self.response.headers['Content-Type'] = 'application/%s' % output_type
+
+    self.response.headers['Content-Disposition'] = str('attachment; filename="%s"' % outfileName)
+    writer = csv.writer(self.response.out, delimiter=delimiter)
+    # Headers
+    index = db.IntegerProperty()
+    dbName = db.StringProperty(u'')
+    lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
+    englishPhrase = db.StringProperty(multiline=True)
+    osagePhraseLatin = db.StringProperty(u'')
+    osagePhraseUnicode = db.StringProperty(u'')
+    status = db.StringProperty('')
+    comment = db.StringProperty('')
+
+    writer.writerow(['index',
+                     'Osage unicode',
+                     'phrase Latin',
+                     'english Phrase',
+                     'status',
+                     'dbName',
+                     'comment',
+                     'lastUpdate'])
+    for entry in entries:
+      logging.info('GetPhrasesCSV WRITING index = %s' % entry.index)
+      new_row = [entry.index,
+                 entry.osagePhraseUnicode.encode('utf-8') if entry.osagePhraseUnicode else "",
+                 entry.osagePhraseLatin.encode('utf-8') if entry.osagePhraseLatin else "",
+                 entry.englishPhrase.encode('utf-8') if entry.englishPhrase else "",
+                 entry.status.encode('utf-8') if entry.status else "",
+                 entry.dbName.encode('utf-8') if entry.dbName else "",
+                 entry.comment.encode('utf-8') if entry.comment else "",
+                 entry.lastUpdate if entry.lastUpdate else "",
+                 ]
+      writer.writerow(new_row)

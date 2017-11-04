@@ -196,6 +196,7 @@ app = webapp2.WSGIApplication([
     ('/words/updateStatus/', words.UpdateStatus),
     ('/words/upload/', words.ProcessUpload),
     ('/words/uploadCSV/', words.ProcessCSVUpload),
+    ('/words/downloadCSV/', words.DownloadPhrasesCSV),
     ('/db/manageDB/', words.SolicitUpload),
     ('/db/handleDB/', database.ManageDbName),
     ('/db/resetDbEntries/', database.ResetDBEntries),
