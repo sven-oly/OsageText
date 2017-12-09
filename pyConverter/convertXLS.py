@@ -20,11 +20,10 @@ import osageConversion
 
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
-UnicodeOsageFont = 'Pawhuska'
 
 # Rule for detecting Latin text or Old Osage font.
 # Some Old Osage text is in Latin CAPS, but with lower case a, e, and o.
-latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo\[\]\^\\\'\/\._`,!]+'
+latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo; \[\]\^\\\'\/\._`,!]+'
 
 # This identifies traditional Osage private use characters
 traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
@@ -58,7 +57,7 @@ def checkAndConvertText(textIn):
     return textIn
 
 
-def convertSheet(ws):
+def convertSheet(ws, unicodeFont):
   print '\n  Converting sheet: %s' % ws
   numConverts = 0
   notConverted = 0
@@ -80,7 +79,7 @@ def convertSheet(ws):
           numConverts += 1
           cell.value = convertedText
           newFont = copy.copy(thisFont)
-          newFont.name = UnicodeOsageFont
+          newFont.name = unicodeFont
           cell.font = newFont
         else:
           converted = False
@@ -96,27 +95,36 @@ def convertSheet(ws):
   return (numConverts, notConverted)
 
 
-def convertAllSheets(wb):
+def convertAllSheets(wb, unicodeFont):
   totalConversions = 0
 
   for ws in wb.worksheets:
-    (converted, notConverted) = convertSheet(ws)
+    (converted, notConverted) = convertSheet(ws, unicodeFont)
     totalConversions += converted
 
   return totalConversions
 
 
-def processOneSpreadsheet(path_to_spreadsheet, output_dir):
+def processOneSpreadsheet(path_to_spreadsheet, output_dir,
+                          unicodeFont='Pawhuska'):
   print 'PATH = %s' % path_to_spreadsheet
   wb = load_workbook(path_to_spreadsheet)
 
   print 'Converting Osage in file: %s' % path_to_spreadsheet
 
-  numConverts = convertAllSheets(wb)
+  numConverts = convertAllSheets(wb, unicodeFont)
 
   if numConverts:
     newName = os.path.splitext(path_to_spreadsheet)[0]
-    unicode_path_to_spreadsheet = os.path.join(output_dir, newName + '.unicode.xlsx')
+    if output_dir is not '':
+      fileIn = os.path.split(path_to_spreadsheet)[1]
+      baseWOextension = os.path.splitext(fileIn)[0]
+      unicode_path_to_spreadsheet = os.path.join(
+          output_dir, baseWOextension + '_unicode.xlsx')
+    else:
+      baseWOextension = os.path.splitext(path_to_spreadsheet)[0]
+      unicode_path_to_spreadsheet = os.path.join(
+          output_dir, baseWOextension + '_unicode.xlsx')
     wb.save(unicode_path_to_spreadsheet)
     print 'Saved new version to file %s' % unicode_path_to_spreadsheet
   else:
@@ -125,7 +133,6 @@ def processOneSpreadsheet(path_to_spreadsheet, output_dir):
 
 def main(argv):
   args = convertUtil.parseArgs()
-  UnicodeOsageFont = args.font
 
   paths_to_spreadsheet = args.filenames
 
@@ -134,7 +141,7 @@ def main(argv):
   convertFileCount = 0
 
   for path in paths_to_spreadsheet:
-    processOneSpreadsheet(path, args.output_dir)
+    processOneSpreadsheet(path, args.output_dir, args.font)
     convertFileCount += 1
 
   print ('\n%d files processed' % convertFileCount)

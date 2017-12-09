@@ -11,7 +11,7 @@ import convertUtil
 # Rule for detecting Latin text or Old Osage font.
 # Some Old Osage text is in Latin CAPS, but with lower case a, e, and o.
 # Limitation: [aeo] right after capital Latin is converted.
-latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo\[\]\^\\\'\/\._`,!-]+'
+latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo; \[\]\^\\\'\/\._`,!]+'
 
 # To avoid converting English words
 notOsageLatinLower = re.compile(r'[b-df-np-z]')
@@ -21,7 +21,6 @@ traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
 
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
-UnicodeOsageFont = 'Pawhuska'
 
 
 def replFunc(matchObj):
@@ -98,8 +97,16 @@ def processOnePresentation(path_to_presentation, outputFont, output_dir=''):
 
   print ('  %d conversions applied to Osage Unicode ' % conversionCount)
 
-  newName = os.path.splitext(path_to_presentation)[0]
-  new_path_to_presentation = os.path.join(output_dir, newName + '.unicode.pptx')
+  if output_dir is not '':
+    # String the directory tree to the file, substituting the output
+    fileIn = os.path.split(path_to_presentation)[1]
+    baseWOextension = os.path.splitext(fileIn)[0]
+    new_path_to_presentation = os.path.join(
+        output_dir, baseWOextension + '_unicode.pptx')
+  else:
+    baseWOextension = os.path.splitext(path_to_presentation)[0]
+    new_path_to_presentation = os.path.join(
+        output_dir, baseWOextension + '_unicode.pptx')
   prs.save(new_path_to_presentation)
 
   if conversionCount:
@@ -110,13 +117,12 @@ def processOnePresentation(path_to_presentation, outputFont, output_dir=''):
 
 def main(argv):
   args = convertUtil.parseArgs()
-  UnicodeOsageFont = args.font
 
   path_to_presentation = args.filenames
 
   convertFileCount = 0
   for path in path_to_presentation:
-    processOnePresentation(path, UnicodeOsageFont, args.output_dir)
+    processOnePresentation(path, args.font, args.output_dir)
     convertFileCount += 1
 
   print ('\n\n%d files were processed' % convertFileCount)

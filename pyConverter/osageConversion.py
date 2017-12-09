@@ -5,7 +5,7 @@ import re
 
 # Convert Osage text to Unicode.
 
-debug = False
+debug = True  #False
 
 accent = u'\u0301'
 doubleAccent = u'\u030B'
@@ -55,14 +55,16 @@ osage_private_use_map = {
   u'\uf03f': unichr(0xd801)+unichr(0xdcbe),
   u'\uf040': '@',
   u'\uf041\uf041': unichr(0xd801)+unichr(0xdcb0)+macron,
+  u'\uf041^': unichr(0xd801)+unichr(0xdcb0)+combiningDotAboveRight,
   u'\uf041': unichr(0xd801)+unichr(0xdcb0),
 
-  u'\uf041\uf05e': unichr(0xd801)+unichr(0xdcb1)+combiningDotAboveRight,
+  u'\uf041\uf05e': unichr(0xd801)+unichr(0xdcb0)+combiningDotAboveRight,
   u'\uf041\uf059': unichr(0xd801)+unichr(0xdcb1),
   u'\uf042': unichr(0xd801)+unichr(0xdcb4),
   u'\uf043': unichr(0xd801)+unichr(0xdcb5),
   u'\uf044': unichr(0xd801)+unichr(0xdcc8),
   u'\uf045\uf045': unichr(0xd801)+unichr(0xdcb7)+macron,
+  u'\uf045^': unichr(0xd801)+unichr(0xdcb7)+combiningDotAboveRight,
   u'\uf045': unichr(0xd801)+unichr(0xdcb7),
 
   u'\uf045\uf05e': unichr(0xd801)+unichr(0xdcb7)+combiningDotAboveRight,
@@ -80,10 +82,13 @@ osage_private_use_map = {
   u'\uf04c': unichr(0xd801)+unichr(0xdcbf),
   u'\uf04d': unichr(0xd801)+unichr(0xdcc0),
   u'\uf04e': unichr(0xd801)+unichr(0xdcc1),
+  u'\uf04f^': unichr(0xd801)+unichr(0xdcc2)+combiningDotAboveRight,
   u'\uf04f\uf04f': unichr(0xd801)+unichr(0xdcc2)+macron,
   u'\uf04f': unichr(0xd801)+unichr(0xdcc2),
   u'\uf04f\uf05e': unichr(0xd801)+unichr(0xdcc2)+combiningDotAboveRight,
   u'\uf050': unichr(0xd801)+unichr(0xdcc4),
+  u'\uf051': ' ',  # Space characters
+  u'\uf052': ' ',
   u'\uf053': unichr(0xd801)+unichr(0xdcc6),
   u'\uf054': unichr(0xd801)+unichr(0xdccd),
   u'\uf055\uf055': unichr(0xd801)+unichr(0xdcce)+macron,
@@ -101,12 +106,15 @@ osage_private_use_map = {
   u'\uf05b': unichr(0xd801)+unichr(0xdcd3),  # ??
   u'\uf05c': unichr(0xd801)+unichr(0xdcc6) + unichr(0xd801)+unichr(0xdcc8),  # Character is no longer used.
   u'\uf05d': unichr(0xd801)+unichr(0xdcca),  # ??],
-  u'\uf05e': '^',  # '^',
+  u'\uf05e': combiningDotAboveRight,  # '^',  # '^',
   u'\uf05f': '_',
   u'\uf060': '`',
-  u'\uf061': unichr(0xd801)+unichr(0xdcb2),  # ??
-  u'\uf065': unichr(0xd801)+unichr(0xdcb8),  # ??
-  u'\uf06f': unichr(0xd801)+unichr(0xdcc3),  # ??
+  u'\uf061': unichr(0xd801)+unichr(0xdcb2),
+  u'\uf061\uf061': unichr(0xd801)+unichr(0xdcb2) + macron,
+  u'\uf065': unichr(0xd801)+unichr(0xdcb8),
+  u'\uf065\uf065': unichr(0xd801)+unichr(0xdcb8) + macron,
+  u'\uf06f': unichr(0xd801)+unichr(0xdcc3),
+  u'\uf06f\uf06f': unichr(0xd801)+unichr(0xdcc3) + macron,
   u'\uf07b': '{',
   u'\uf07c': '|',
   u'\uf07d': '}',
@@ -264,7 +272,16 @@ osage_latin_to_unicode_map = {
   'ZH': unichr(0xd801)+unichr(0xdcd3),
   ';':  unichr(0xd801)+unichr(0xdcC6) + unichr(0xd801)+unichr(0xdcBC),
   '^':  combiningDotAboveRight,
-  ',':  unichr(0xd801)+unichr(0xdcb9),
+  ',':  unichr(0xd801)+unichr(0xdcba),  # HYA character
+
+  # Handle comma and period special cases
+  ', ':  ', ',
+  ',\u000a':  ',\u000a',
+  '. ':  '. ',
+  '.\u000a': '.\u000a',
+  '.\u2008': '.',
+
+  '[': unichr(0xd801)+unichr(0xdcd3),
   '[': unichr(0xd801)+unichr(0xdcd3),
   '{': '{',
   ']': unichr(0xd801)+unichr(0xdcca),
@@ -340,11 +357,16 @@ osage_latin_to_unicode_map = {
 osage_latin_chars = u"[ÁÍÓ\u00e1\u00ed\u00f3\u0100]\u0328|"  # Vowel followed by ogonek
 osage_latin_chars += u"[AÁáEÉéOÓó]į|[ÁAá]i|"  # Vowel + i-ogonek or i.
 osage_latin_chars += u"[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|"
-osage_latin_chars += u"iu|tsh|t[hs]|zh"
+osage_latin_chars += u"iu|tsh|t[hs]|zh|"
+
+# Comma and period special cases
+osage_latin_chars += u", |,\u000a|\. |\.\u000a|\.|\;$"
     
-old_osage_chars = u"[\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|"
+old_osage_chars = u"\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|"
+old_osage_chars += u"\uf061\uf061|\uf065\uf065|\uf06f\uf06f|" 
 old_osage_chars += u"\uf041\uf059|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|"
-old_osage_chars += u"[\uf020-\uf0b6]"
+old_osage_chars += u"[\uf041\uf045\uf04f\uf059][\^\uf05e]|"
+old_osage_chars += u"[\\^\uf05e\uf020-\uf0b6]"
 # old_osage_chars += u"[\uf020-\uf045\uf048-\uf050\uf053-\uf061\uf065\uf07b-\uf07e\uf0b6]"
 
 combined_chars = old_osage_chars + "|" + osage_latin_chars + "|."
@@ -354,37 +376,50 @@ def preParseOldOsage(instring):
     outList = regex2.findall(instring)
     return outList;
 
-def oldOsageToUnicode(textIn, convertToLower=False, convertLatin=True,
-     clearOsageDot=False):
+def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
+                      clearOsageDot=True):
   convertResult = u''
   outputIsUTF16 = True
 
   parsedInput = preParseOldOsage(textIn)
   if debug:
-    print parsedInput
+    print('&&&& Text in = >%s<' % textIn.encode('utf-8'))
+    print('&&& Convert parsed input = %s' % parsedInput)
 
   if not parsedInput:
+    print '!!!! preParse fails'
     return ''
 
   for index in xrange(len(parsedInput)):
     c = parsedInput[index];
-    if debug:
-      print 'c = %s' % c
+    #if debug:
+    #  print 'c = %s' % c.encode('utf-8')
+    # Handle ASCII period between two non-white space characters
+    #  as if it were an oldOsageDot.
     if c == oldOsageDot and clearOsageDot:
       continue
 
     out = c
     if c in osage_private_use_map:
       out = osage_private_use_map[c]
+      #if debug:
+      #  print ' output for %s  = %s' % (c.encode('utf-8'), out.encode('utf-8'))
     else:
       # It's not in the map.
       if convertLatin:
         if c in osage_latin_to_unicode_map:
           out = osage_latin_to_unicode_map[c]
+        else:
+          print '!!!! Character %s not found' % (c.encode('utf-8'))
     convertResult += out
 
+  if convertResult == textIn:
+    print ('!!! No change in input %s' % (textIn.encode('utf-8')))
+
+  if debug:
+    print('&&&& Text out = >%s<' % convertResult.encode('utf-8'))
   return convertResult
-  
+
 
 def testConvertOld():
   # Debug!
@@ -399,7 +434,8 @@ def testConvertOld():
     print '** Not converting Old Osage: expected(%d) >%s<. Result(%d) = >%s<' % (len(expected), expected, len(result), result)
 
   print '\nOLD OSAGE Punctuation'
-  oldOsagePunctuation = [(u'\uf02d' '-'), (u'\uf020', ' '), (u'\uf05e', '^')]
+  oldOsagePunctuation = [(u'\uf02d' '-'), (u'\uf020', ' '),
+                         (u'\uf05e', '^'), (u'\uf02e', '.')]
 
   for punct in oldOsagePunctuation:
     result = oldOsageToUnicode(punct[0])
@@ -430,10 +466,29 @@ def testConvertLatin():
   expected = u" !𐓇#$%&'()*+𐒺-𐒾0123456789:𐓆𐒼<=>𐒾@𐒰𐒴𐒵𐓈𐒷𐒹𐒱𐒳𐒼𐒿𐓀𐓁𐓂𐓄𐓆𐓍𐓎𐓇𐓏𐓐𐒻𐓒𐓓𐓆𐓈𐓊͘_`𐒲𐒸𐓃{|}~¶"
 
 
+
+def testCommaPeriod():
+  print '!!!! testCommanPeriod'
+  intext = 'A,B A,'
+  expected = u'\ud801\udcb0\ud801\udcba\u0042\u0020\ud801\udcb0\u002c'
+  result = oldOsageToUnicode(intext)
+  if result != expected:
+    print('textCommaPeriod fails on input %s' % intext)
+
+  intext = 'A.B.C A.\u000aD.'
+  expected = u'𐒰𐒴C 𐒰.\u000a𐓈.'
+  result = oldOsageToUnicode(intext)
+  if result != expected:
+    print('textCommaPeriod fails on input %s' % intext)
+
+
 def main():
   testConvertLatin()
 
   testConvertOld()
+
+  testCommaPeriod()
+
 
 if __name__ == '__main__':
     main()

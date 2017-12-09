@@ -32,6 +32,17 @@ def parseArgs():
                       help='File containing filenames to be converted, one per line')
   parser.add_argument('-output_dir', metavar='output_dir', nargs='?', default='',
                       help='Directory where converted files are stored')
+  parser.add_argument('-debug', action='store_true',
+                      help='Set debug to print additional information.')
+  parser.add_argument('-extract', action='store_true',
+                      help='Flag to create file of extracted and converted data as .tsv.')
+  parser.add_argument('-lowercase', action='store_true',
+                      help='Flag to force lowercasing of converted text.')
+  parser.add_argument('-uppercase', action='store_false',
+                      help='Flag to force uppercasing of converted text.')
+  parser.add_argument('-sentencecase', action='store_false',
+                      help='Flag to force sentence casing of converted text.')
+
   args = parser.parse_args()
 
   # Get the filenames from the input file list, if available.
