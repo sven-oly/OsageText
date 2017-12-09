@@ -19,7 +19,7 @@
 
 var OSA_UNICODE_LAYOUT = {
   'id': 'osa',
-  'title': 'Osage Unicode',
+  'title': '\ud801\udccf\ud801\udcd8\ud801\udcfb\ud801\udcd8\ud801\udcfb\ud801\udcdf \ud801\udcbb\ud801\udcdf',
   'mappings': {
     '': {
       '': '{{\u0301}}1234567890-=' +
@@ -45,8 +45,8 @@ var OSA_UNICODE_LAYOUT = {
     },
    'c': {  // alt-control
       '': '`{{¡}}™£¢\u221e§¶•{{\u25B8}}°–{{\u2260}}' +
-        '{{}}{{}}{{\ud801\udce0}}{{\ud801\udcf4}}' +
-          '{{\ud801\udcf3}}{{\u00a5}}' +
+        '{{}}{{}}{{\ud801\udce0}}{{\ud801\udcf3}}' +
+          '{{\ud801\udcf4}}{{\u00a5}}' +
           '{{}}{{\ud801\udcd9}}{{\ud801\udceb}}' +
           '{{\ud801\udced}}{{\u201C}}{{\u2018}}{{\u00ab}}' +
 	  '{{\ud801\udcda}}{{\ud801\udcef}}{{\ud801\udcf1}}{{}}' + 
@@ -57,8 +57,8 @@ var OSA_UNICODE_LAYOUT = {
     },
    'sc': {  // shift-alt-control
       '': '~/€{{\u00be}}¼½†‡·„‚—±' +
-        '{{}}{{}}{{\ud801\udcb8}}{{\ud801\udccc}}' +
-          '{{\ud801\udccb}}{{}}{{}}{{\ud801\udcb1}}' +
+        '{{}}{{}}{{\ud801\udcb8}}{{\ud801\udccb}}' +
+          '{{\ud801\udccc}}{{}}{{}}{{\ud801\udcb1}}' +
           '{{\ud801\udcc3}}{{\ud801\udcc5}}{{\u201d}}{{\u2019}}{{\u00bb}}' +
         '{{\ud801\udcb2}}{{\ud801\udcc7}}{{\ud801\udcc9}}{{}}' + 
           '{{\u00ae}}{{}}{{\ud801\udcb3\u0358}}{{\ud801\udcbd}}' +
@@ -92,9 +92,14 @@ var OSA_UNICODE_LAYOUT = {
     '\ud801\udcb9\ud801\udcbc': '\ud801\udcbd',  // H-KA
     
     '\ud801\udce1\ud801\udcf0': '\ud801\udcf1',  // h-ta
-    '\ud801\udce1\ud801\udcc8': '\ud801\udcc9',  // h-ta
+    '\ud801\udce1\ud801\udccd': '\ud801\udccc',  // h-ta
     '\ud801\udcb9\ud801\udcf0': '\ud801\udcf1',  // H-ta
-    '\ud801\udcb9\ud801\udcc8': '\ud801\udcc9',  // H-TA
+    '\ud801\udcb9\ud801\udccd': '\ud801\udccc',  // H-TA
+
+    '\ud801\udce1\ud801\udcf5': '\ud801\udcf4',  // h-dha
+    '\ud801\udce1\ud801\udcc8': '\ud801\udcc9',  // h-Dha
+    '\ud801\udcb9\ud801\udcf5': '\ud801\udcf4',  // H-dha
+    '\ud801\udcb9\ud801\udcc8': '\ud801\udcc9',  // H-DHA
 
     '\ud801\udce1\ud801\udcdd': '\ud801\udcde',  // h-cha 
     '\ud801\udce1\ud801\udcb5': '\ud801\udcb6',  // h-CHA 

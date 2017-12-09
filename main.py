@@ -4,6 +4,7 @@
 
 from userDB import getUserInfo
 
+import blobstorage
 import database
 import userDB
 import words
@@ -18,8 +19,10 @@ from google.appengine.api import users
 from google.appengine.ext.webapp import template
 
 # The Unicode fonts from Osage Nation.
-OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney', 
-  'Prue', 'Wazhezhe', 'Gadugi', 'NotoSansOsage']
+OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney',
+              'Prue', 'Wazhezhe', 'GadugiBeta2', 'GadugiBoldBeta2',
+              'NotoSansOsage_20170818',
+              'NotoSansOsage_alpha', 'NotoSansOsage']
 
 Language = 'Osage'
 
@@ -42,7 +45,7 @@ class MainHandler(webapp2.RequestHandler):
         'isAdmin': user_info[4],
       }
       path = os.path.join(os.path.dirname(__file__), 'osage.html')
-      self.response.out.write(template.render(path, template_values))     
+      self.response.out.write(template.render(path, template_values))
 
 class ConverterTestHandler(webapp2.RequestHandler):
   def get(self):
@@ -54,7 +57,7 @@ class ConverterTestHandler(webapp2.RequestHandler):
       'utext': utext,
       'language': Language,
     }
-    
+
     path = os.path.join(os.path.dirname(__file__), 'testConvert.html')
     self.response.out.write(template.render(path, template_values))
 
@@ -73,7 +76,7 @@ class OsageFontTest(webapp2.RequestHandler):
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
     }
-    
+
     path = os.path.join(os.path.dirname(__file__), 'osageFonts.html')
     self.response.out.write(template.render(path, template_values))
 
@@ -87,10 +90,10 @@ class OsageKeyboard(webapp2.RequestHandler):
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
     }
-    
+
     path = os.path.join(os.path.dirname(__file__), 'keyboard_osa.html')
     self.response.out.write(template.render(path, template_values))
-        
+
 class OsageUload(webapp2.RequestHandler):
   def get(self):
     user_info = getUserInfo(self.request.url)
@@ -104,7 +107,7 @@ class OsageUload(webapp2.RequestHandler):
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
     }
-    
+
     path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
     self.response.out.write(template.render(path, template_values))
 
@@ -117,7 +120,7 @@ class OsageDownload(webapp2.RequestHandler):
       'outfile': outfile,
       'language': Language,
     }
-    
+
     path = os.path.join(os.path.dirname(__file__), 'osageDownloads.html')
     self.response.out.write(template.render(path, template_values))
 
@@ -134,7 +137,7 @@ class ProcessSlides(webapp2.RequestHandler):
       'outfile': outfile,
       'language': Language,
     }
-    
+
     path = os.path.join(os.path.dirname(__file__), 'slideConvert.html')
     self.response.out.write(template.render(path, template_values))
 
@@ -177,30 +180,46 @@ app = webapp2.WSGIApplication([
     ('/OsageConverter/', MainHandler),
     ('/OsageConverter/test/', ConverterTestHandler),
     ('/OsageFonts/', OsageFontTest),
-    ('/keyboard/', OsageKeyboard), 
-    ('/downloads/', OsageDownload), 
-    ('/upload/', OsageUload), 
+    ('/keyboard/', OsageKeyboard),
+    ('/downloads/', OsageDownload),
+    ('/upload/', OsageUload),
 
-    ('/login/', LoginPageHandler), 
+    ('/login/', LoginPageHandler),
 
     ('/words/', words.WordHandler),
     ('/words/addPhrase/', words.AddPhrase),
     ('/words/clear/', words.ClearWords),
+    ('/words/renameDB/', words.RenameDB),
     ('/words/getWords/', words.GetWordsHandler),
     ('/words/getPhrases/', words.GetPhrases),
     ('/words/startUpload/', words.SolicitUpload),
     ('/words/updateStatus/', words.UpdateStatus),
     ('/words/upload/', words.ProcessUpload),
     ('/words/uploadCSV/', words.ProcessCSVUpload),
+    ('/words/downloadCSV/', words.DownloadPhrasesCSV),
     ('/db/manageDB/', words.SolicitUpload),
     ('/db/handleDB/', database.ManageDbName),
     ('/db/resetDbEntries/', database.ResetDBEntries),
-    ('/slides/', ProcessSlides),   
+    ('/slides/', ProcessSlides),
 
-    ('/users/', userDB.showUsers),
-    ('/users/manage/', userDB.manageUsers),
+    ('/users/', userDB.manageUsers),
     ('/users/add/', userDB.addUser),
+    ('/users/remove/', userDB.deleteUser),
     ('/users/clear/', userDB.clearUsers),
 
-  ], debug=True)
-    
+    ('/sound/showupload/', blobstorage.SoundUploadFormHandler),
+    ('/sound/view/', blobstorage.ViewSoundHandler),
+    ('/sound/listall/', blobstorage.SoundListHandler),
+    ('/sound/viewall/', blobstorage.SoundDataViewerHandler),
+    ('/sound/uploadtodbitem/', blobstorage.SoundUploadUI),
+    ('/sound/uploadSoundForPhrase/', blobstorage.SoundFileUploadHandler),
+
+    ('/sound/start/', blobstorage.CreateAndReadFileHandler),
+    ('/sound/upload/', blobstorage.SoundUploadHandler),
+    ('/sound/uploadresults/', blobstorage.SoundUploadResults),
+
+    ('/sound/uploadresults/', blobstorage.SoundUploadResults),
+    ('/sound/soundsdb/', blobstorage.AllSoundsDB),
+    ('/sound/delete/', blobstorage.RemoveSoundHandler),
+
+], debug=True)

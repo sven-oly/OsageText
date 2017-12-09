@@ -59,7 +59,7 @@
     }
   }
   
-  // Code to request Osage data at index with optional filter.
+  // Code to request {{language}} data at index with optional filter.
   // Direction indicates previous (-1) or next (+1)
   function dataRequest(index, direction) {
     // Prepare for the call to the backendvar xmlhttp;
@@ -80,10 +80,12 @@
 		  var newIndex = document.getElementById('newIndex');
 		  var status = document.getElementById('status');
 		  var errorMsg = document.getElementById('errorMsg');
-      var comment = document.getElementById('comment');
-      var dbName = document.getElementById('dbName');
+          var comment = document.getElementById('comment');
+          var dbName = document.getElementById('dbName');
+          var updatePhraseKey1 = document.getElementById('updatePhraseKeyStatus');
+          var updatePhraseKey2 = document.getElementById('updatePhraseKeyUpload');
 
-		  var json_obj = JSON.parse(returned_json);
+          var json_obj = JSON.parse(returned_json);
           if (json_obj.error) {
             // Warn, and don't change values.
             alert(json_obj.error);
@@ -96,8 +98,12 @@
           comment.value = comment.innerHTML = json_obj.comment;
           unicodeOsage.value = unicodeOsage.innerHTML = json_obj.utext;
           dbName.value = json_obj.dbName
+
+          if (updatePhraseKey1) updatePhraseKey1.value = json_obj.phraseKey;
+          if (updatePhraseKey2) updatePhraseKey2.value = json_obj.phraseKey;
+
           var warnStatus = setWarningBox(json_obj.utext, json_obj.oldtext);
-          if (!warnStatus) {
+          if (json_obj.oldtext && !warnStatus) {
             // uText is either empty or same as converted.
             convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
           }
@@ -111,7 +117,27 @@
           status.value = status.innerHTML = newStatus;
           // Reset the status radio button
           setStatusRadioButton("updateStatus", newStatus);
-        }          
+
+          // Handle voice icons
+          var isMaleVoice = json_obj.soundMaleLink;
+          var sound = document.getElementById("audio_out_male");
+          if (isMaleVoice && isMaleVoice != "None") {
+            setDisplayState('maleVoice', 'block');
+            if (sound) sound.src = isMaleVoice;
+          } else {
+             setDisplayState('maleVoice', 'none');
+             if (sound) sound.src = null;
+         }
+          var isFemaleVoice = json_obj.soundFemaleLink;
+          sound = document.getElementById("audio_out_female");
+          if (isFemaleVoice && isFemaleVoice != "None") {
+            if (sound) sound.src = isFemaleVoice;
+            setDisplayState('femaleVoice', 'block');
+          } else {
+            if (sound) sound.src = null;
+            setDisplayState('femaleVoice', 'none');
+          }
+        }
       }
 	
 	// Set up the call, with filtering.
@@ -165,11 +191,14 @@
   	var newStatus = getStatusRadioButton(statusSetter); 
     var comment = document.getElementById("comment").value;
     var dbName = document.getElementById("dbName").value;
-	
+    var phraseKey =
+        document.getElementById("updatePhraseKeyStatus").value;
+
 	var target = "/words/updateStatus/?index=" + index + "&newStatus=" + newStatus +
 	  "&unicodePhrase=" + unicodeData + "&comment=" + comment +
 	  "&oldOsageData=" + oldOsageData +
-	  "&dbName=" + dbName;
+	  "&dbName=" + dbName +
+	  "&phraseKey=" + phraseKey;
 	
 	xmlhttp.open("GET", target, true);
 	var size = target.length;
@@ -210,7 +239,13 @@
 	  if (xmlhttp.readyState==4) {
 	    var returned_json = xmlhttp.responseText;
 		var json_obj = JSON.parse(returned_json);
-
+        if (json_obj.new_index) {
+          // Update index value.
+          var indexObj = document.getElementById("index");
+          indexObj.innerHTML = indexObj.value = json_obj.new_index;
+          var numEntries = document.getElementById("numEntries");
+          numEntries.innerHTML = numEntries.value = json_obj.new_index;
+        }
         // Set up alert for results.
         alert(json_obj.message);       
       }
@@ -224,7 +259,7 @@
     var oldText = oldTextObj.value;
     var unicodeText = uTextObj.innerHTML;
     var englishText = englishTextObj.value; 
-    var dbName = document.getElementById(englishText).value;
+    var dbName = document.getElementById("dbName").value;
     
 	var target = "/words/addPhrase/?oldtext=" + oldText + "&utext=" + unicodeText +
 	  "&engtext=" + englishText + "&comment=" + comment + "&dbName=" + dbName;
@@ -261,6 +296,12 @@
       warning_box.style.display = 'none';
       return false;
     }
+
+    var oldTextArea = document.getElementById('oldOsageText');
+    if (oldOsageText == "") {
+      warning_box.style.display = 'none';
+      return false;
+    }
     var convertedUText = oldOsageToUnicode(oldOsageText,
          false, true, false);
     if (convertedUText !== oldUText) {
@@ -273,6 +314,77 @@
     }
   }
 
+  function onSoundLoaded(audio_id, target) {
+    var audio_out = document.getElementById(audio_id);
+    audio_out.src = target;
+    audio_out.controls = "true";
+    // document.getElementById('audio_out').play();
+  }
+
+  function removeSoundFile(genderOfRecording) {
+    var phraseKey =
+      document.getElementById("updatePhraseKeyStatus").value;
+    if (!phraseKey) {
+      window.alert("Problem getting the phrase Key. The recording is unchanged.");
+    }
+    result = window.confirm("Really delete the " + genderOfRecording + " voice recording?");
+    if (!result == true) {
+      window.alert("You pressed Cancel. The recording is unchanged.");
+      return;
+    }
+
+    // Send phrase key and gender to backend.
+    // Handle result.
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	} else { // code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+
+    // Deal with the results
+    xmlhttp.onreadystatechange=function()
+	{
+	  if(xmlhttp.readyState==4) {
+	      var returned_json = xmlhttp.responseText;
+		  var json_obj = JSON.parse(returned_json);
+
+		  if (json_obj.status) {
+		    var status = document.getElementById("status");
+            var errorMsg = json_obj.errorMsg;
+            var retGender = json_obj.gender;
+
+           if (status) {
+             // Turn off the appropriate sound visual.
+             var sound;
+             if (retGender == "female") {
+               sound = document.getElementById("femaleVoice");
+             } else {
+               sound = document.getElementById("maleVoice");
+             }
+             sound.style.display = 'none';
+           }
+         }
+       }
+	}
+
+  	// Set up the call with new status.
+
+	var target = "/sound/delete/?phraseKey=" + phraseKey + "&gender=" + genderOfRecording;
+
+	xmlhttp.open("GET", target, true);
+	var size = target.length;
+	xmlhttp.send(null);
+  }
+
+  // Update to toggle region on/off.
+  function setDisplayState(id, newstate) {  // block or none
+    var obj = document.getElementById(id);
+    if(obj) {
+      obj.style.display = newstate;
+    }
+   }
+
+
   // Initialize the page.
   function init() {
     // Set warning if store is not same as new conversion.
@@ -280,13 +392,27 @@
     var uText = document.getElementById('UnicodeOsage').value;
     var warnStatus = setWarningBox(uText, oldOsageText);
   
-    if (!warnStatus) {
+    if (oldOsageText && !warnStatus) {
       // uText is either empty or same as converted.
       convertToUnicode('OldOsage', 'UnicodeOsage', 'old_hex');
     }
     // Set initial status.
     var status = document.getElementById("status").innerHTML;
     setStatusRadioButton("updateStatus", status);
+
+    // Reset the sound file display.
+    var sound = document.getElementById("audio_out_female");
+    if (sound.currentSrc) {
+      setDisplayState('femaleVoice', 'block');
+    } else {
+      setDisplayState('femaleVoice', 'none');
+    }
+    sound = document.getElementById("audio_out_male");
+    if (sound.currentSrc) {
+      setDisplayState('maleVoice', 'block');
+    } else {
+      setDisplayState('maleVoice', 'none');
+    }
   }
 
   </script>
@@ -299,7 +425,7 @@
     <div class="span-1">  
     </div>
     <div class="span-16">
-      <h3>Index <span id="index">{{index}}</span> of {{numEntries}}</h3>
+      <h3>Index <span id="index">{{index}}</span> of <span id="numEntries">{{numEntries}}</span></h3>
       <textarea id="OldOsage" class="oldOsageText" >{{oldtext}}</textarea>
       <br />
       <input type="button" value="Convert to Unicode"
@@ -333,21 +459,62 @@
       Please select "Convert to Unicode", check the result, and update status!
       </div>
       <br>
-      <h4>Status: <span id="status">{{status}}. Change status of this phrase:</h4>
+      <h4>Status: <span id="status">{{status}}
+      {% if editOrAdmin %}. Change status of this phrase:{% endif %}</h4>
       <form action="" id="set_status">
         <input type="radio" name="updateStatus" value="Unknown"> Unknown 
         <input type="radio" name="updateStatus" value="Verified"> Verified 
         <input type="radio" name="updateStatus" value="Incorrect"> Incorrect
         <input type="radio" name="updateStatus" value="Font"> Font
         <input type="radio" name="updateStatus" value="Other"> Other
-     <input type="button" value="Update status"
+        {% if editOrAdmin %}
+        <input type="button" value="Update status"
            onclick="updatePhraseStatus('index', 'updateStatus');"/>
+        <input type="hidden" id="updatePhraseKeyStatus" name="phraseKey" value="{{phraseKey}}">
+        {% endif %}
       </form>
       <br />
       <h4>Comment:</h4>
       <textarea id="comment" class="default">{{comment}}</textarea>
       <br />
       <div id='errorMsg'>{{error}}</div>
+
+      {% if showSounds %}
+      <span id="maleVoice">
+        M:
+       <audio id="audio_out_male" controls="controls">
+         <source src="{{soundMaleLink}}" type="audio/wav">
+          Your browser does not support the audio element.
+        </audio>
+        {% if editOrAdmin %}
+          <input type="button" value="Remove recording?"
+           onclick="removeSoundFile('male');"/>
+        {% endif %}
+      </span>
+      <br />
+      <span id="femaleVoice">
+       F:
+         <audio id="audio_out_female" controls="controls">
+           <source src="{{soundFemaleLink}}" type="audio/wav">
+            Your browser does not support the audio element.
+          </audio>
+        {% if editOrAdmin %}
+          <input type="button" value="Remove recording?"
+           onclick="removeSoundFile('female');"/>
+        {% endif %}
+      </span>
+
+      {% if editOrAdmin %}
+      <hr>
+      <h4>Upload sound file for this phrase:</h4>
+      <form action="/sound/start/" method="GET" enctype="multipart/form-data">
+        <input type="submit" name="submit" value="Upload sound file">
+        <input type="hidden" id="updatePhraseKeyUpload" name="phraseKey" value="{{phraseKey}}">
+      </form>
+
+       {% endif %}
+
+        {% endif %}
     </div>
 
     <div class="span-4 last">
@@ -378,7 +545,7 @@
       <h4>Admin Functions</h4>
       <ul>
         <li><a href="/db/manageDB/">Manage database</a></li>
-        <li><a href="/db/resetDbEntries/">Reset Null DB Name</a></li>
+        <li><a href="/users/">Manage users</a></li>
       </ul>
       {% endif %}
       <hr>
@@ -403,6 +570,7 @@
         <input type="radio" name="filterStatus" value="Font"> Font
         <br />
         <input type="radio" name="filterStatus" value="Other"> Other
+        <input type="hidden" name="phraseKey" value="{{phraseKey}}">
         <br />
       </form>
 
@@ -419,8 +587,10 @@
      <br />    
      <hr />
      <!-- Add a new value to the data store -->
+     {% if editOrAdmin %}
      <input type="button" onclick="addPhraseToDatastore('OldOsage', 'UnicodeOsage', 'English');"
        value="Add new phrase to database">
+     {% endif %}
       
      </div> <!-- end span last -->
   </div> <!-- end container --> 

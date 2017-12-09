@@ -58,12 +58,21 @@
     }
     
    @font-face{ 
-      font-family:'Gadugi';
-      src:url('/fonts/gadugi_116.ttf');
+      font-family:'GadugiBeta2';
+      src:url('/fonts/gadugibeta2.ttf');
       font-weight:normal;
       font-style:normal;
       font-variant-ligatures: normal;
     }
+
+   @font-face{ 
+      font-family:'GadugiBoldBeta2';
+      src:url('/fonts/gadugib_beta2.ttf');
+      font-weight:normal;
+      font-style:normal;
+      font-variant-ligatures: normal;
+    }
+
 
    @font-face{ 
       font-family:'NotoSansOsage';
@@ -123,7 +132,50 @@
     font-size: 32px;
     }
 
+    .gadugibeta {
+    font-family:"GadugiBeta";
+    font-size: 32px;
+    }
+
+    .gadugibeta2 {
+    font-family:"GadugiBeta2";
+    font-size: 32px;
+    }
+
+    .gadugiboldbeta2 {
+    font-family:"GadugiBoldBeta2";
+    font-size: 32px;
+    }
+
     .notosansosage {
     font-family:"NotoSansOsage";
     font-size: 32px;
     }
+
+    @font-face{ 
+	font-family:'NotoSansOsage_alpha';
+	src:url('/fonts/NotoSansOsage-Regular_alpha_20170718.ttf');
+	font-weight:normal;
+	font-style:normal;
+	font-variant-ligatures: normal;
+    }
+
+    .notosansosage_alpha {
+    font-family:"NotoSansOsage_alpha";
+    font-size: 32px;
+    }
+
+    @font-face{ 
+	font-family:'NotoSansOsage_20170818';
+	src:url('/fonts/NotoSansOsage-Regular_20170818.ttf');
+	font-weight:normal;
+	font-style:normal;
+	font-variant-ligatures: normal;
+    }
+
+    .notosansosage_20170818 {
+    font-family:"NotoSansOsage_20170818";
+    font-size: 32px;
+    }
+
+    

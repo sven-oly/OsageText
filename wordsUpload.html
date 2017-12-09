@@ -19,15 +19,16 @@
 		<hr>
        <ul>
           <li>Index column: <input type="text" size=3 name="indexColumn"></li>
-          <li>Osage column: <input type="text" size=3 name="osageColumn"></li>
+          <li>Unicode column: <input type="text" size=3 name="unicodeColumn"></li>
+          <li>Old Osage column: <input type="text" size=3 name="osageColumn"></li>
           <li>English column: <input type="text" size=3 name="englishColumn"></li>
           <li>Comment column: <input type="text" size=3 name="commentColumn"></li>
-          <li>Unicode column: <input type="text" size=3 name="unicodeColumn"></li>
           <li>Reference column: <input type="text" size=3 name="referenceColumn"></li>
-          <li>Lines to skip at start:
+<br />
+           <li>Lines to skip at start:
             <input type="text" size=3 name="skipLines" value="0"><br /></li>
           <li>Maximum # lines to load:
-            <input type="text" size=3 name="maxLines" value="10000"><br /></li>
+            <input type="text" size=5 name="maxLines" value="10000"><br /></li>
         </ul>
         <input type="checkbox" name="skipEmptyLines" id="skipEmpty" checked>Skip empty lines?
         <br />
@@ -45,6 +46,24 @@
       </select><input type="submit" name="submit" value="Submit">
       <input type="checkbox" name="confirmClear" id="confirmClear">Really clear entries?
   </form>   
+  <hr>
+  <form action="/words/renameDB/" method="GET">
+      Rename all contents of old database:
+      <select id="selectDatabase" name="oldDbName">
+          {% for dbName in dbNames %}
+            <option value="{{dbName}}">{{dbName}}</option>
+          {% endfor %}
+          <option value="*All*">All</option>
+      </select>
+      to new database:
+      <select id="selectDatabase" name="newDbName">
+          {% for dbName in dbNames %}
+            <option value="{{dbName}}">{{dbName}}</option>
+          {% endfor %}
+          <option value="*All*">All</option>
+      </select><input type="submit" name="submit" value="Submit">
+      <input type="checkbox" name="confirmRename" id="confirmRename">Really rename entries?
+  </form>
   <hr>
   <form action="/db/handleDB/" method="GET">
       Database name to add: <input type="text" size=20 name="dbName">

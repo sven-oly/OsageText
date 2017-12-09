@@ -84,7 +84,7 @@
 
     function showCodePoints() {
       var src_field = document.getElementById('t1');
-      var code_text = uplus(src_field.value);
+      var code_text = uplus(src_field.value, " ");
       var dest_field = document.getElementById('codepoints');
       dest_field.value = code_text;
       document.getElementById('t1').focus();
@@ -123,7 +123,7 @@
     </div>
  <div class="span-4 last">
      {% if user_nickname %}
-    <h4>Welcome {{user_nickname}}
+     <h4>Welcome {{user_nickname}}</h4>
       {% if user_logout %}
         <a href={{user_logout}}>Logout</a>
       {% endif %}
@@ -148,7 +148,7 @@
           <a href="/words/">Review Osage phrases</a>
        </li>
        <li>
-         <a href="/words/getPhrases/">View database</a>       
+         <a href="/words/getPhrases/">View database</a>
           <br />
           <br />
        </li>
@@ -158,7 +158,8 @@
         <li>
            <a href="http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4619.pdf">Osage Unicode proposal</a>
         </li>
-        <ol>
+       </ul>
+
     </div>
   <div class="span-18 last">
   <textarea id="codepoints" class="default-font" style="width:600px;" rows="10"></textarea>

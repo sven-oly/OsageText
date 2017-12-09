@@ -4,6 +4,7 @@
 import main
 from userDB import getUserInfo
 
+import codecs
 import csv
 import json
 import logging
@@ -36,17 +37,31 @@ class OsagePhraseDB(db.Model):
   comment = db.StringProperty('')
   reference = db.StringProperty('')  # Reference number or other identifier
 
+  # Pointing to sound files by URL:
+  soundFemaleLink = db.TextProperty('');
+  soundMaleLink = db.TextProperty('');
+  soundLinks = db.ListProperty(str, verbose_name='sound_files', default=[])
+
 
 # The set of registered db names.
 class OsageDbName(db.Model):
   dbName = db.StringProperty(u'')
   lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
   default = db.StringProperty(u'')
+  isTestDB = db.StringProperty('')
 
-# Retrieves data at a given index and dbName via AJAX. 
+
+# Sound file info uploaded.
+class UserSound(db.Model):
+  lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
+  user = db.StringProperty('')
+  blob_key = db.StringProperty('')
+
+
+# Retrieves data at a given index and dbName via AJAX.
 class GetWordsHandler(webapp2.RequestHandler):
   def post(self):
-    self.response.headers['Content-Type'] = 'text/plain'   
+    self.response.headers['Content-Type'] = 'text/plain'
 
     print 'GetWordsHandler received.'
     self.response.out.write('GetWordsHandler received.\n')
@@ -58,38 +73,44 @@ class GetWordsHandler(webapp2.RequestHandler):
     direction = int(self.request.get('direction', '0'))
     dbName = self.request.get('dbName', '')
     databases = self.request.GET.getall('databases')
-    
-    logging.info('GetWordsHandler databases = %s' % databases)
-    #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
-    #   (index, filterStatus, direction))
 
-    qdb = OsageDbName.all()
-    dbNames = [p.dbName for p in qdb.run()]
-
-    q = OsagePhraseDB.all()
-
-    selectByDB = True
-    logging.info('GetWordsHandler DBNAME = %s' % dbName)
-    if '*All*' in databases:
-      logging.info('*All* in databases = %s' % databases)
-      selectByDB = False
-
-    if databases:
-      q.filter('dbName IN', databases)
-      logging.info('GetWordsHandler FILTER by databases = %s' % databases)
-
-    logging.info('Index = %s' % index)
-
-    if filterStatus == 'All' or filterStatus == 'all':
-      # Get the specified index, with no status filter.
-      #logging.info('GetWordsHandler Going for index = %d' % index)
-      q.filter("index =", index)
+    phraseKey = self.request.get('phraseKey', None)
+    logging.info('phraseKey = %s' % phraseKey)
+    if phraseKey:
+      keyForPhrase = db.Key(encoded=phraseKey)
     else:
-      # Set up to get next phrase with required status and index >= query index.
-      #logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
-      q.filter('status =', filterStatus)
+      keyForPhrase = None
+
+    if keyForPhrase:
+      # Get the pharse result from the key.
+      result = db.get(keyForPhrase)
+      logging.info('+++ Got object from key')
+    else:
+      #logging.info('GetWordsHandler databases = %s' % databases)
+      #logging.info('GetWordsHandler index = %d, filterStatus=>%s<, direction = %d' %
+      #   (index, filterStatus, direction))
+
+      qdb = OsageDbName.all()
+      dbNames = [p.dbName for p in qdb.run()]
+
+      q = OsagePhraseDB.all()
+
+      selectByDB = True
+      #logging.info('GetWordsHandler DBNAME = %s' % dbName)
+      if '*All*' in databases:
+        logging.info('*All* in databases = %s' % databases)
+        selectByDB = False
+
+      if databases:
+        q.filter('dbName IN', databases)
+        # logging.info('GetWordsHandler FILTER by databases = %s' % databases)
+
+      if filterStatus != 'All' and filterStatus != 'all':
+        # Set up to get next phrase with required status and index >= query index.
+        #logging.info('FILTERING WITH status = %s, index >= %d' % (filterStatus, index))
+        q.filter('status =', filterStatus)
       if selectByDB and databases:
-        q.filter('dbName IN', databases) 
+        q.filter('dbName IN', databases)
         logging.info('GetWordsHandler FILTER WITH DATABASES: %s' % databases)
       if direction < 0:
         q.filter('index <=', index)
@@ -98,9 +119,15 @@ class GetWordsHandler(webapp2.RequestHandler):
         q.filter('index >=', index)
         q.order('index')
 
-    result = q.get()  # Use get_multi for more than one?
+      results = q.run()  # Use get_multi for more than one?
+      logging.info(' RESULTS ITERATOR = %s' % results)
+      try:
+        result = results.next()
+        logging.info(' RESULT = %s' % result)
+      except:
+        result = None
+      # END OF QUERY FOR RESULT.
 
-    #logging.info('RESULT = %s' % (result))
     if result:
       index = result.index
       dbName = result.dbName
@@ -109,16 +136,25 @@ class GetWordsHandler(webapp2.RequestHandler):
       english = result.englishPhrase
       status = result.status
       comment = result.comment
-      errorMsg = '' 
+      errorMsg = ''
+      phraseKey = str(result.key())
     else:
+      errorMsg = 'No phrase found'
+      phraseKey = ''
       oldtext = utext = english = status = ''
-      errorMsg = 'No results found'
       comment = ''
+
+    # logging.info('PHRASE KEY = %s ' % phraseKey)
+    logging.info('soundMaleLink: %s' % result.soundMaleLink)
+    logging.info('soundFemaleLink: %s' % result.soundFemaleLink)
+
     obj = {
         'language': main.Language,
         'dbNames': dbNames,
+        'entry': result,  # All the data in one place
         'index': index,
         'dbName': dbName,
+        'phraseKey': phraseKey,
         'oldtext': oldtext,
         'utext': utext,
         'english': english,
@@ -128,6 +164,8 @@ class GetWordsHandler(webapp2.RequestHandler):
         'user_nickname': user_info[1],
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
+        'soundMaleLink': result.soundMaleLink,
+        'soundFemaleLink': result.soundFemaleLink,
     }
     self.response.out.write(json.dumps(obj))
 
@@ -144,33 +182,56 @@ class WordHandler(webapp2.RequestHandler):
       index = int(self.request.get('index', '1'))
       comment = self.request.get('comment', '')
       dbName = self.request.get('dbName', '')
+      phraseKey = self.request.get('phraseKey', '')
       status = ''
+      soundFemaleLink = ''
+      soundMaleLink = ''
 
-      q = OsagePhraseDB.all()
+      if phraseKey:
+        keyForPhrase = db.Key(encoded=phraseKey)
+        logging.info('+++ Key for Phrase = %s' % keyForPhrase)
+      else:
+        keyForPhrase = None
+
+      result = None
       currentEntries = 0
-      for p in q.run():
-        currentEntries += 1
-      q.filter("index =", index)
-      if dbName:
-        logging.info("dbName filter by %s" % dbName)
-        q.filter("dbName", dbName)
-      result = q.get()
+      if keyForPhrase:
+        result = db.get(keyForPhrase)
+      else:
+        # No phraseKey found. Need to search
+        q = OsagePhraseDB.all()
+        for p in q.run():
+          currentEntries += 1
+        q.filter("index =", index)
+        if dbName:
+          logging.info("dbName filter by %s" % dbName)
+          q.filter("dbName", dbName)
+        result = q.get()
 
       dbq = OsageDbName.all()
       dbNameList = [p.dbName for p in dbq.run()]
 
       if result:
+        index = result.index
         oldtext = result.osagePhraseLatin
         dbName = result.dbName
         utext = result.osagePhraseUnicode
         english = result.englishPhrase
         status = result.status
         comment = result.comment
+        soundFemaleLink = result.soundFemaleLink
+        soundMaleLink = result.soundMaleLink
+        phraseKey = str(result.key())
+
+      editOrAdmin = user_info[4]
+
       #logging.info('q = %s' % result)
       template_values = {
+        'editOrAdmin': editOrAdmin,
         'language': main.Language,
         'index': index,
         'dbName': dbName,
+        'phraseKey': phraseKey,
         'dbNames': dbNameList,
         'numEntries': currentEntries,
         'fontFamilies': fontList,
@@ -184,6 +245,9 @@ class WordHandler(webapp2.RequestHandler):
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
         'isAdmin': user_info[4],
+        'soundFemaleLink': soundFemaleLink,
+        'soundMaleLink': soundMaleLink,
+        'showSounds': True,
       }
       # logging.info('WORDS = %s' % template_values)
       path = os.path.join(os.path.dirname(__file__), 'words.html')
@@ -213,7 +277,7 @@ class SolicitUpload(webapp2.RequestHandler):
 
 # Add entries in the uploaded CSV to the data store.
 # TODO: check for duplicates.
-class ProcessUpload(webapp2.RequestHandler): 
+class ProcessUpload(webapp2.RequestHandler):
   def post(self):
     fileInfo = self.request.get('file')
     self.response.out.write(fileInfo)
@@ -227,7 +291,7 @@ class ProcessUpload(webapp2.RequestHandler):
     for p in q.run():
       numEntries += 1
     #logging.info('### Starting at index %d' % numEntries)
-    self.response.out.write('### Starting at index %d' % numEntries) 
+    self.response.out.write('### Starting at index %d' % numEntries)
     startIndex = numEntries + 1
     currentIndex = startIndex
     stringReader = unicode_csv_reader(StringIO.StringIO(fileInfo))
@@ -235,20 +299,20 @@ class ProcessUpload(webapp2.RequestHandler):
       entry = processRow(currentIndex, row)
       currentIndex += 1
       numEntries += 1
-      self.response.out.write(entry) 
+      self.response.out.write(entry)
 
     #logging.info('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex))
-    self.response.out.write('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex)) 
+    self.response.out.write('### StartIndex = %d. %d new entries added' % (startIndex, numEntries - startIndex))
     q = OsagePhraseDB.all()
     currentEntries = 0
     for p in q.run():
       currentEntries += 1
     self.response.out.write('!!! Current entries now = %d.' %
-      (currentEntries)) 
+      (currentEntries))
 
 
 # Clear out the entire phrase data store, or part of it (eventually)
-class ClearWords(webapp2.RequestHandler): 
+class ClearWords(webapp2.RequestHandler):
   def get(self):
     user_info = getUserInfo(self.request.url)
 
@@ -257,10 +321,10 @@ class ClearWords(webapp2.RequestHandler):
     if not confirmClear:
       self.response.out.write('!!! Clearing DB %s not confirmed. No changes made.' %
         dbName)
-      return 
+      return
 
     logging.info('CLEAR DB %s' % dbName)
-    
+
     q = OsagePhraseDB.all()
     numEntries = 0
     nullCount = 0
@@ -279,8 +343,38 @@ class ClearWords(webapp2.RequestHandler):
       numDeleted, dbName))
 
 
+# Rename all entries in a DB to a new DB
+class RenameDB(webapp2.RequestHandler):
+  def get(self):
+    user_info = getUserInfo(self.request.url)
+
+    confirmRename = self.request.get('confirmRename', False)
+    oldDbName = self.request.get('oldDbName', '')
+    newDbName = self.request.get('newDbName', '')
+    if not confirmRename:
+      self.response.out.write('!!! Renaming DB %s to %s not confirmed. No changes made.' %
+                              (oldDbName, newDbName))
+      return
+
+    logging.info('RENAME DB %s to %s' % (oldDbName, newDbName))
+
+    q = OsagePhraseDB.all()
+    numEntries = 0
+    nullCount = 0
+    numRenamed = 0
+    for p in q.run():
+      numEntries += 1
+      if p.dbName == oldDbName:
+        p.dbName = newDbName
+        p.put()
+        numRenamed += 1
+
+    self.response.out.write('!!! Renamed %d entries from %s to %s.' % (
+      numRenamed, oldDbName, newDbName))
+
+
 # Updates the status of an entry and sets the Unicode field.
-class UpdateStatus(webapp2.RequestHandler): 
+class UpdateStatus(webapp2.RequestHandler):
   def get(self):
     index = int(self.request.get('index', '1'))
     dbName = self.request.get('dbName', '')
@@ -289,13 +383,26 @@ class UpdateStatus(webapp2.RequestHandler):
     oldOsagePhrase = self.request.get('oldOsageData', '')
     comment = self.request.get('comment', '')
     dbName = self.request.get('dbName', '')
+    phraseKey = self.request.get('phraseKey', '')
 
-    logging.info('Update index = %d, oldOsage = %s' % (index, oldOsagePhrase))
+    logging.info("_+_+_+ Update phraseKey = %s" % phraseKey)
+    # To get the database object more easily
+    if phraseKey:
+      keyForPhrase = db.Key(encoded=phraseKey)
+    else:
+      keyForPhrase = None
 
-    q = OsagePhraseDB.all()
-    q.filter("index =", index)
-    result = q.get()
+    logging.info('_+_+_+_+_+_+_+ Update index = %d, oldOsage = %s' % (index, oldOsagePhrase))
 
+    if keyForPhrase:
+      result = db.get(keyForPhrase)
+      logging.info('+++ Got object from key')
+    else:
+      q = OsagePhraseDB.all()
+      q.filter("index =", index)
+      result = q.get()
+
+    # TODO: Check for null result
     result.status = newStatus;
     result.comment = comment
     if dbName:
@@ -307,22 +414,22 @@ class UpdateStatus(webapp2.RequestHandler):
     if unicodePhrase:
       result.osagePhraseUnicode = unicodePhrase
     result.put()
-    
+
     # Send update back to client
     obj = {
       'language': main.Language,
       'index': index,
-      'status' : result.status,  
+      'status' : result.status,
       'osagePhraseLatin' :  oldOsagePhrase,
     }
     self.response.out.write(json.dumps(obj))
 
 
-class AddPhrase(webapp2.RequestHandler): 
+class AddPhrase(webapp2.RequestHandler):
   def get(self):
     oldtext = self.request.get('oldtext', '')
     dbName = self.request.get('dbName', '')
-    utext = self.request.get('utext', '')    
+    utext = self.request.get('utext', '')
     engtext = self.request.get('engtext', '')
     comment = self.request.get('comment', '')
     dbName = self.request.get('dbName', '')
@@ -331,6 +438,7 @@ class AddPhrase(webapp2.RequestHandler):
     q = OsagePhraseDB.all()
     q.filter('osagePhraseLatin =', oldtext)
     result = q.get()
+
     if result:
       # It's a duplicate. Return warning.
       message = 'This Osage message already exists at index %s' % result.index
@@ -347,18 +455,21 @@ class AddPhrase(webapp2.RequestHandler):
         osagePhraseLatin=oldtext,
         osagePhraseUnicode=utext,
         comment=comment,
+        soundFemaleLink='',
+        soundMaleLink='',
         status='Unknown')
       entry.put()
-      message = 'New Osage message added at index %s' % entry.index  
+      message = 'New Osage message added at index %s' % entry.index
 
     response = {
+      'new_index': entry.index,
       'message': message,
-    }    
+    }
     self.response.out.write(json.dumps(response))
 
 
 # Resets items from database.
-class GetPhrases(webapp2.RequestHandler): 
+class GetPhrases(webapp2.RequestHandler):
   def get(self):
     user_info = getUserInfo(self.request.url)
 
@@ -367,11 +478,11 @@ class GetPhrases(webapp2.RequestHandler):
     databases = self.request.GET.getall('databases')
     if databases == '*All*' or '*All*' in databases:
       selectAllDB = True
-      databases = [] 
+      databases = []
     else:
       selectAllDB = False
-    
-    logging.info('  **** Databases = %s, selectAllDB = %s' % (databases, selectAllDB)) 
+
+    logging.info('  **** Databases = %s, selectAllDB = %s' % (databases, selectAllDB))
 
     q = OsagePhraseDB.all()
     if filterStatus:
@@ -379,7 +490,7 @@ class GetPhrases(webapp2.RequestHandler):
     if not selectAllDB or databases:
       if type(databases) is not list:
         databases = [databases]
-      q.filter('dbName IN', databases) 
+      q.filter('dbName IN', databases)
       logging.info('FILTER WITH DATABASES: %s' % databases)
     q.order('index')
 
@@ -397,7 +508,10 @@ class GetPhrases(webapp2.RequestHandler):
     logging.info('dbNameList = %s' % dbNames)
 
     # TODO: Make this user-specific.
-    defaultDB = dbNames[0]
+    try:
+      defaultDB = dbNames[0]
+    except:
+      defaultDB = None
 
     numEntries = 0
     entries = []
@@ -428,25 +542,7 @@ class GetPhrases(webapp2.RequestHandler):
 
     path = os.path.join(os.path.dirname(__file__), 'phrasesList.html')
     self.response.out.write(template.render(path, template_values))
-  
-# Uses blob. TODO: make this work.
-class OldProcessUpload(webapp2.RequestHandler): 
-   def post(self):
-     upload_files = self.get_uploads('file')
-     #logging.info('$$$$$$$$$ upload_files %s' % upload_files[1])
 
-     blob_info = upload_files[0]
-     #logging.info('$$$$$$$$$ blob_info %s' % blob_info)
-     
-     entries = process_csv(blob_info)
-     blobstore.delete(blob_info.key())  # optional: delete file after import
-     
-     self.response.headers['Content-Type'] = 'application/json'
-     self.response.out.write(self.request.get('csv'))
-     # filename = 'data/Approved_Words.Language.xlsx - Sheet1.csv'
-     #file = open(os.path.join(os.path.dirname(__file__), filename)) 
-
-     self.response.out.write(entries) 
 
 # To handle UTF-8 input.
 def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
@@ -460,7 +556,7 @@ def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
 def utf_8_encoder(unicode_csv_data):
     for line in unicode_csv_data:
         yield line.encode('utf-8')
-        
+
 def processRow(index, row):
   english, osageLatin = row
   #logging.info('!! index = %d     english= %s' % (index, english))
@@ -469,16 +565,22 @@ def processRow(index, row):
     englishPhrase=english,
     osagePhraseLatin=osageLatin,
     osagePhraseUnicode='',
-    status="Unknown")
+    status="Unknown",
+    soundFemaleLink='',
+    soundMaleLink='',
+  )
   entry.put()
   return entry
 
+def utf_8_encoder(unicode_csv_data):
+  for line in unicode_csv_data:
+    yield line.encode('utf-8')
 
-class ProcessCSVUpload(webapp2.RequestHandler): 
+class ProcessCSVUpload(webapp2.RequestHandler):
 # http://stackoverflow.com/questions/2970599/upload-and-parse-csv-file-with-google-app-engine
   def post(self):
 
-    #self.response.headers['Content-Type'] = 'text/plain'   
+    #self.response.headers['Content-Type'] = 'text/plain'
     csv_file = self.request.POST.get('file')
     logging.info('ProcessCSVUpload csv_file = %s' % csv_file)
     dbName = self.request.POST.get('dbName', '')
@@ -486,12 +588,14 @@ class ProcessCSVUpload(webapp2.RequestHandler):
     osageColumn = self.request.POST.get('osageColumn', 'B')
     englishColumn = self.request.POST.get('englishColumn', 'D')
     commentColumn = self.request.POST.get('commentColumn', '')
-    unicodeColumn = self.request.POST.get('UnicodeColumn', '')
+    unicodeColumn = self.request.POST.get('unicodeColumn', '')
     referenceColumn = self.request.POST.get('referenceColumn', '')
     skipLines = int(self.request.POST.get('skipLines', '1'))
     skipEmptyLines = self.request.POST.get('skipEmptyLines', False)
     maxLines = int(self.request.POST.get('maxLines', -1))
-    
+
+    logging.info('unicodeColumn = %s' % unicodeColumn)
+
     logging.info('skip Empty Lines = %s' % skipEmptyLines)
     columns = [osageColumn, englishColumn, commentColumn, unicodeColumn]
 
@@ -500,7 +604,7 @@ class ProcessCSVUpload(webapp2.RequestHandler):
     self.response.out.write('Skip lines = %d\n' % skipLines)
     self.response.out.write('Skip empty lines = %s\n' % skipEmptyLines)
     self.response.out.write('maxLines = %s\n' % maxLines)
-    
+
     fileReader = csv.reader(csv_file.file)
     lineNum = 0
     numProcessed = 0
@@ -522,30 +626,30 @@ class ProcessCSVUpload(webapp2.RequestHandler):
         #self.response.out.write('Skipping line %d :  %s\n' % (lineNum, row))
       else:
         x = 0
-        #self.response.out.write('%3d: %s \n' % (lineNum, row))
-        
+        # self.response.out.write('%3d: %s \n' % (lineNum, row))
+
         try:
           indexValue = int(row[columnMap[indexColumn]])
         except:
           indexValue = maxIndex + 1
         try:
-          englishPhrase = row[columnMap[englishColumn]]
+          englishPhrase = row[columnMap[englishColumn]].strip()
         except:
           englishPhrase = ''
         try:
-          osagePhraseLatin = row[columnMap[osageColumn]]
+          osagePhraseLatin = row[columnMap[osageColumn]].strip()
         except:
           osagePhraseLatin = ''
         try:
-          comment = row[columnMap[commentColumn]]
+          comment = row[columnMap[commentColumn]].strip()
         except:
           comment = ''
         try:
-          utext = row[columnMap[unicodeColumn]]
+          utext = row[columnMap[unicodeColumn]].strip()
         except:
           utext = ''
         try:
-          reference = row[columnMap[referenceColumn]]
+          reference = row[columnMap[referenceColumn]].strip()
         except:
           reference = ''
 
@@ -554,27 +658,31 @@ class ProcessCSVUpload(webapp2.RequestHandler):
         #self.response.out.write('    C>%s<C \n' % (comment))
         #self.response.out.write('    U>%s<Y\n' % (utext))
 
-        if (skipEmptyLines and not englishPhrase and not osagePhraseLatin and 
+        if (skipEmptyLines and not englishPhrase and not osagePhraseLatin and
           not utext):
           emptyLines += 1
+          #self.response.out.write('--- Skipping line %d: %s' % (lineNum, row))
           continue
         try:
           entry = OsagePhraseDB(
             index=indexValue,
-            dbName = dbName,
-            englishPhrase = englishPhrase,
-            osagePhraseLatin = osagePhraseLatin,
-            osagePhraseUnicode = utext,
-            comment = comment,
-            reference = reference,
-            status = 'Unknown')
+            dbName=dbName,
+            englishPhrase=englishPhrase.decode('utf-8'),
+            osagePhraseLatin=osagePhraseLatin,
+            osagePhraseUnicode=utext.decode('utf-8'),
+            comment=comment,
+            reference=reference,
+            soundFemaleLink='',
+            soundMaleLink='',
+            status= 'Unknown')
           entry.put()
-          entries.append(entry)         
+          entries.append(entry)
           numProcessed += 1
           maxIndex += 1
-        except:
+        except Exception as err:
           y = 1
-          #self.response.out.write('  Cannot set item %d: %s' % (lineNum, row))
+          self.response.out.write('  Cannot set item %d: %s. Error=%s\n' % (lineNum, row, err))
+
 
         if maxLines > 0 and numProcessed > maxLines:
           self.response.out.write('\n Stopped after maximum %d processed' % (numProcessed))
@@ -582,7 +690,7 @@ class ProcessCSVUpload(webapp2.RequestHandler):
 
       lineNum += 1
 
-    # self.response.out.write('\n %d lines processed\n' % (numProcessed))
+    self.response.out.write('\n %d lines processed\n' % (numProcessed))
 
     template_values = {
       'language': main.Language,
@@ -595,3 +703,109 @@ class ProcessCSVUpload(webapp2.RequestHandler):
     }
     path = os.path.join(os.path.dirname(__file__), 'DBUploadResults.html')
     self.response.out.write(template.render(path, template_values))
+
+
+# Return entries based on the criteria given.
+def getDBItemsFiltered(databases, selectAllDB, filterStatus, orderBy=None):
+  logging.info('!!! getDBItemsFiltered selectAllDB %s' % selectAllDB)
+
+  q = OsagePhraseDB.all()
+  if filterStatus:
+    logging.info('!!! getDBItemsFiltered filterStatus %s' % filterStatus)
+    q.filter('status =', filterStatus)
+  if not selectAllDB or databases:
+    logging.info('!!! getDBItemsFiltered databases %s' % databases)
+    if type(databases) is not list:
+      databases = [databases]
+    q.filter('dbName IN', databases)
+  if orderBy:
+    logging.info('!!! getDBItemsFiltered orderBy %s' % orderBy)
+    q.order(orderBy)
+
+  numEntries = 0
+  entries = []
+  nullIndexCount = 0
+  for p in q.run():
+    numEntries += 1
+
+    if not p.index:
+      nullIndexCount += 1
+
+    entries.append(p)
+
+  logging.info('!!! getDBItemsFiltered has %d entries' % numEntries)
+  return entries
+
+
+# Returns items from database as CSV file or TSV file.
+class DownloadPhrasesCSV(webapp2.RequestHandler):
+  def get(self):
+    user_info = getUserInfo(self.request.url)
+    logging.info('GetPhrasesCSV')
+
+    filterStatus = self.request.get('filterStatus', '')
+    sortCriteria = self.request.get('sortCriteria', 'index')
+    outfileName = self.request.get('outfileName', 'database.csv')
+
+    delimiter = self.request.get('delimiter', ',')  # This may set up TSV or other types.
+
+    databases = self.request.GET.getall('databases')
+
+
+    if databases == None or databases == '*All*' or '*All*' in databases:
+      selectAllDB = True
+      databases = []
+    else:
+      selectAllDB = False
+
+    logging.info('filterStatus = %s' % filterStatus)
+    logging.info('sortCriteria = %s' % sortCriteria)
+    logging.info('outfileName = %s' % outfileName)
+    logging.info('delimiter = %s' % delimiter)
+    logging.info('databases = %s' % databases)
+
+    if sortCriteria == 'alpha':
+      sortCriteria = 'osagePhraseUnicode'
+    entries = getDBItemsFiltered(databases, selectAllDB, filterStatus, sortCriteria)
+    logging.info('GetPh rasesCSV WRITING %s entries' % entries)
+
+    output_type = 'csv'
+    if delimiter == 'comma':
+      delimiter = ','
+    if delimiter == 'tab':
+      delimiter='\t'
+      output_type = 'tsv'
+    self.response.headers['Content-Type'] = 'application/%s' % output_type
+
+    self.response.headers['Content-Disposition'] = str('attachment; filename="%s"' % outfileName)
+    writer = csv.writer(self.response.out, delimiter=delimiter)
+    # Headers
+    index = db.IntegerProperty()
+    dbName = db.StringProperty(u'')
+    lastUpdate = db.DateTimeProperty(auto_now=True, auto_now_add=True)
+    englishPhrase = db.StringProperty(multiline=True)
+    osagePhraseLatin = db.StringProperty(u'')
+    osagePhraseUnicode = db.StringProperty(u'')
+    status = db.StringProperty('')
+    comment = db.StringProperty('')
+
+    writer.writerow(['index',
+                     'Osage unicode',
+                     'phrase Latin',
+                     'english Phrase',
+                     'status',
+                     'dbName',
+                     'comment',
+                     'lastUpdate'])
+    for entry in entries:
+      logging.info('GetPhrasesCSV WRITING index = %s' % entry.index)
+      new_row = [entry.index,
+                 entry.osagePhraseUnicode.encode('utf-8') if entry.osagePhraseUnicode else "",
+                 entry.osagePhraseLatin.encode('utf-8') if entry.osagePhraseLatin else "",
+                 entry.englishPhrase.encode('utf-8') if entry.englishPhrase else "",
+                 entry.status.encode('utf-8') if entry.status else "",
+                 entry.dbName.encode('utf-8') if entry.dbName else "",
+                 entry.comment.encode('utf-8') if entry.comment else "",
+                 entry.lastUpdate if entry.lastUpdate else "",
+                 ]
+      writer.writerow(new_row)

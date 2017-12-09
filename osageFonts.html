@@ -16,13 +16,12 @@
 
    <script type="text/javascript" src="/js/osage_utils.js"></script>
 
-
    <script type="text/javascript" src="/js/osageConverter.js"></script>
-
 
    <script type="text/javascript" src="/js/utils.js"></script>
 
-  
+   <script src="/js/vk-debug.js"></script>
+
    <script>
    function fillAllWithUnicodeOsage() {
      area_List = [{% for fontFam in fontFamilies %}"{{fontFam|lower}}_area",{% endfor %} "None"];
@@ -55,7 +54,8 @@
 
    function onload() {
      copyToAll("input_area");
-   }
+     initKeyboard('input_area');
+  }
 
   // DRAG FUNCTIONS   
   function allowDrop(ev) {
@@ -79,10 +79,34 @@
     parent.insertBefore(movingNode, targetElement); 
     //ev.target.appendChild(document.getElementById(data));
   }
+
+  var controller, visible = true;
+  function initKeyboard(textAreaID) {
+      var input = document.getElementById(textAreaID);
+      controller = new i18n.input.keyboard.Keyboard();
+      controller.loadLayout('osa');
+      controller.reposition(input, 2, 0, [1, 0, 0, 0]);
+      controller.register(input);
+      controller.addEventListener('kc', function() { visible = false; });
+      input.focus();
+      var selector = document.getElementById('selectKeyboard');
+      onLayoutSelected(selector, controller, textAreaID);
+  }
+
+  function onLayoutSelected(selector, this_controller, outputId) {
+    var layoutCode = selector.value;
+    if (this_controller) {
+      this_controller.activateLayout(layoutCode);
+    } else {  // The global.
+      controller.activateLayout(layoutCode);
+    }
+    document.getElementById(outputId).focus();
+  }
+
    </script>
-   
+
    </head>
-  
+
   <body onload="onload()">
 
   <div class="container">
@@ -97,15 +121,18 @@
     <b>{{fontFam}}</b>
     <br/>
       <text id="{{fontFam|lower}}_area" class="{{fontFam|lower}}"
-      style="font-size:32px" colums="80" rows="2">{{utext}}</text>
+      style="font-size:32px; white-space:pre-wrap;" colums="80" rows="2">{{utext}}</text>
     <br />
   </div>
   {% endfor %}
 
   <div id='osageUnicodeSource'>
+    <br />
+    <h3>Unicode text:</h3>
     <textarea id="input_area" class="avant" cols="60" rows="3" 
       onchanged="copyToAll('input_area', null);">{{utext}}
     </textarea>
+    <br />
   </div>
   <input type="button"
            onclick="copyToAll('input_area',
@@ -122,11 +149,14 @@
              <option value="36pt">36</option>
              <option value="48pt">48</option>
              <option value="64pt">64</option>
-           <select/>
+           </select>
   <input type="button"
            onclick="fillAllWithUnicodeOsage('Unicode_font_output_text',
                     'new_hex');"
            value="Insert all {{scriptName}} Unicode characters" /> 
+    Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
+      <option value="osa">Osage Unicode</option>
+    </select>
            
   </div>
   </div>

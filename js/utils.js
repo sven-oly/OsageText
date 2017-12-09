@@ -1,6 +1,6 @@
 // Utilities for handling text.
 
-  // Takes hex text and converts to characters, displaying in another field.
+// Takes hex text and converts to characters, displaying in another field.
 function convertToText(inId, outId) {
   var textinput = document.getElementById(inId);
   var textoutput = document.getElementById(outId);

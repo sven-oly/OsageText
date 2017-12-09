@@ -47,6 +47,7 @@ var osage_private_use_map = {
   '\uf041\uf041': [String.fromCodePoint(0x104b0)+macron],
   '\uf041': [String.fromCodePoint(0x104b0)],
 
+  '\uf041^': [String.fromCodePoint(0x104b1)],
   '\uf041\uf059': [String.fromCodePoint(0x104b1)],
   '\uf042': [String.fromCodePoint(0x104b4)],
   '\uf043': [String.fromCodePoint(0x104b5)],
@@ -54,6 +55,7 @@ var osage_private_use_map = {
   '\uf045\uf045': [String.fromCodePoint(0x104b7)+macron],
   '\uf045': [String.fromCodePoint(0x104b7)],
 
+  '\uf045^': [String.fromCodePoint(0x104b7)+combiningDotAboveRight],
   '\uf045\uf05e': [String.fromCodePoint(0x104b7)+combiningDotAboveRight],
   '\uf048': [String.fromCodePoint(0x104b9),],
   // The eh-consonants
@@ -71,12 +73,14 @@ var osage_private_use_map = {
   '\uf04e': [String.fromCodePoint(0x104c1)],
   '\uf04f\uf04f': [String.fromCodePoint(0x104c2)+macron],
   '\uf04f': [String.fromCodePoint(0x104c2)],
+  '\uf04f^': [String.fromCodePoint(0x104c2)+combiningDotAboveRight],
   '\uf04f\uf05e': [String.fromCodePoint(0x104c2)+combiningDotAboveRight],
   '\uf050': [String.fromCodePoint(0x104c4)],
   '\uf053': [String.fromCodePoint(0x104c6)],
   '\uf054': [String.fromCodePoint(0x104cd)],
   '\uf055\uf055': [String.fromCodePoint(0x104ce)+macron],
   '\uf055': [String.fromCodePoint(0x104ce)],
+  '\uf055^': [String.fromCodePoint(0x104ce)+combiningDotAboveRight],
   '\uf055\uf05e': [String.fromCodePoint(0x104ce)+combiningDotAboveRight],
   '\uf056': [String.fromCodePoint(0x104c7)],
   '\uf057': [String.fromCodePoint(0x104cf)],
@@ -84,7 +88,6 @@ var osage_private_use_map = {
   '\uf059\uf059': [String.fromCodePoint(0x104bb)+macron],
   '\uf059': [String.fromCodePoint(0x104bb)],
   '\uf059^': [String.fromCodePoint(0x104bb)+combiningDotAboveRight],
-  '\uf059\uf059': [String.fromCodePoint(0x104bb)+macron],
   '\uf059\uf05e': [String.fromCodePoint(0x104bb)+combiningDotAboveRight],
   '\uf05a': [String.fromCodePoint(0x104d2)],  // ??
   '\uf05b': [String.fromCodePoint(0x104d3)],  // ??
@@ -94,8 +97,22 @@ var osage_private_use_map = {
   '\uf05f': '_',
   '\uf060': '`',
   '\uf061': [String.fromCodePoint(0x104b2)],  // ??
+  '\uf062': " ",
+  '\uf063': " ",
+  '\uf064': " ",
   '\uf065': [String.fromCodePoint(0x104b8)],  // ??
+  '\uf066': " ",
+  '\uf067': " ",
+  '\uf068': " ",
+  '\uf069': " ",
+  '\uf06a': " ",
+  '\uf06c': " ",
+  '\uf06d': " ",
+  '\uf06e': " ",
   '\uf06f': [String.fromCodePoint(0x104c3)],  // ??
+  '\uf078': ' ',
+  '\uf079': ' ',
+  '\uf07a': ' ',
   '\uf07b': '{',
   '\uf07c': '|',
   '\uf07d': '}',
@@ -165,7 +182,7 @@ var osage_latin_to_unicode_map = {
   'uU': [String.fromCodePoint(0x104f6)+macron, '\uf055\uf055'], // Macron
   'v':  [String.fromCodePoint(0x104ef), '\uf056'],
   'w':  [String.fromCodePoint(0x104f7), '\uf057'],
-  'x':  [String.fromCodePoint(0x104f8), '\uf058'],
+  'x':  [' ', '\uf078'], // OLD: String.fromCodePoint(0x104f8), '\uf058'],
   'y':  [String.fromCodePoint(0x104e3), '\uf059'],
   'yy':  [String.fromCodePoint(0x104e3)+macron, '\uf059\uf059'],
   'yY':  [String.fromCodePoint(0x104e3)+macron, '\uf059\uf059'],
@@ -249,8 +266,8 @@ var osage_latin_to_unicode_map = {
   'Yy':  [String.fromCodePoint(0x104bb)+macron, '\uf05a\uf05a'],
   'YY':  [String.fromCodePoint(0x104bb)+macron, '\uf05a\uf05a'],
   'Z':  [String.fromCodePoint(0x104d2), '\uf05a'],
-  'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],  
-  'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],  
+  'Zh': [String.fromCodePoint(0x104d3), '\uf05b'],
+  'ZH': [String.fromCodePoint(0x104d3), '\uf05b'],
   ';':  [String.fromCodePoint(0x104C6) + String.fromCodePoint(0x104BC), '\uf03b'],  // ??
   '^':  [combiningDotAboveRight, '\uf05e'],
   ',':  [String.fromCodePoint(0x104ba), '\uf02c'],
@@ -531,7 +548,7 @@ function preParseLatin(instring) {
 // For converting input to sets of connected characters.
 // Vowels + ^, double vowels, pre-aspirated consonants, single characters.
 var old_osage_chars =
-  "[\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|\uf041\uf059|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf07b-\uf07e\uf0b6]|";
+  "[\\^\uf05e]|\uf041\uf041|\uf045\uf045|\uf04f\uf04f|\uf055\uf055|\uf059\uf059|\uf041\uf059|\uf048[\uf043\uf04b\uf050\uf044\uf05d]|[\uf021-\uf045\uf048-\uf061\uf065\uf06f\uf078-\uf07e\uf0b6]|";
 
 function preParseOldOsage(instring) {
   if (typeof instring == 'string') {
@@ -549,4 +566,9 @@ function preParseOldOsage(instring) {
     return outList;
   }
   return null;
+}
+
+// TODO: Write regression tests.
+function conversionRegressionTests() {
+  return true;
 }
