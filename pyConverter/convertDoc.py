@@ -161,16 +161,20 @@ def parseDocXML(path_to_doc, unicodeFont='Pawhuska',
   print ('%d drawing lines found' % drawingCount)
   print ('----------------------------')
 
-  if drawingCount == 0:
-    convertWordOsage.convertOneDoc(path_to_doc)
-    return
+  # TODO RE-ENABLE when header and footer are considered.
+  # #if drawingCount == 0:
+  #  convertWordOsage.convertOneDoc(path_to_doc)
+  #  return
 
   # So we can get the parents of each node.
   # http://elmpowered.skawaii.net/?p=74
   parent_map = dict((c, p) for p in tree.getiterator() for c in p)
 
-  body = root.find('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}body')
+  #body = root.find('{http://schemas.openxmlformats.org/word processingml/2006/main}body')
 
+  #header = root.find('*hdr')
+
+  #footer = root.find('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}ftr')
   # TODO: package the following in a separate function
   osageNodeCount = 0
   convertCount = 0
@@ -221,16 +225,20 @@ def parseDocXML(path_to_doc, unicodeFont='Pawhuska',
                       collectedText = ''
                       textElements = []
                       inEncodedFont = False
-            elif re.search('}t', rchild.tag) and inEncodedFont:
-              # Process <w:t>
-              collectedText += rchild.text
-              textElements.append(rchild)
+            elif re.search('}t', rchild.tag):
+              if inEncodedFont:
+                # Process <w:t>
+                collectedText += rchild.text
+                textElements.append(rchild)
+              else:
+                notEncoded = rchild.text
+                print 'notEncoded = >%s>' % notEncoded
 
-  if collectedText:
-    convertCount += processCollectedText(collectedText, textElements, parent_map, superscriptNode,
-                                         unicodeFont=unicodeFont)
-    collectedText = ''
-    textElements = []
+    if collectedText:
+      convertCount += processCollectedText(collectedText, textElements, parent_map, superscriptNode,
+                                           unicodeFont=unicodeFont)
+      collectedText = ''
+      textElements = []
 
   print '%d text items converted' % convertCount
 
@@ -256,6 +264,10 @@ def isOsageFontNode(node):
 def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska'):
   newzip = zipfile.ZipFile(path_to_doc)
   docfile_name = 'word/document.xml'
+
+  # TEMPORARY
+  #docfile_name = 'word/header1.xml'
+
   compress_method = ''
   for info in newzip.infolist():
     if info.filename == docfile_name:
@@ -304,6 +316,7 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska'):
   if debug_output:
     outzip.printdir()
   outzip.close()
+
 
 def unzipInputFile(infile, outdir):
   # https://docs.python.org/3/library/zipfile.html
