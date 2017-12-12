@@ -13,6 +13,8 @@ import osageConversion
 # The version using docx
 import convertWordOsage
 
+import docxDebug
+
 # https://docs.python.org/2/library/xml.etree.elementtree.html
 # https://docs.python.org/2/library/zipfile.html
 
@@ -34,6 +36,7 @@ osageConvertPattern = latinOsagePattern2 + '|' + traditionalOsageCharacters
 
 debug_output = False
 
+debugParse = False   #True
 
 def replFunc(matchObj):
   if matchObj.group(0):
@@ -61,11 +64,34 @@ def checkAndConvertText(textIn):
     return textIn
 
 
+def fixElementAndParent(textElement, parent, newText, unicodeFont):
+  removeList = []
+  oldText = textElement.text
+  for item in parent.findall('*'):
+    for child in item.findall('*'):
+      if re.search('}rFonts', child.tag):
+        attrib = child.attrib
+        for key in attrib:
+          if attrib[key] == OfficialOsageFont:
+            attrib[key] = unicodeFont
+      elif re.search('}vertAlign', child.tag):
+        if (oldText == u'H' or oldText == u'\uf048'):
+          print 'vertAlign item'
+          keys = child.attrib.keys()
+          #removeList.append(child)
+  textElement.text = newText
+  # Remove all the children we don't want or need
+  #for item in removeList:
+  #  if item in parent.findall('*'):
+  #    parent.remove(item)
+
 # Replace the text in the first text element with the converted
 # unicode string, remove text from other text elements in that,
 # batch, and remove the empty elements.
 # Should I reset the font in this function, too?
-def processCollectedText(collectedText, textElementList, parent_map):
+def processCollectedText(collectedText, textElementList, parent_map, superscriptNode,
+                         unicodeFont):
+  # TODO:
   # First, change the text
   if debug_output:
     print('** CONVERTING %s to Unicode. ' % collectedText)
@@ -78,35 +104,38 @@ def processCollectedText(collectedText, textElementList, parent_map):
 
   # 1. Reset text in first element
   if textElementList:
-    textElementList[0].text = convertedText
+    # ∂textElementList[0].text = convertedText
+    parent = parent_map[textElementList[0]]
+    # Fix font and superscripting
+    fixElementAndParent(textElementList[0], parent, convertedText, unicodeFont)  # Update the font in this item.
+    if superscriptNode:
+      superscriptNode.val = 'baseline'
+  else:
+    return 0
 
+  oldTextParentList = []
+
+  # Just nuke all the parents of additional text items?
   # 2. Clear text in other elements
-  # 3. Delete empty elements:
   for element in textElementList[1:]:
-    parent = parent_map[element]
-    if parent is not None:
-      parent.remove(element)
+    element.text = ''
+    #parent = parent_map[element]
+    #oldTextParentList.append(parent)
+    #if parent is not None:
+    # Nuke the text element
+    #  parent.remove(element)
 
-      countFontItems = 0
-      countOtherItems = 0
-      for item in parent.findall('*'):
-        for child in item.findall('*'):
-          if re.search('}rFonts', child.tag):
-            countFontItems += 1
-          else:
-            countOtherItems +=1
-        if re.search('}rFonts', item.tag):
-          countFontItems += 1
-        else:
-          countOtherItems +=1
-
-      # If each count == 1, then this contains only a font spec.
-      # Remove empty parents
-      if countFontItems == 1 and countOtherItems == 1:
-        uberParent = parent_map[parent]
-        if uberParent is not None:
-          uberParent.remove(parent)
-
+  # Try removing these empty text parents.
+  #for parent in oldTextParentList:
+  #  uP = parent_map[parent]
+  #  if uP and parent:
+  #    uP.remove(parent)
+  # 3. Delete empty elements:
+  # Maybe this is nuking too much.
+  # for uP in uberParents:
+  #   uPP = parent_map[uP]
+  #   if uPP and uP:
+  #     uPP.remove(uP)
   return convertedCount
 
 # Looks at text parts of the DOCX data, extracting each.
@@ -140,6 +169,7 @@ def parseDocXML(path_to_doc, unicodeFont='Pawhuska',
 
   body = root.find('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}body')
 
+  # TODO: package the following in a separate function
   osageNodeCount = 0
   convertCount = 0
 
@@ -147,42 +177,56 @@ def parseDocXML(path_to_doc, unicodeFont='Pawhuska',
   textElements = []
   collectedText = ''
 
+  # Current font
+  inEncodedFont = False
+
   for node in root.iter('*'):
 
     if re.search('}p$', node.tag):
-      if textElements:
-        convertCount += processCollectedText(collectedText, textElements, parent_map)
-        collectedText = ''
-        textElements = []
 
-    if re.search('}rFonts', node.tag) and not isOsageFontNode(node):
-      # Switching out of Osage mode.
-      if textElements:
-        # print ' &&&&&&&&&&& Not Osage font node %s' % node
-        convertCount += processCollectedText(collectedText, textElements, parent_map)
-        collectedText = ''
-        textElements = []
-    elif isOsageFontNode(node):
-      osageNodeCount += 1
-      # print '%d Osage node = %s' % (osageNodeCount, node.tag)
+      textElements = []
+      collectedText = ''
+      superscriptNode = False
 
-      rPr = parent_map[node]
-      # print rPr
-      rNode = parent_map[rPr]
+      # Process the children.
+      for pchild in node._children:
+        if re.search('}r$', pchild.tag):
+          # Look at the rPr and <w:t>
 
-      textItems = []
-      convertedList = []
+          for rchild in pchild._children:
+            superscriptNode = None
 
-      for item in rNode.findall('*'):
-        if re.search('}t$', item.tag):
-          if debug_output:
-            print '  Traditional Osage: %s' % item.text.encode('utf-8')
+            # Process <w:r>
+            if re.search('}rPr', rchild.tag):
+              for rprchild in rchild._children:
+                # Process <w:rPr>
+                if re.search('}vertAlign', rprchild.tag):
+                  # TODO: Handle the superscript flag
+                  superscriptNode = rprchild
+                elif re.search('}rFonts', rprchild.tag):
+                  # Font info.
+                  if isOsageFontNode(rprchild):
+                    # In font encoded node
+                    inEncodedFont = True
+                  else:
+                    # Check if we are switching out. If so, handle accumulated text
+                    if inEncodedFont:
+                      if collectedText:
+                        convertCount += processCollectedText(collectedText,
+                                                             textElements, parent_map,
+                                                             superscriptNode,
+                                                             unicodeFont=unicodeFont)
+                      collectedText = ''
+                      textElements = []
+                      inEncodedFont = False
+            elif re.search('}t', rchild.tag) and inEncodedFont:
+              # Process <w:t>
+              collectedText += rchild.text
+              textElements.append(rchild)
 
-          collectedText += item.text
-          textElements.append(item)
-
-  if textElements:
-    convertCount += processCollectedText(collectedText, textElements, parent_map)
+  if collectedText:
+    convertCount += processCollectedText(collectedText, textElements, parent_map, superscriptNode,
+                                         unicodeFont=unicodeFont)
     collectedText = ''
     textElements = []
 
@@ -220,6 +264,14 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska'):
 
   docXML = newzip.read(docfile_name)  # A file-like object
 
+  # For debugging
+  if debugParse:
+    docxDebug.parseDocXMLText(docXML, unicodeFont, isString=True)
+
+    # TODO: remove this when debugged
+    return
+
+  # The real parsing.
   new_docXML = parseDocXML(docXML, unicodeFont, isString=True)
 
   # Create a new zip archive

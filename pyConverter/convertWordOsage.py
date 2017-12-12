@@ -52,8 +52,6 @@ def checkAndConvertText(textIn):
   if textIn[0] == '=':
     # Ignore function calls
     return textIn
-  # if notOsageLatinLower.search(textIn):
-  #  return textIn
 
   # Handle Latin and TraditionalOsage private use characters.
   if convertAllInOldFontRange:

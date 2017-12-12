@@ -7,16 +7,20 @@ import main
 import words
 from userDB import getUserInfo
 
-import csv
-import json
+
 import logging
 import os
-import StringIO
 
-import urllib
 import webapp2
 
 from google.appengine.api import users
+from google.appengine.ext.webapp import template
+
+# Help from http://nealbuerger.com/2013/12/google-app-engine-import-csv-to-datastore/
+
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
+from google.appengine.ext import db
 
 # Clear out the entire phrase data store, or part of it (eventually)
 class ResetDBEntries(webapp2.RequestHandler): 
@@ -87,4 +91,34 @@ class ManageDbName(webapp2.RequestHandler):
       entry.put()
       self.response.out.write('db Name = %s has been added.\n' % dbName)
 
-        
+
+# Show simple interface for CSV upload.
+class SolicitUpload(webapp2.RequestHandler):
+  def get(self):
+    # upload_url = blobstore.create_upload_url('upload')
+    upload_url = '/words/uploadCSV/'
+
+    user_info = getUserInfo(self.request.url)
+
+    #logging.info('$$$$$$$$$ upload_url %s' % upload_url)
+    q = words.OsageDbName.all()
+    dbNameList = [p.dbName for p in q.run()]
+    logging.info('dbNameList = %s' % dbNameList)
+
+    template_values = {
+      'language': main.Language,
+      'upload_url':upload_url,
+      'dbNames': dbNameList,
+    }
+    path = os.path.join(os.path.dirname(__file__), 'wordsUpload.html')
+    self.response.out.write(template.render(path, template_values))
+
+
+# Dispatch requests.
+app = webapp2.WSGIApplication([
+
+    ('/db/manageDB/', SolicitUpload),
+    ('/db/handleDB/', ManageDbName),
+    ('/db/resetDbEntries/', ResetDBEntries),
+
+], debug=True)

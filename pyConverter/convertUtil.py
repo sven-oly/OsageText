@@ -42,7 +42,8 @@ def parseArgs():
                       help='Flag to force uppercasing of converted text.')
   parser.add_argument('-sentencecase', action='store_false',
                       help='Flag to force sentence casing of converted text.')
-
+  parser.add_argument('-removedotsequence', action='store_false',
+                      help='Flag to omit sequence of dots rather than converting.')
   args = parser.parse_args()
 
   # Get the filenames from the input file list, if available.

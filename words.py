@@ -4,14 +4,12 @@
 import main
 from userDB import getUserInfo
 
-import codecs
 import csv
 import json
 import logging
 import os
 import StringIO
 
-import urllib
 import webapp2
 
 from google.appengine.api import users
@@ -254,26 +252,6 @@ class WordHandler(webapp2.RequestHandler):
       self.response.out.write(template.render(path, template_values))
 
 
-# Show simple interface for CSV upload.
-class SolicitUpload(webapp2.RequestHandler):
-  def get(self):
-    # upload_url = blobstore.create_upload_url('upload')
-    upload_url = '/words/uploadCSV/'
-
-    user_info = getUserInfo(self.request.url)
-
-    #logging.info('$$$$$$$$$ upload_url %s' % upload_url)
-    q = OsageDbName.all()
-    dbNameList = [p.dbName for p in q.run()]
-    logging.info('dbNameList = %s' % dbNameList)
-
-    template_values = {
-      'language': main.Language,
-      'upload_url':upload_url,
-      'dbNames': dbNameList,
-    }
-    path = os.path.join(os.path.dirname(__file__), 'wordsUpload.html')
-    self.response.out.write(template.render(path, template_values))
 
 # Add entries in the uploaded CSV to the data store.
 # TODO: check for duplicates.
@@ -809,3 +787,47 @@ class DownloadPhrasesCSV(webapp2.RequestHandler):
                  entry.lastUpdate if entry.lastUpdate else "",
                  ]
       writer.writerow(new_row)
+
+
+# Special for updating 578 with oldOsage data from 578-old.
+class Fix578(webapp2.RequestHandler):
+  def get(self):
+    user_info = getUserInfo(self.request.url)
+
+    old578Phrases = OsagePhraseDB.all()
+    old578Phrases.filter('dbName =', '578-old')
+    for p in old578Phrases.run():
+      index = p.index
+
+      logging.info('old 578 index = %s, key= %s' % (index, p.key))
+
+      new578Phrases = OsagePhraseDB.all().filter('index =', index)
+
+      for newphrase in new578Phrases.run():
+        #logging.info(' New 578 phrases index: %s, key: %s' %
+        #             (newphrase.index, newphrase.key))
+
+        if p.englishPhrase == newphrase.englishPhrase:
+          newphrase.osagePhraseLatin = p.osagePhraseLatin
+          newphrase.put()
+          logging.info('Updating 578 index %s with %s' %
+            (newphrase.index, newphrase.osagePhraseLatin))
+
+
+# Displatching for WORDS.
+app = webapp2.WSGIApplication([
+
+    ('/words/', WordHandler),
+    ('/words/addPhrase/', AddPhrase),
+    ('/words/clear/', ClearWords),
+    ('/words/renameDB/', RenameDB),
+    ('/words/getWords/', GetWordsHandler),
+    ('/words/getPhrases/', GetPhrases),
+    ('/words/updateStatus/', UpdateStatus),
+    ('/words/upload/', ProcessUpload),
+    ('/words/uploadCSV/', ProcessCSVUpload),
+    ('/words/downloadCSV/', DownloadPhrasesCSV),
+
+    ('/words/fix578/', Fix578),
+
+], debug=True)

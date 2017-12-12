@@ -273,6 +273,7 @@ osage_latin_to_unicode_map = {
   ';':  unichr(0xd801)+unichr(0xdcC6) + unichr(0xd801)+unichr(0xdcBC),
   '^':  combiningDotAboveRight,
   ',':  unichr(0xd801)+unichr(0xdcba),  # HYA character
+  u'.': '.',
 
   # Handle comma and period special cases
   ', ':  ', ',
@@ -376,10 +377,18 @@ def preParseOldOsage(instring):
     outList = regex2.findall(instring)
     return outList;
 
+
+def replaceDots(matchobj):
+  return '.' * len(matchobj.group(0))
+
 def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
-                      clearOsageDot=True):
+                      clearOsageDot=True, clearDotSequence=False):
   convertResult = u''
   outputIsUTF16 = True
+
+  # Replace sequence of Old Osage dots with periods.
+  # TODO: use the flag.
+  textIn = re.sub(u'(\uf02e{2,})', replaceDots, textIn)
 
   parsedInput = preParseOldOsage(textIn)
   if debug:

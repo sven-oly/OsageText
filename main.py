@@ -5,9 +5,7 @@
 from userDB import getUserInfo
 
 import blobstorage
-import database
 import userDB
-import words
 
 import json
 import logging
@@ -186,20 +184,6 @@ app = webapp2.WSGIApplication([
 
     ('/login/', LoginPageHandler),
 
-    ('/words/', words.WordHandler),
-    ('/words/addPhrase/', words.AddPhrase),
-    ('/words/clear/', words.ClearWords),
-    ('/words/renameDB/', words.RenameDB),
-    ('/words/getWords/', words.GetWordsHandler),
-    ('/words/getPhrases/', words.GetPhrases),
-    ('/words/startUpload/', words.SolicitUpload),
-    ('/words/updateStatus/', words.UpdateStatus),
-    ('/words/upload/', words.ProcessUpload),
-    ('/words/uploadCSV/', words.ProcessCSVUpload),
-    ('/words/downloadCSV/', words.DownloadPhrasesCSV),
-    ('/db/manageDB/', words.SolicitUpload),
-    ('/db/handleDB/', database.ManageDbName),
-    ('/db/resetDbEntries/', database.ResetDBEntries),
     ('/slides/', ProcessSlides),
 
     ('/users/', userDB.manageUsers),

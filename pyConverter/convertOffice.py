@@ -17,6 +17,7 @@ import convertUtil
 def main(argv):
   args = convertUtil.parseArgs()
   UnicodeOsageFont = args.font
+  print '** args = %s' % args
 
   paths_to_doc = args.filenames
 
