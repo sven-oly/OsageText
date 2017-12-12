@@ -78,6 +78,8 @@ def fixElementAndParent(textElement, parent, newText, unicodeFont):
         if (oldText == u'H' or oldText == u'\uf048'):
           print 'vertAlign item'
           keys = child.attrib.keys()
+          if re.search('}val', keys[0]):
+            child.attrib[keys[0]] = 'baseline'
           #removeList.append(child)
   textElement.text = newText
   # Remove all the children we don't want or need
