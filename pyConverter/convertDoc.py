@@ -38,31 +38,6 @@ debug_output = False
 
 debugParse = False  # Remove when no longer needed
 
-def replFunc(matchObj):
-  if matchObj.group(0):
-    if notOsageLatinLower.search(matchObj.group(0)):
-      return matchObj.group(0)
-    else:
-      return osageConversion.oldOsageToUnicode(matchObj.group(0))
-
-# Check for Osage text and convert the Osage parts of the strings.
-def checkAndConvertText(textIn):
-  if not textIn:
-    return textIn
-
-  if textIn[0] == '=':
-    # Ignore function calls
-    return textIn
-#  if notOsageLatinLower.search(textIn):
-#    return textIn
-
-  # Handle Latin and TraditionalOsage private use characters.
-  tryResult = re.subn(osageConvertPattern, replFunc, textIn)
-  if tryResult[1] >= 1:
-    return tryResult[0]
-  else:
-    return textIn
-
 
 def fixElementAndParent(textElement, parent, newText, unicodeFont):
   removeList = []
@@ -89,7 +64,6 @@ def fixElementAndParent(textElement, parent, newText, unicodeFont):
 # Should I reset the font in this function, too?
 def processCollectedText(collectedText, textElementList, parent_map, superscriptNode,
                          unicodeFont):
-  # TODO:
   # First, change the text
   if debug_output:
     print('** CONVERTING %s to Unicode. ' % collectedText)
@@ -154,7 +128,6 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
   parent_map = dict((c, p) for p in tree.getiterator() for c in p)
 
   # TODO: package the following in a separate function
-  osageNodeCount = 0
   convertCount = 0
 
   # Look for series of items
@@ -185,7 +158,6 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
               for rprchild in rchild._children:
                 # Process <w:rPr>
                 if re.search('}vertAlign', rprchild.tag):
-                  # TODO: Handle the superscript flag
                   superscriptNode = rprchild
                 elif re.search('}rFonts', rprchild.tag):
                   # Font info.
@@ -227,7 +199,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
     if not outpath:
       outpath = path_to_doc
     tree.write(outpath)
-  return tree, convertedList
+  return tree
 
 
 def isOsageFontNode(node):
