@@ -5,7 +5,7 @@ import re
 
 # Convert Osage text to Unicode.
 
-debug = True  #False
+debug = False
 
 accent = u'\u0301'
 doubleAccent = u'\u030B'
@@ -97,7 +97,6 @@ osage_private_use_map = {
   u'\uf056': unichr(0xd801)+unichr(0xdcc7),
   u'\uf057': unichr(0xd801)+unichr(0xdccf),
   u'\uf058': unichr(0xd801)+unichr(0xdcd0),
-  u'\uf059\uf059': unichr(0xd801)+unichr(0xdcbb)+macron,
   u'\uf059': unichr(0xd801)+unichr(0xdcbb),
   u'\uf059^': unichr(0xd801)+unichr(0xdcbb)+combiningDotAboveRight,
   u'\uf059\uf059': unichr(0xd801)+unichr(0xdcbb)+macron,
@@ -127,7 +126,6 @@ osage_private_use_map = {
 osage_latin_to_unicode_map = {
   'á': unichr(0xd801)+unichr(0xdcd8) + accent,
   'a': unichr(0xd801)+unichr(0xdcb2),
-  'aa': unichr(0xd801)+unichr(0xdcd8)+macron,
   'aa': unichr(0xd801)+unichr(0xdcd8)+macron,
   'ā': unichr(0xd801)+unichr(0xdcd8)+macron,
   'ą̄': unichr(0xd801)+unichr(0xdcd8)+macron,
@@ -283,7 +281,6 @@ osage_latin_to_unicode_map = {
   '.\u2008': '.',
 
   '[': unichr(0xd801)+unichr(0xdcd3),
-  '[': unichr(0xd801)+unichr(0xdcd3),
   '{': '{',
   ']': unichr(0xd801)+unichr(0xdcca),
   'h]': unichr(0xd801)+unichr(0xdccb),
@@ -319,8 +316,6 @@ osage_latin_to_unicode_map = {
   u'\ue0b2': unichr(0xd801)+unichr(0xdcbb) + accent + combiningDotAboveRight,
   u'\u00e1\u0328': unichr(0xd801)+unichr(0xdcbb) + accent + combiningDotAboveRight,
   u'\ue0b1': unichr(0xd801)+unichr(0xdcd8) + accent + combiningDotAboveRight,
-  u'\ue0b1': unichr(0xd801)+unichr(0xdcd8) + accent + combiningDotAboveRight,
-  u'\ue0b3': unichr(0xd801)+unichr(0xdce3) + accent + combiningDotAboveRight,
   u'\ue0b3': unichr(0xd801)+unichr(0xdce3) + accent + combiningDotAboveRight,
   # Accent + i + cedilla
   #   Áį áį,   Éį éį,   Óį Óį;   Ái ái
