@@ -5,6 +5,8 @@ import re
 
 # Convert Osage text to Unicode.
 
+# TODO: resolve duplicates in the map.
+
 debug = False
 
 accent = u'\u0301'
@@ -368,6 +370,7 @@ old_osage_chars += u"[\\^\uf05e\uf020-\uf0b6]"
 combined_chars = old_osage_chars + "|" + osage_latin_chars + "|."
 regex2 = re.compile(combined_chars, flags=re.I)
 
+
 def preParseOldOsage(instring):
     outList = regex2.findall(instring)
     return outList;
@@ -376,10 +379,10 @@ def preParseOldOsage(instring):
 def replaceDots(matchobj):
   return '.' * len(matchobj.group(0))
 
+
 def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
                       clearOsageDot=True, clearDotSequence=False):
   convertResult = u''
-  outputIsUTF16 = True
 
   # Replace sequence of Old Osage dots with periods.
   # TODO: use the flag.
@@ -396,8 +399,7 @@ def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
 
   for index in xrange(len(parsedInput)):
     c = parsedInput[index];
-    #if debug:
-    #  print 'c = %s' % c.encode('utf-8')
+
     # Handle ASCII period between two non-white space characters
     #  as if it were an oldOsageDot.
     if c == oldOsageDot and clearOsageDot:
@@ -406,8 +408,6 @@ def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
     out = c
     if c in osage_private_use_map:
       out = osage_private_use_map[c]
-      #if debug:
-      #  print ' output for %s  = %s' % (c.encode('utf-8'), out.encode('utf-8'))
     else:
       # It's not in the map.
       if convertLatin:
