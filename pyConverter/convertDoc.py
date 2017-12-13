@@ -13,8 +13,6 @@ import osageConversion
 # The version using docx
 import convertWordOsage
 
-import docxDebug
-
 # https://docs.python.org/2/library/xml.etree.elementtree.html
 # https://docs.python.org/2/library/zipfile.html
 
@@ -215,11 +213,6 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska'):
       print 'COMPRESS TYPE = %s' % compress_method
 
     docXML = newzip.read(docfile_name)  # A file-like object
-
-    if debugParse:
-      docxDebug.parseDocXMLText(docXML, unicodeFont, isString=True)
-      # For debugging the parsing only
-      continue
 
     # The real parsing.
     new_docXML = parseDocXML(docfile_name, docXML, unicodeFont, isString=True)
