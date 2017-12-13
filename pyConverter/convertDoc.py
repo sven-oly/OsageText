@@ -22,18 +22,6 @@ import docxDebug
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]
 
-# Rule for detecting Latin text or Old Osage font.
-# Some Old Osage text is in Latin CAPS, but with lower case a, e, and o.
-latinOsagePattern2 = ur'[\^A-Z\[\]][A-Zaeo\[\]\^\\\'\/\._`,!]+'
-
-# This identifies traditional Osage private use characters
-traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
-
-# To avoid converting English words
-notOsageLatinLower = re.compile(r'[b-df-np-z]')
-
-osageConvertPattern = latinOsagePattern2 + '|' + traditionalOsageCharacters
-
 debug_output = False
 
 debugParse = False  # Remove when no longer needed
@@ -274,7 +262,6 @@ def unzipInputFile(infile, outdir):
   print 'unzipping %s to directory %s' % (infile, outdir)
 
   newzip = zipfile.ZipFile(infile)
-  # Be careful on this.
   result = newzip.extractall(path=outdir, pwd=None)
   print 'zip extract result = %s' % result
 
