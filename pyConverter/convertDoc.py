@@ -20,7 +20,7 @@ import convertWordOsage
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]
 
-debug_output = False
+debug_output = True
 
 debugParse = False  # Remove when no longer needed
 
@@ -197,11 +197,32 @@ def isOsageFontNode(node):
   return False
 
 
+def parseFontTable(docXML, unicodeFont):
+  tree = ET.fromstring(docXML)
+
+  for node in tree.iter('*'):
+    if re.search('}font$', node.tag):
+      keys = node.attrib.keys()
+      if re.search('}name', keys[0]) and node.attrib[keys[0]] == OfficialOsageFont:
+        print 'Replacing font %s with %s' % (node.attrib[keys[0]], unicodeFont)
+        node.attrib[keys[0]] = unicodeFont
+  return ET.tostring(tree, encoding='utf-8')
+
+
+def tryFontUpdate(newzip, unicodeFont):
+  filename = 'word/fontTable.xml'
+  docXML = newzip.read(filename)  # A file-like object
+
+  return parseFontTable(docXML, unicodeFont)
+
+
 def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska'):
   newzip = zipfile.ZipFile(path_to_doc)
   docfiles = ['word/document.xml', 'word/header1.xml', 'word/footer1.xml']
 
-  docPartsOut = {}
+  newFontTable = tryFontUpdate(newzip, unicodeFont)
+
+  docPartsOut = {'word/fontTable.xml': newFontTable}
   for docfile_name in docfiles:
 
     compress_method = ''
