@@ -20,7 +20,7 @@ import convertWordOsage
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]
 
-debug_output = True
+debug_output = False
 
 debugParse = False  # Remove when no longer needed
 
@@ -50,6 +50,7 @@ def fixElementAndParent(textElement, parent, newText, unicodeFont):
 # Should I reset the font in this function, too?
 def processCollectedText(collectedText, textElementList, parent_map, superscriptNode,
                          unicodeFont):
+  clearedTextElements = []
   # First, change the text
   if debug_output:
     print('** CONVERTING %s to Unicode. ' % collectedText)
@@ -73,19 +74,9 @@ def processCollectedText(collectedText, textElementList, parent_map, superscript
   # 2. Clear text in other elements
   for element in textElementList[1:]:
     element.text = ''
+    clearedTextElements.append(element)
 
-  # Try removing these empty text parents.
-  # for parent in oldTextParentList:
-  #  uP = parent_map[parent]
-  #  if uP and parent:
-  #    uP.remove(parent)
-  # 3. Delete empty elements:
-  # Maybe this is nuking too much.
-  # for uP in uberParents:
-  #   uPP = parent_map[uP]
-  #   if uPP and uP:
-  #     uPP.remove(uP)
-  return convertedCount
+  return convertedCount, clearedTextElements
 
 # Looks at text parts of the DOCX data, extracting each.
 def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
@@ -116,9 +107,11 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
   # TODO: package the following in a separate function
   convertCount = 0
 
+  allEmptiedTextElements = []
   # Look for series of items
   textElements = []
   collectedText = ''
+  superscriptNode = False
 
   # Current font
   inEncodedFont = False
@@ -154,10 +147,13 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                     # Check if we are switching out. If so, handle accumulated text
                     if inEncodedFont:
                       if collectedText:
-                        convertCount += processCollectedText(collectedText,
-                                                             textElements, parent_map,
-                                                             superscriptNode,
-                                                             unicodeFont=unicodeFont)
+                        (newConvertedCount, emptiedElements) = (
+                          processCollectedText(collectedText,
+                                               textElements, parent_map,
+                                               superscriptNode,
+                                               unicodeFont=unicodeFont))
+                        convertCount += newConvertedCount
+                        allEmptiedTextElements.append(emptiedElements)
                       collectedText = ''
                       textElements = []
                       inEncodedFont = False
@@ -171,10 +167,17 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                 # print 'notEncoded = >%s<' % notEncoded
 
     if collectedText:
-      convertCount += processCollectedText(collectedText, textElements, parent_map, superscriptNode,
-                                           unicodeFont=unicodeFont)
+      (newConvertedCount, emptiedElements) = (
+        processCollectedText(collectedText,
+                             textElements, parent_map, superscriptNode,
+                             unicodeFont=unicodeFont))
+      convertCount += newConvertedCount
       collectedText = ''
       textElements = []
+      allEmptiedTextElements.append(emptiedElements)
+
+  # TODO: remove all emptied text elements.
+  removeOldTextElements(allEmptiedTextElements, parent_map)
 
   print ' %s: %d text items converted' % (docfile_name, convertCount)
 
@@ -186,6 +189,20 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
       outpath = path_to_doc
     tree.write(outpath)
   return tree
+
+
+def removeOldTextElements(allElementsToRemove, parent_map):
+  count = 0
+  for group in reverse(allElementsToRemove):
+    for item in reverse(group):
+      parent = parent_map[item]
+      if parent.remove(item):
+        print 'Removed'
+        count += 1
+      else:
+        print 'did not remove %s' % item
+  # And probably remove the siblings and the empty parent, too.
+  print 'removed %d items' % count
 
 
 def isOsageFontNode(node):
