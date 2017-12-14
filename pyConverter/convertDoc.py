@@ -20,7 +20,7 @@ import convertWordOsage
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]
 
-debug_output = True
+debug_output = False
 
 debugParse = False  # Remove when no longer needed
 
@@ -50,15 +50,17 @@ def fixElementAndParent(textElement, parent, newText, unicodeFont):
 # Should I reset the font in this function, too?
 def processCollectedText(collectedText, textElementList, parent_map, superscriptNode,
                          unicodeFont):
+  global debug_output
+
   # First, change the text
   if debug_output:
-    print('** CONVERTING %s to Unicode. ' % collectedText)
+    print('** CONVERTING %s to Unicode. ' % collectedText.encode('utf-8'))
   convertedText = osageConversion.oldOsageToUnicode(collectedText)
   convertedCount = 0
   if convertedText != collectedText:
     convertedCount = 1
   else:
-    print('---- Not converted: %s' % collectedText)
+    print('---- Not converted: %s' % collectedText.encode('utf-8'))
 
   # 1. Reset text in first element
   if not textElementList:
@@ -90,6 +92,7 @@ def processCollectedText(collectedText, textElementList, parent_map, superscript
 # Looks at text parts of the DOCX data, extracting each.
 def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                 saveConversion=False, outpath=None, isString=False):
+  global debug_output
   if isString:
     tree = ET.fromstring(path_to_doc)
     root = tree
@@ -168,7 +171,8 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                 textElements.append(rchild)
               else:
                 notEncoded = rchild.text
-                # print 'notEncoded = >%s<' % notEncoded
+                if debug_output:
+                  print 'notEncoded = >%s<' % notEncoded
 
     if collectedText:
       convertCount += processCollectedText(collectedText, textElements, parent_map, superscriptNode,
@@ -216,7 +220,11 @@ def tryFontUpdate(newzip, unicodeFont):
   return parseFontTable(docXML, unicodeFont)
 
 
-def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska'):
+def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
+  global debug_output
+  if debug:
+    debug_output = True
+
   newzip = zipfile.ZipFile(path_to_doc)
   docfiles = ['word/document.xml', 'word/header1.xml', 'word/footer1.xml']
 

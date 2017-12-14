@@ -44,6 +44,8 @@ def parseArgs():
                       help='Flag to force sentence casing of converted text.')
   parser.add_argument('-removedotsequence', action='store_false',
                       help='Flag to omit sequence of dots rather than converting.')
+  parser.add_argument('-cleardots', action='store_false',
+                      help='If set, removes dots without a space beforeafter')
   args = parser.parse_args()
 
   # Get the filenames from the input file list, if available.
