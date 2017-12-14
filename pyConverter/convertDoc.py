@@ -51,15 +51,17 @@ def fixElementAndParent(textElement, parent, newText, unicodeFont):
 def processCollectedText(collectedText, textElementList, parent_map, superscriptNode,
                          unicodeFont):
   clearedTextElements = []
+  global debug_output
+
   # First, change the text
   if debug_output:
-    print('** CONVERTING %s to Unicode. ' % collectedText)
+    print('** CONVERTING %s to Unicode. ' % collectedText.encode('utf-8'))
   convertedText = osageConversion.oldOsageToUnicode(collectedText)
   convertedCount = 0
   if convertedText != collectedText:
     convertedCount = 1
   else:
-    print('---- Not converted: %s' % collectedText)
+    print('---- Not converted: %s' % collectedText.encode('utf-8'))
 
   # 1. Reset text in first element
   if not textElementList:
@@ -81,6 +83,7 @@ def processCollectedText(collectedText, textElementList, parent_map, superscript
 # Looks at text parts of the DOCX data, extracting each.
 def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                 saveConversion=False, outpath=None, isString=False):
+  global debug_output
   if isString:
     tree = ET.fromstring(path_to_doc)
     root = tree
@@ -164,7 +167,8 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                 textElements.append(rchild)
               else:
                 notEncoded = rchild.text
-                # print 'notEncoded = >%s<' % notEncoded
+                if debug_output:
+                  print 'notEncoded = >%s<' % notEncoded
 
     if collectedText:
       (newConvertedCount, emptiedElements) = (
@@ -193,14 +197,16 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
 
 def removeOldTextElements(allElementsToRemove, parent_map):
   count = 0
-  for group in reverse(allElementsToRemove):
-    for item in reverse(group):
+
+  for group in reversed(allElementsToRemove):
+    for item in  reversed(group):
       parent = parent_map[item]
-      if parent.remove(item):
-        print 'Removed'
-        count += 1
-      else:
-        print 'did not remove %s' % item
+      parent.remove(item)
+      # Can I remove the parent of this, too?
+      grandparent = parent_map[parent]
+      if grandparent:
+        grandparent.remove(parent)
+      count += 1
   # And probably remove the siblings and the empty parent, too.
   print 'removed %d items' % count
 
@@ -233,7 +239,11 @@ def tryFontUpdate(newzip, unicodeFont):
   return parseFontTable(docXML, unicodeFont)
 
 
-def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska'):
+def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
+  global debug_output
+  if debug:
+    debug_output = True
+
   newzip = zipfile.ZipFile(path_to_doc)
   docfiles = ['word/document.xml', 'word/header1.xml', 'word/footer1.xml']
 

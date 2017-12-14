@@ -114,7 +114,7 @@ osage_private_use_map = {
   u'\uf061\uf061': unichr(0xd801)+unichr(0xdcb2) + macron,
   u'\uf065': unichr(0xd801)+unichr(0xdcb8),
   u'\uf065\uf065': unichr(0xd801)+unichr(0xdcb8) + macron,
-  u'\uf06f': unichr(0xd801)+unichr(0xdcc3),
+  u'\uf06e': '',
   u'\uf06f\uf06f': unichr(0xd801)+unichr(0xdcc3) + macron,
   u'\uf07b': '{',
   u'\uf07c': '|',
@@ -126,6 +126,12 @@ osage_private_use_map = {
 }
 
 osage_latin_to_unicode_map = {
+  u'\u0020': ' ',
+  u'\u0027': '\'',
+  u'\u0029': ')',
+  u'\u002f': '/',
+  u'\u0031': '1',
+
   'á': unichr(0xd801)+unichr(0xdcd8) + accent,
   'a': unichr(0xd801)+unichr(0xdcb2),
   'aa': unichr(0xd801)+unichr(0xdcd8)+macron,
@@ -376,9 +382,16 @@ def preParseOldOsage(instring):
     return outList;
 
 
-def replaceDots(matchobj):
+def replaceDotSequence(matchobj):
   return '.' * len(matchobj.group(0))
 
+
+def replaceOsageSyllableDot(matchobj):
+  # Omit the dot between two non-space, non-period characters.
+  result = matchobj.group(0)[0] + matchobj.group(0)[-1]
+  # print 'Removing dot from %s giving %s' % (matchobj.group(0).encode('utf-8'),
+  #                                          result.encode('utf-8'))
+  return result
 
 def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
                       clearOsageDot=True, clearDotSequence=False):
@@ -386,7 +399,9 @@ def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
 
   # Replace sequence of Old Osage dots with periods.
   # TODO: use the flag.
-  textIn = re.sub(u'(\uf02e{2,})', replaceDots, textIn)
+  textIn = re.sub(u'(\uf02e{2,})', replaceDotSequence, textIn)
+
+  textIn = re.sub(u'([^\u0020\uf020\u002e\uf02e][\u002e\uf02e][^\u0020\uf020\u002e\uf02e])', replaceOsageSyllableDot, textIn)
 
   parsedInput = preParseOldOsage(textIn)
   if debug:
@@ -414,7 +429,8 @@ def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
         if c in osage_latin_to_unicode_map:
           out = osage_latin_to_unicode_map[c]
         else:
-          print '!!!! Character %s not found' % (c.encode('utf-8'))
+          for cc in c:
+            print '!!!! Character %s not found (0x%x)' % (cc.encode('utf-8'), ord(cc))
     convertResult += out
 
   if convertResult == textIn:
@@ -486,7 +502,57 @@ def testCommaPeriod():
     print('textCommaPeriod fails on input %s' % intext)
 
 
+def printResult(expected, result, msg):
+  if result != expected:
+    print('%s: expected = >%s<, result = >%s<' % 
+          (msg,
+           expected.encode('utf-8'), result.encode('utf-8')))
+  else:
+    print('%s: test passes!' % msg)
+
+def testRemoveDots():
+  t = u'A. W.a'
+  result = oldOsageToUnicode(t)
+  expected = u'𐒰. 𐓏𐒲'
+  printResult(expected, result, 'testRemoveDots 1')
+
+  t = u'A\uf02ed'
+  result = oldOsageToUnicode(t)
+  expected = u'𐒰𐓈'
+  printResult(expected, result, 'testRemoveDots 2')
+  
+  t = u'WSX\u002eXYZ'
+  result = oldOsageToUnicode(t)
+  expected = u'𐓏𐓆𐓐𐓐𐒻𐓒'
+  printResult(expected, result, 'testRemoveDots 3')
+
+  t = u'WSX\uf02eXYZ'
+  result = oldOsageToUnicode(t)
+  # Same expected
+  printResult(expected, result, 'testRemoveDots 4')
+
+  t = u'\u002e\u002eJ'
+  result = oldOsageToUnicode(t)
+  expected = u'..𐒳'
+  printResult(expected, result, 'testRemoveDots 5')
+
+  t = u'\u0031\u002e\uf02e'
+  result = oldOsageToUnicode(t)
+  expected = u'\u0031.'
+  printResult(expected, result, 'testRemoveDots 6')
+
+  t = 'HU.HA.;A.'
+  result = oldOsageToUnicode(t)
+  expected = u'𐒹𐓎𐒹𐒰𐓆𐒼𐒰.'
+  printResult(expected, result, 'testRemoveDots 7')
+
+  print '** testRemoveDots done'
+
+
 def main():
+  testRemoveDots()
+
+  # 
   testConvertLatin()
 
   testConvertOld()
