@@ -129,8 +129,9 @@ osage_latin_to_unicode_map = {
   u'\u0020': ' ',
   u'\u0027': '\'',
   u'\u0029': ')',
-  u'\u002f': '/',
+  u'\u002f': unichr(0xd801)+unichr(0xdcbe),
   u'\u0031': '1',
+  u'\u004f': unichr(0xd801)+unichr(0xdcc2),
 
   'á': unichr(0xd801)+unichr(0xdcd8) + accent,
   'a': unichr(0xd801)+unichr(0xdcb2),
@@ -294,7 +295,7 @@ osage_latin_to_unicode_map = {
   'h]': unichr(0xd801)+unichr(0xdccb),
   'H]': unichr(0xd801)+unichr(0xdccb),
   '}': '}',
-  '\/': unichr(0xd801)+unichr(0xdcbe),
+  '/': unichr(0xd801)+unichr(0xdcbe),
   '|': unichr(0xd801)+unichr(0xdcc6) + unichr(0xd801)+unichr(0xdcc8),
   '\\': unichr(0xd801)+unichr(0xdcc6) + unichr(0xd801)+unichr(0xdcc8),
   '\"': unichr(0xd801)+unichr(0xdcbe),
@@ -549,10 +550,35 @@ def testRemoveDots():
   print '** testRemoveDots done'
 
 
+def testCharacterConversions():
+  t = '/\\'
+  result = oldOsageToUnicode(t)
+  expected = u'𐒾𐓆𐓈'
+  printResult(expected, result, 'char conversion slash, backslash')
+
+  t = 'QWERTYUIOP{}|ASDFGHJKL:\\"ZXCVBNM<>?'
+  result = oldOsageToUnicode(t)
+  expected = u'Q𐓏𐒷R𐓍𐒻𐓎𐒱𐓂𐓄{}𐓆𐓈𐒰𐓆𐓈F𐓑𐒹𐒳𐒼𐒿:𐒾𐓒𐓐𐒵𐓇𐒴𐓁𐓀<>?'
+  printResult(expected, result, 'Upper case regression test')
+
+  t = 'qwertyuiop[]\asdfghjkl;\'zxcvbnm,./'
+  expected = u'q𐓷𐒸r𐓵𐓣𐓶𐓙𐓃𐓬𐓓𐓊𐓆𐓈𐒲𐓮𐓰f𐓹𐓡𐓛𐓤𐓧𐓆𐒼\'𐓺 𐓝𐓯𐓜𐓩𐓸𐒺𐒾'
+  result = oldOsageToUnicode(t)
+  printResult(expected, result, 'Lower case regression test')
+
+  t = u'\'
+  result = oldOsageToUnicode(t)
+  expected = u' !𐓇#$%&\'()*+𐒺-𐒾0123456789:𐓆𐒼<=>𐒾@𐒰𐒴𐒵𐓈𐒷𐒹𐒱𐒳𐒼𐒿𐓀𐓁𐓂𐓄𐓆𐓍𐓎𐓇𐓏𐓐𐒻𐓒𐓓𐓆𐓈𐓊͘_`𐒲𐒸𐓃{|}~¶'
+  printResult(expected, result, 'All old characters regression test')
+
+
 def main():
   testRemoveDots()
 
-  # 
+  #Regression test on character conversions.
+  testCharacterConversions()
+
+  # Other tests need updating
   testConvertLatin()
 
   testConvertOld()

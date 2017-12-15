@@ -204,7 +204,7 @@ def removeOldTextElements(allElementsToRemove, parent_map):
       parent.remove(item)
       # Can I remove the parent of this, too?
       grandparent = parent_map[parent]
-      if grandparent:
+      if grandparent is not None:
         grandparent.remove(parent)
       count += 1
   # And probably remove the siblings and the empty parent, too.
@@ -260,7 +260,10 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
     if debug_output:
       print 'COMPRESS TYPE = %s' % compress_method
 
-    docXML = newzip.read(docfile_name)  # A file-like object
+    try:
+      docXML = newzip.read(docfile_name)  # A file-like object
+    except KeyError:
+      continue
 
     # The real parsing.
     new_docXML = parseDocXML(docfile_name, docXML, unicodeFont, isString=True)
