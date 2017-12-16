@@ -24,6 +24,12 @@ debug_output = False
 
 debugParse = False  # Remove when no longer needed
 
+# Flag controls if the conversion removes
+# structure from replaced text when drawings are found
+# in the .docx input.
+removeOldText = False
+# More aggressive removal of grandparents of empty text blocks.
+removeOldTextParents = False
 
 def fixElementAndParent(textElement, parent, newText, unicodeFont):
   removeList = []
@@ -198,18 +204,26 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
 def removeOldTextElements(allElementsToRemove, parent_map):
   count = 0
 
+  if not removeOldText:
+    return count
+
+  # This may be causing corruption in the MS Word file structure.
   for group in reversed(allElementsToRemove):
     for item in  reversed(group):
       parent = parent_map[item]
       parent.remove(item)
-      # Can I remove the parent of this, too?
+
+      if not removeOldTextParents:
+        continue
+     # Can I remove the parent of this, too?
       grandparent = parent_map[parent]
       if grandparent is not None:
         grandparent.remove(parent)
       count += 1
+
   # And probably remove the siblings and the empty parent, too.
   print 'removed %d items' % count
-
+  return count
 
 def isOsageFontNode(node):
   # Look for "rFonts", and check if any font contains "Official Osage"
