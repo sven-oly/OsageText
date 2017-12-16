@@ -431,7 +431,8 @@ def oldOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
           out = osage_latin_to_unicode_map[c]
         else:
           for cc in c:
-            print '!!!! Character %s not found (0x%x)' % (cc.encode('utf-8'), ord(cc))
+            print '!!!! Character %s not found (0x%x) in %s' % (
+                cc.encode('utf-8'), ord(cc), textIn.encode('utf-8'))
     convertResult += out
 
   if convertResult == textIn:

@@ -31,6 +31,9 @@ removeOldText = False
 # More aggressive removal of grandparents of empty text blocks.
 removeOldTextParents = False
 
+# If enabled, replaces the Official Osage font in fontsTable.xml
+convertFontsTable = False
+
 def fixElementAndParent(textElement, parent, newText, unicodeFont):
   removeList = []
   oldText = textElement.text
@@ -167,7 +170,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                       textElements = []
                       inEncodedFont = False
             elif re.search('}t', rchild.tag):
-              if inEncodedFont:
+              if inEncodedFont and rchild.text:
                 # Process <w:t>
                 collectedText += rchild.text
                 textElements.append(rchild)
@@ -260,10 +263,12 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
 
   newzip = zipfile.ZipFile(path_to_doc)
   docfiles = ['word/document.xml', 'word/header1.xml', 'word/footer1.xml']
+  docPartsOut = {}
 
-  newFontTable = tryFontUpdate(newzip, unicodeFont)
+  if convertFontsTable:
+    newFontTable = tryFontUpdate(newzip, unicodeFont)
+    docPartsOut['word/fontTable.xml'] = newFontTable
 
-  docPartsOut = {'word/fontTable.xml': newFontTable}
   for docfile_name in docfiles:
 
     compress_method = ''
