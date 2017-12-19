@@ -34,7 +34,6 @@ notOsageLatinLower = re.compile(r'[b-df-np-z]')
 
 osageConvertPattern = latinOsagePattern2 + '|' + traditionalOsageCharacters
 
-extractedFileName = None
 
 # This function is not used because it is difficult to figure
 # which is the actual Osage text. Use the font instead.

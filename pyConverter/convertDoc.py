@@ -20,8 +20,7 @@ import convertWordOsage
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]
 
-debug_output = True # False
-
+debug_output = False
 
 # Flag controls if the conversion removes
 # structure from replaced text when drawings are found
@@ -126,6 +125,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
 
   # Current font
   inEncodedFont = False
+  fontFound = False
 
   for node in root.iter('*'):
 
@@ -171,7 +171,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                       textElements = []
                       inEncodedFont = False
             elif re.search('}t', rchild.tag):
-              if not fontFound:
+              if not fontFound and debug_output:
                 print('^^^^^^^^^^^^^ Font not found ^^^^')
               if fontFound and inEncodedFont and rchild.text:
                 # Process <w:t>
@@ -179,7 +179,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                 textElements.append(rchild)
               else:
                 notEncoded = rchild.text
-                if debug_output:
+                if notEncoded and debug_output:
                   print 'notEncoded = >%s<' % notEncoded.encode('utf-8')
 
     if collectedText:
@@ -261,8 +261,6 @@ def tryFontUpdate(newzip, unicodeFont):
 
 def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
   global debug_output
-  if debug:
-    debug_output = True
 
   newzip = zipfile.ZipFile(path_to_doc)
   docfiles = ['word/document.xml', 'word/header1.xml', 'word/footer1.xml']
@@ -335,15 +333,19 @@ def unzipInputFile(infile, outdir):
 
 
 def main(argv):
+  global debug_output
+
   args = convertUtil.parseArgs()
 
   paths_to_doc = args.filenames
   print 'ARGS = %s' % args
 
+  print('Args = %s'% args.debug)
+
   for path in paths_to_doc:
     extension = os.path.splitext(path)[-1]
     if extension == '.docx':
-      processDOCX(path, args.output_dir, args.font)
+      processDOCX(path, args.output_dir, args.font, debug_output)
     else:
       print '!!! Not processing file %s !' % path
 
