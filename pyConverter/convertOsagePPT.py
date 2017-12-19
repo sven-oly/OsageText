@@ -8,6 +8,9 @@ import sys
 import osageConversion
 import convertUtil
 
+# TIMESTAMP for version information.
+TIMESTAMP = "Version 2017-12-19 13:49"
+
 # Rule for detecting Latin text or Old Osage font.
 # Some Old Osage text is in Latin CAPS, but with lower case a, e, and o.
 # Limitation: [aeo] right after capital Latin is converted.
@@ -77,6 +80,8 @@ def processsTextFrame(shape, outFont):
 def processOnePresentation(path_to_presentation, outputFont, output_dir=''):
   prs = Presentation(path_to_presentation)
 
+  print 'TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
+      TIMESTAMP, osageConversion.TIMESTAMP)
   print( '%d slides found in %s' % (len(prs.slides), path_to_presentation))
 
   conversionCount = 0

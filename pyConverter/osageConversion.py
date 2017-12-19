@@ -5,6 +5,9 @@ import re
 
 # Convert Osage text to Unicode.
 
+# TIMESTAMP for version information.
+TIMESTAMP = "Version 2017-12-19 13:54"
+
 # TODO: resolve duplicates in the map.
 
 debug = False
@@ -291,6 +294,7 @@ osage_latin_to_unicode_map = {
   '. ':  '. ',
   '.\u000a': '.\u000a',
   '.\u2008': '.',
+  '\u0060': '\u0060',
 
   '[': unichr(0xd801)+unichr(0xdcd3),
   '{': '{',

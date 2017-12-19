@@ -18,6 +18,9 @@ from openpyxl import load_workbook
 import convertUtil
 import osageConversion
 
+# TIMESTAMP for version information.
+TIMESTAMP = "Version 2017-12-19 13:48"
+
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
 
@@ -111,6 +114,9 @@ def processOneSpreadsheet(path_to_spreadsheet, output_dir,
   wb = load_workbook(path_to_spreadsheet)
 
   print 'Converting Osage in file: %s' % path_to_spreadsheet
+
+  print 'TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
+      TIMESTAMP, osageConversion.TIMESTAMP)
 
   numConverts = convertAllSheets(wb, unicodeFont)
 

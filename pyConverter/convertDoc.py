@@ -13,6 +13,10 @@ import osageConversion
 # The version using docx
 import convertWordOsage
 
+# TIMESTAMP for version information.
+TIMESTAMP = "Version 2017-12-18 17:35"
+
+# Documentation here:
 # https://docs.python.org/2/library/xml.etree.elementtree.html
 # https://docs.python.org/2/library/zipfile.html
 
@@ -261,6 +265,9 @@ def tryFontUpdate(newzip, unicodeFont):
 
 def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
   global debug_output
+
+  print 'TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
+      TIMESTAMP, osageConversion.TIMESTAMP)
 
   newzip = zipfile.ZipFile(path_to_doc)
   docfiles = ['word/document.xml', 'word/header1.xml', 'word/footer1.xml']

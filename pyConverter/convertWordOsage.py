@@ -11,6 +11,9 @@ import sys
 
 # https://openpyxl.readthedocs.io/en/default/tutorial.html
 
+# TIMESTAMP for version information.
+TIMESTAMP = "Version 2017-12-19 13:45"
+
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]
 
@@ -19,32 +22,13 @@ from docx import Document
 import convertUtil
 import osageConversion
 
+extractedFileName = False
+
 # Flag for handling all characters in an Old font.
 convertAllInOldFontRange = True
 
-# Rule for detecting Latin text or Old Osage font.
-# Some Old Osage text is in Latin CAPS, but with lower case a, e, and o.
-latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo\[\]\^\\\'\/\._`,!]+'
 
-# This identifies traditional Osage private use characters
-traditionalOsageCharacters = ur'([\uf040-\uf05d]+)'
-
-# To avoid converting English words
-notOsageLatinLower = re.compile(r'[b-df-np-z]')
-
-osageConvertPattern = latinOsagePattern2 + '|' + traditionalOsageCharacters
-
-
-# This function is not used because it is difficult to figure
-# which is the actual Osage text. Use the font instead.
-def replFunc(matchObj):
-  if matchObj.group(0):
-    if notOsageLatinLower.search(matchObj.group(0)):
-      return matchObj.group(0)
-    else:
-      return osageConversion.oldOsageToUnicode(matchObj.group(0))
-
-# Check for Osage text and convert the Osage parts of the strings.
+# Converts Osage text that is labeld with the old font encoding
 # It assumes that the font has been detected.
 def checkAndConvertText(textIn):
 
@@ -52,17 +36,9 @@ def checkAndConvertText(textIn):
     # Ignore function calls
     return textIn
 
-  # Handle Latin and TraditionalOsage private use characters.
-  if convertAllInOldFontRange:
-    result = osageConversion.oldOsageToUnicode(textIn)
-    return result
-  else:
-    # Attempt to get the Old Osage parts of the string.
-    tryResult = re.subn(osageConvertPattern, replFunc, textIn)
-    if tryResult[1] >= 1:
-      return tryResult[0]
-    else:
-      return textIn
+  # Handle text in font-labeled regions
+  result = osageConversion.oldOsageToUnicode(textIn)
+  return result
 
 
 def convertDoc(doc, unicodeFont, debugInfo=None,
@@ -148,6 +124,8 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
 def convertOneDoc(path_to_doc, unicodeFont='Pawhuska',
                   outpath=None, isString=False):
 
+  print('TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
+      TIMESTAMP, osageConversion.TIMESTAMP))
   print ('Converting Osage in file: %s' % path_to_doc)
 
   doc = Document(path_to_doc)
