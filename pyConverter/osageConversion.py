@@ -115,6 +115,7 @@ osage_private_use_map = {
   u'\uf065': unichr(0xd801)+unichr(0xdcb8),
   u'\uf065\uf065': unichr(0xd801)+unichr(0xdcb8) + macron,
   u'\uf06e': '',
+  u'\uf06f': unichr(0xd801)+unichr(0xdcc3),
   u'\uf06f\uf06f': unichr(0xd801)+unichr(0xdcc3) + macron,
   u'\uf07b': '{',
   u'\uf07c': '|',
@@ -123,6 +124,8 @@ osage_private_use_map = {
   u'\uf0b6': '\u00b6',
   # Some older combination codes
   u'\ue000': unichr(0xd801)+unichr(0xdcb0) + combiningDotAboveRight,
+
+  u'\u2026': u'\u2026',
 }
 
 osage_latin_to_unicode_map = {

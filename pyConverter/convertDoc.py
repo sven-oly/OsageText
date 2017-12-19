@@ -20,9 +20,8 @@ import convertWordOsage
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]
 
-debug_output = False
+debug_output = True # False
 
-debugParse = False  # Remove when no longer needed
 
 # Flag controls if the conversion removes
 # structure from replaced text when drawings are found
@@ -146,12 +145,14 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
 
             # Process <w:r>
             if re.search('}rPr', rchild.tag):
+              fontFound = False
               for rprchild in rchild._children:
                 # Process <w:rPr>
                 if re.search('}vertAlign', rprchild.tag):
                   superscriptNode = rprchild
                 elif re.search('}rFonts', rprchild.tag):
                   # Font info.
+                  fontFound = True
                   if isOsageFontNode(rprchild):
                     # In font encoded node
                     inEncodedFont = True
@@ -170,14 +171,16 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
                       textElements = []
                       inEncodedFont = False
             elif re.search('}t', rchild.tag):
-              if inEncodedFont and rchild.text:
+              if not fontFound:
+                print('^^^^^^^^^^^^^ Font not found ^^^^')
+              if fontFound and inEncodedFont and rchild.text:
                 # Process <w:t>
                 collectedText += rchild.text
                 textElements.append(rchild)
               else:
                 notEncoded = rchild.text
                 if debug_output:
-                  print 'notEncoded = >%s<' % notEncoded
+                  print 'notEncoded = >%s<' % notEncoded.encode('utf-8')
 
     if collectedText:
       (newConvertedCount, emptiedElements) = (
