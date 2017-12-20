@@ -14,7 +14,7 @@ import osageConversion
 import convertWordOsage
 
 # TIMESTAMP for version information.
-TIMESTAMP = "Version 2017-12-18 17:35"
+TIMESTAMP = "Version 2017-12-20 07:55"
 
 # Documentation here:
 # https://docs.python.org/2/library/xml.etree.elementtree.html
@@ -138,6 +138,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
       textElements = []
       collectedText = ''
       superscriptNode = False
+      inEncodedFont = False
 
       # Process the children.
       for pchild in node._children:

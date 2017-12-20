@@ -6,7 +6,7 @@ import re
 # Convert Osage text to Unicode.
 
 # TIMESTAMP for version information.
-TIMESTAMP = "Version 2017-12-19 13:54"
+TIMESTAMP = "Version 2017-12-20 07:57"
 
 # TODO: resolve duplicates in the map.
 
@@ -117,7 +117,11 @@ osage_private_use_map = {
   u'\uf061\uf061': unichr(0xd801)+unichr(0xdcb2) + macron,
   u'\uf065': unichr(0xd801)+unichr(0xdcb8),
   u'\uf065\uf065': unichr(0xd801)+unichr(0xdcb8) + macron,
-  u'\uf06e': '',
+  u'\uf06a': ' ',
+  u'\uf06b': ' ',
+  u'\uf06c': ' ',
+  u'\uf06d': ' ',
+  u'\uf06e': ' ',
   u'\uf06f': unichr(0xd801)+unichr(0xdcc3),
   u'\uf06f\uf06f': unichr(0xd801)+unichr(0xdcc3) + macron,
   u'\uf07b': '{',
