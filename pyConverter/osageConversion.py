@@ -292,7 +292,7 @@ osage_latin_to_unicode_map = {
   ',':  unichr(0xd801)+unichr(0xdcba),  # HYA character
   u'.': '.',
 
-  # Handle comma and period special cases
+  # Handle comma and period and other special cases
   ', ':  ', ',
   ',\u000a':  ',\u000a',
   '. ':  '. ',
@@ -373,7 +373,7 @@ osage_latin_to_unicode_map = {
 osage_latin_chars = u"[ÁÍÓ\u00e1\u00ed\u00f3\u0100]\u0328|"  # Vowel followed by ogonek
 osage_latin_chars += u"[AÁáEÉéOÓó]į|[ÁAá]i|"  # Vowel + i-ogonek or i.
 osage_latin_chars += u"[aeouy]\uf05e|aa|ee|ii|oo|uu|yy|h\]|a\'|ts\'|br|[cs]h|hch|hts|h[cdkpt]|"
-osage_latin_chars += u"iu|tsh|t[hs]|zh|"
+osage_latin_chars += u"iu|tsh|t[hs]|zh|\u0060|"
 
 # Comma and period special cases
 osage_latin_chars += u", |,\u000a|\. |\.\u000a|\.|\;$"
