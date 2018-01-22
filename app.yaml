@@ -28,6 +28,9 @@ handlers:
 - url: /words/.*
   script: words.app
 
+- url: /docx/.*
+  script: processDocx.app
+
 - url: .*
   script: main.app
 
