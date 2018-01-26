@@ -18,8 +18,10 @@ from openpyxl import load_workbook
 import convertUtil
 import osageConversion
 
+debug = False
+
 # TIMESTAMP for version information.
-TIMESTAMP = "Version 2017-12-19 13:48"
+TIMESTAMP = "Version 2018-01-25 20:30"
 
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
@@ -49,15 +51,16 @@ def checkAndConvertText(textIn):
   if textIn[0] == '=':
     # Ignore function calls
     return textIn
-  if notOsageLatinLower.search(textIn):
-    return textIn
+  #if notOsageLatinLower.search(textIn):
+  #  return textIn
 
   # Handle Latin and TraditionalOsage private use characters.
-  tryResult = re.subn(osageConvertPattern, replFunc, textIn)
-  if tryResult[1] >= 1:
-    return tryResult[0]
-  else:
-    return textIn
+  tryResult = osageConversion.oldOsageToUnicode(textIn)
+  #tryResult = re.subn(osageConvertPattern, replFunc, textIn)
+  #if tryResult[1] >= 1:
+  return tryResult #[0]
+  #else:
+  #  return textIn
 
 
 def convertSheet(ws, unicodeFont):
@@ -73,7 +76,8 @@ def convertSheet(ws, unicodeFont):
       if not thisText:
         continue
 
-      # print 'Cell (%d, %d) = %s' % (rowNum, col, cell.value)
+      if debug:
+        print 'Cell (%d, %d) = >%s<  font = %s' % (rowNum, col, cell.value, cell.font.name)
       thisFont = cell.font
       if thisFont and thisFont.name == OfficialOsageFont:
         convertedText = checkAndConvertText(thisText)
@@ -84,6 +88,8 @@ def convertSheet(ws, unicodeFont):
           newFont = copy.copy(thisFont)
           newFont.name = unicodeFont
           cell.font = newFont
+          if debug:
+            print '  Conversion = %s' % convertedText.encode('utf-8')
         else:
           converted = False
           notConverted += 1

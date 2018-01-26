@@ -583,6 +583,12 @@ def testCharacterConversions():
   expected = u' !𐓇#$%&\'()*+𐒺-𐒾0123456789:𐓆𐒼<=>𐒾@𐒰𐒴𐒵𐓈𐒷𐒹𐒱𐒳𐒼𐒿𐓀𐓁𐓂𐓄𐓆𐓍𐓎𐓇𐓏𐓐𐒻𐓒𐓓𐓆𐓈𐓊͘_`𐒲𐒸𐓃{|}~¶'
   printResult(expected, result, 'All old characters regression test')
 
+  t = 'o  e o a . WEO^O'
+  result = oldOsageToUnicode(t)
+  print result
+  expected = u'𐓃  𐒸 𐓃 𐒲 . 𐓏𐒷𐓂͘𐓂'
+  printResult(expected, result, 'Lower case vowels eoa')
+
 
 def main():
   testRemoveDots()
