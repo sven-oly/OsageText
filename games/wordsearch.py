@@ -151,7 +151,7 @@ def getTokens(word):
     while index < len(vals):
         if ord(vals[index]) >= 0xd800 and ord(vals[index]) <+ 0xdbff:
 
-            retval.append((vals[index], vals[index+1]))
+            retval.append((vals[index] + vals[index+1]))
             index += 2
         else:
             retval.append(vals[index])
@@ -166,6 +166,8 @@ def printGrid(grid):
     print ("+" + ('---+' * width))
 
     for i,line in enumerate(grid):
+        #for item in line:
+        #    print item.decode('utf-8')
         print ("| " + " | ".join(line) + " |")
         print ("+" + ('---+' * width))
 
