@@ -74,6 +74,7 @@ def insertWord(word, grid, invalid=None):
     height, width = len(grid), len(grid[0])
     # TODO: Use the number of combined characters, not just length.
     tokens = getTokens(word)
+    print tokens
     length = len(tokens)
 
     #Detect whether the word can fit horizontally or vertically.
@@ -143,8 +144,19 @@ def tryPlacingWord(tokens, grid):
 
 def getTokens(word):
     '''Get the tokens, not code points.'''
-    # TODO: make this smarter.
-    return list(word)
+    # TODO: make this smarter utf-16 and diacritics.
+    vals = list(word)
+    retval = []
+    index = 0
+    while index < len(vals):
+        if ord(vals[index]) >= 0xd800 and ord(vals[index]) <+ 0xdbff:
+
+            retval.append((vals[index], vals[index+1]))
+            index += 2
+        else:
+            retval.append(vals[index])
+            index += 1
+    return retval
 
 
 def printGrid(grid):
