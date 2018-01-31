@@ -72,7 +72,9 @@ def insertWord(word, grid, invalid=None):
     Returns an updated grid as well as a list of the added word's indices.'''
 
     height, width = len(grid), len(grid[0])
-    length = len(word)
+    # TODO: Use the number of combined characters, not just length.
+    tokens = getTokens(word)
+    length = len(tokens)
 
     #Detect whether the word can fit horizontally or vertically.
     hori = width >= length + 1
@@ -81,6 +83,7 @@ def insertWord(word, grid, invalid=None):
         #If both can be true, flip a coin to decide which it will be
         hori = bool(randint(0,1))
         vert = not hori
+    # Try diagonal, too!
 
     line = [] #For storing the letters' locations
     if invalid is None:
@@ -102,24 +105,41 @@ def insertWord(word, grid, invalid=None):
 
     start = [y, x, hori] #Saved in case of invalid placement
     #Now attempt to insert each letter
-    for letter in getTokens(word):
-        if grid[y][x] in (' ', letter):
+    for letter in tokens:
+        if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
             line.append([y,x])
             if hori:
                 x += 1
             else:
                 y += 1
+            # And handle diagonal, too!
         else:
             #We found a place the word can't fit
             #Mark the starting point as invalid
             invalid.append(start)
             return insertWord(word, grid, invalid)
 
+    # If it didn't work, try the reversed word.
+
     #Since it's a valid place, write to the grid and return
     for i,cell in enumerate(line):
         grid[cell[0]][cell[1]] = word[i]
     return grid, line
 
+def tryPlacingWord(tokens, grid):
+    for letter in tokens:
+        if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
+            line.append([y, x])
+            if hori:
+                x += 1
+            else:
+                y += 1
+                # And handle diagonal, too!
+        else:
+            # We found a place the word can't fit
+            # Mark the starting point as invalid
+            invalid.append(start)
+            return insertWord(word, grid, invalid)
 
 def getTokens(word):
     '''Get the tokens, not code points.'''
@@ -140,8 +160,8 @@ def printGrid(grid):
 
 def printAnswers(answers):
     for answer in answers:
-        print(' %s' % answer)
-
+        #print(' %s: %s' % answer, answers[answer])
+        print answer, answers[answer]
 
 # The Osage works, with diacritics
 osageWords = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷',
@@ -156,8 +176,10 @@ def testOsageSplit():
 
 
 words = ["python", "itertools", "wordsearch","code","review","functions",
-         "dimensional", "dictionary", "lacklustre"]
-grid, answers = makeGrid(words, [14,8])
+         "dimensional", "dictionary", "lacklustre", 'google', 'unicode', 'horizontal',
+         'vertical', 'diagonal', u'𐓏𐒻𐒷𐒻𐒷']
+
+grid, answers = makeGrid(words, [14,14])
 printGrid(grid)
 printAnswers(answers)
 testOsageSplit()
