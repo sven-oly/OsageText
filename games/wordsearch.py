@@ -149,13 +149,20 @@ def getTokens(word):
     retval = []
     index = 0
     while index < len(vals):
-        if ord(vals[index]) >= 0xd800 and ord(vals[index]) <+ 0xdbff:
+        item = ''
+        v = ord(vals[index])
 
-            retval.append((vals[index] + vals[index+1]))
+        if v >= 0xd800 and v <+ 0xdbff:
+            item += vals[index] + vals[index+1]
             index += 2
         else:
-            retval.append(vals[index])
+            item += vals[index]
             index += 1
+        while index < len(vals) and ord(vals[index]) >= 0x300 and ord(vals[index]) <= 0x365:
+            # It's a combining character. Add to the growing item.
+            item += vals[index]
+            index += 1
+        retval.append(item)
     return retval
 
 
@@ -185,15 +192,14 @@ osageWords = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰
 def testOsageSplit():
     for word in osageWords:
         print('Word = %s' % word)
-        print('  split = %s' % list(word))
-        #print("\n".join(regex.findall(r'\X', word, regex.U)))
+        print('  split = %s' % getTokens(word))
 
 
-words = ["python", "itertools", "wordsearch","code","review","functions",
+words = [u"𐒰̄𐓂͘𐒴𐓎̄͘𐓒", "pthon", "itertools", "wordsearch","code","review","functions",
          "dimensional", "dictionary", "lacklustre", 'google', 'unicode', 'horizontal',
          'vertical', 'diagonal', u'𐓏𐒻𐒷𐒻𐒷']
 
-grid, answers = makeGrid(words, [14,14])
+grid, answers = makeGrid(words, [15,15])
 printGrid(grid)
 printAnswers(answers)
 testOsageSplit()
