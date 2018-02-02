@@ -15,6 +15,8 @@ from random import randint
 letters = u'𐒰𐒱𐒲𐒳𐒴𐒵𐒶𐒷𐒸𐒹𐒺𐒻𐒼𐒽𐒾𐒿𐓀𐓁𐓂𐓃𐓄𐓅𐓆𐓇𐓈𐓉𐓊𐓋𐓌𐓍𐓎𐓏𐓐𐓑𐓒𐓓'
 # letters = "qwertyuiopasdfghjklzxcvbnm"
 
+debug = False
+
 # TODO: add diagonals, too.
 # TODO: add reversal of letters
 
@@ -43,8 +45,10 @@ def attemptGrid(words, size):
 
     # Convert all the words to tokens first.
     tokenList = [getTokens(x) for x in words]
-    for tokens in tokenList:
-      print 'Tokens: %s' % tokens
+    tokens = ''
+    if debug:
+      for tokens in tokenList:
+        print 'Tokens: %s' % tokens
 
     #Make sure that the board is bigger than even the biggest set of tokens
     sizeCap = (size[0] if size[0] >= size[1] else size[1])
@@ -113,12 +117,14 @@ def insertWord(word, grid, invalid=None):
     #Now attempt to insert each letter
     for letter in tokens:
         if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
+            if grid[y][x] != ' ':
+              print 'Created an overlap at [%s, %s]' % (y,x)
             line.append([y,x])
             if hori:
                 x += 1
             else:
                 y += 1
-            # And handle diagonal, too!
+            # TODO: And handle diagonal, too!
         else:
             #We found a place the word can't fit
             #Mark the starting point as invalid
@@ -193,13 +199,14 @@ def printAnswers(answers):
 osageWords = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷',
               u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬']
 
-words = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷',
-              u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬']
+words = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
+         u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
+         u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
 
 
 Oldwords = [u"𐒰̄𐓂͘𐒴𐓎̄͘𐓒", u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', "python", "itertools", "wordsearch","code","review","functions",
          "dimensional", "dictionary", "lacklustre", 'google', 'unicode', u'𐓏𐒻𐒷𐒻𐒷']
 
-grid, answers = makeGrid(words, [15,15])
+grid, answers = makeGrid(words, [11,11])
 printGrid(grid)
 printAnswers(answers)
