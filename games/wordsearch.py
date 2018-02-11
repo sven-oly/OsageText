@@ -173,9 +173,8 @@ def printGrid(grid):
     print ("+" + ('---+' * width))
 
     for i,line in enumerate(grid):
-        #for item in line:
-        #    print item.decode('utf-8')
-        print ("| " + " | ".join(line) + " |")
+
+        print (u"| " + u" | ".join(line) + u" |")
         print ("+" + ('---+' * width))
 
 
