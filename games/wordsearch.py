@@ -5,15 +5,17 @@
 #   https://codereview.stackexchange.com/questions/98247/wordsearch-generator
 import itertools
 
-# For handling regex of characters
-import regex
 from copy import deepcopy
 from random import randint
 
 # Set up fill letters, including those with diacritics.
 # Should we done something with statistics?
 # Check for bad words?
-letters = "qwertyuiopasdfghjklzxcvbnm"
+
+letters = u'𐒰𐒱𐒲𐒳𐒴𐒵𐒶𐒷𐒸𐒹𐒺𐒻𐒼𐒽𐒾𐒿𐓀𐓁𐓂𐓃𐓄𐓅𐓆𐓇𐓈𐓉𐓊𐓋𐓌𐓍𐓎𐓏𐓐𐓑𐓒𐓓'
+# letters = "qwertyuiopasdfghjklzxcvbnm"
+
+debug = False
 
 # TODO: add diagonals, too.
 # TODO: add reversal of letters
@@ -41,14 +43,22 @@ def attemptGrid(words, size):
     Returns the 2D list grid and a dictionary of the words as keys and
     lists of their co-ordinates as values.'''
 
-    #Make sure that the board is bigger than even the biggest word
+    # Convert all the words to tokens first.
+    tokenList = [getTokens(x) for x in words]
+    tokens = ''
+    if debug:
+      for tokens in tokenList:
+        print 'Tokens: %s' % tokens
+
+    #Make sure that the board is bigger than even the biggest set of tokens
     sizeCap = (size[0] if size[0] >= size[1] else size[1])
     sizeCap -= 1
-    if any(len(word) > sizeCap for word in words):
-        print "ERROR: Too small a grid for supplied words."
+    if any(len(tokens) > sizeCap for tokens in tokenList):
+        print "ERROR: Too small a grid for supplied words: %s" % tokens
         return
 
     grid = [[' ' for _ in range(size[0])] for __ in range(size[1])]
+
 
     #Insert answers and store their locations
     answers = {}
@@ -74,7 +84,6 @@ def insertWord(word, grid, invalid=None):
     height, width = len(grid), len(grid[0])
     # TODO: Use the number of combined characters, not just length.
     tokens = getTokens(word)
-    print tokens
     length = len(tokens)
 
     #Detect whether the word can fit horizontally or vertically.
@@ -108,12 +117,14 @@ def insertWord(word, grid, invalid=None):
     #Now attempt to insert each letter
     for letter in tokens:
         if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
+            if grid[y][x] != ' ':
+              print 'Created an overlap at [%s, %s]' % (y,x)
             line.append([y,x])
             if hori:
                 x += 1
             else:
                 y += 1
-            # And handle diagonal, too!
+            # TODO: And handle diagonal, too!
         else:
             #We found a place the word can't fit
             #Mark the starting point as invalid
@@ -124,7 +135,7 @@ def insertWord(word, grid, invalid=None):
 
     #Since it's a valid place, write to the grid and return
     for i,cell in enumerate(line):
-        grid[cell[0]][cell[1]] = word[i]
+        grid[cell[0]][cell[1]] = tokens[i]
     return grid, line
 
 def tryPlacingWord(tokens, grid):
@@ -187,18 +198,14 @@ def printAnswers(answers):
 osageWords = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷',
               u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬']
 
-# Test splitting of Osage.
-def testOsageSplit():
-    for word in osageWords:
-        print('Word = %s' % word)
-        print('  split = %s' % getTokens(word))
+words = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
+         u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
+         u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
 
 
-words = [u"𐒰̄𐓂͘𐒴𐓎̄͘𐓒", "pthon", "itertools", "wordsearch","code","review","functions",
-         "dimensional", "dictionary", "lacklustre", 'google', 'unicode', 'horizontal',
-         'vertical', 'diagonal', u'𐓏𐒻𐒷𐒻𐒷']
+Oldwords = [u"𐒰̄𐓂͘𐒴𐓎̄͘𐓒", u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', "python", "itertools", "wordsearch","code","review","functions",
+         "dimensional", "dictionary", "lacklustre", 'google', 'unicode', u'𐓏𐒻𐒷𐒻𐒷']
 
-grid, answers = makeGrid(words, [15,15])
+grid, answers = makeGrid(words, [11,11])
 printGrid(grid)
 printAnswers(answers)
-testOsageSplit()
