@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Starting with
@@ -12,8 +12,15 @@ from random import randint
 # Should we done something with statistics?
 # Check for bad words?
 
+# These are upper case only.
+adlam_upper_letters = u'𞤀𞤁𞤂𞤃𞤄𞤅𞤆𞤇𞤈𞤉𞤊𞤋𞤌𞤍𞤎𞤏𞤐𞤑𞤒𞤓𞤔𞤕𞤖𞤗𞤘𞤙𞤚𞤛𞤜𞤝𞤞𞤟𞤠𞤡𞤢𞤣'
+
 letters = u'𐒰𐒱𐒲𐒳𐒴𐒵𐒶𐒷𐒸𐒹𐒺𐒻𐒼𐒽𐒾𐒿𐓀𐓁𐓂𐓃𐓄𐓅𐓆𐓇𐓈𐓉𐓊𐓋𐓌𐓍𐓎𐓏𐓐𐓑𐓒𐓓'
 # letters = "qwertyuiopasdfghjklzxcvbnm"
+
+# TODO: Fix this to be better
+#letters = adlam_upper_letters
+
 
 debug = False
 
@@ -112,6 +119,9 @@ def insertWord(word, grid, invalid=None):
     else:
         # Probably painted into a corner, raise an error to retry.
         raise(RuntimeError)
+
+    reverse_it = bool(randint(0,1))
+    print 'Reverse_it = %s' % reverse_it
 
     start = [y, x, hori] #Saved in case of invalid placement
     #Now attempt to insert each letter
