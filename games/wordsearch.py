@@ -92,14 +92,22 @@ def insertWord(word, grid, invalid=None):
     #Detect whether the word can fit horizontally or vertically.
     hori = width >= length + 1
     vert = height >= length + 1
+    diag = False
     if hori and vert:
         #If both can be true, flip a coin to decide which it will be
-        hori = bool(randint(0,1))
-        vert = not hori
-    # Try diagonal, too!
-    if hori == 0:
+        rint = randint(0, 1)
+        hori = vert = diag = False
+        if rint == 0:
+            hori = True
+        elif rint == 1:
+            vert = True
+        else:
+            # TODO: Try diagonal, too!
+            diag = True
+            print 'TRY DIAGONAL'
+    if hori:
         direction = 'x'
-    elif hori == 1:
+    elif vert:
         direction = 'y'
     else:
         direction = 'd'
@@ -107,6 +115,20 @@ def insertWord(word, grid, invalid=None):
     line = [] #For storing the letters' locations
     if invalid is None:
         invalid = [[None,None,True],[None,None,False]]
+
+    # new: Generate all the positions at which this word can start.
+    positions = []
+    for x in xrange(0, width-length):
+        for y in xrange(0, height-length):
+            positions.append([x,y])
+
+    # Now generate a starting coordinate from the above.
+    num_positions = len(positions)
+    if num_positions < 1:
+        print 'only one position'
+    rand_pos = randint(0, num_positions - 1)
+    x = positions[rand_pos][0]
+    y = positions[rand_pos][1]
 
     #Height * width is an approximation of how many attempts we need
     for _ in range(height*width):
@@ -116,17 +138,23 @@ def insertWord(word, grid, invalid=None):
         else:
             x = randint(0,width-1)
             y = randint(0,height-1-length)
-        if [y,x,hori] not in invalid:
+        if [y,x,direction] not in invalid:
             break
     else:
         # Probably painted into a corner, raise an error to retry.
         raise(RuntimeError)
 
-    start = [y, x, hori] #Saved in case of invalid placement
+    start = [y, x, direction] #Saved in case of invalid placement
+    do_reverse = bool(randint(0,1))
     #Now attempt to insert each letter
+    if do_reverse:
+        tokens.reverse()
     line = tryPlacingWord(tokens, x, y, direction, grid)
 
     if line:
+        if do_reverse:
+            line.reverse()
+            print 'REVERSED'
         for i,cell in enumerate(line):
             grid[cell[0]][cell[1]] = tokens[i]
         return grid, line
