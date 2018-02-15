@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+
+  <title>{{language}} wordsearch generator</title>
+
+  <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
+  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">
+  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
+  <![endif]-->
+
+  <link rel="stylesheet" type="text/css" href="/css/fonts.css">
+
+  <script src="/js/osage_utils.js"></script>
+
+  <script src="/js/vk-debug.js"></script>
+
+<script>
+  // Code to request {{language}} data at index with optional filter.
+  // Direction indicates previous (-1) or next (+1)
+  function sendWords(wordSrc, resultArea) {
+    // Prepare for the call to the backendvar xmlhttp;
+	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	} else { // code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+
+    // Deal with the results
+    xmlhttp.onreadystatechange=function() {
+	  if(xmlhttp.readyState==4) {
+        // Handle results
+      }
+    }
+	target = "/games/genwordsearch/";
+	target += "?words=" + wordlist;
+    xmlhttp.open("GET", target, true);
+	var size = target.length;
+	xmlhttp.send(null);
+  }
+
+  // Handle Keyboard
+  var controller, visible = true;
+  function initKeyboard(textAreaID) {
+      var input = document.getElementById(textAreaID);
+      controller = new i18n.input.keyboard.Keyboard();
+      controller.loadLayout('osa_traditional');
+      controller.loadLayout('osa');
+      controller.reposition(input, 2, 0, [1, 0, 0, 0]);
+      controller.register(input);
+      controller.addEventListener('kc', function() { visible = false; });
+      input.focus();
+      var selector = document.getElementById('selectKeyboard');
+      onLayoutSelected(selector, controller, textAreaID);
+  }
+
+  function onLayoutSelected(selector, this_controller, outputId) {
+    var layoutCode = selector.value;
+    if (this_controller) {
+      this_controller.activateLayout(layoutCode);
+    } else {  // The global.
+      controller.activateLayout(layoutCode);
+    }
+    document.getElementById(outputId).focus();
+  }
+
+  function onPageLoaded() {
+    initKeyboard("wordlist");
+  }
+  </script>
+</head>
+
+
+ <body onload="onPageLoaded();">
+  <div class="container">
+    <div class="span-1">
+    </div>
+  <div class="span-16">
+
+          Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
+      <option value="osa">Osage Unicode</option>
+    </select>
+  <div>
+      {{language}} Words:<br />
+      <textarea id="wordlist">
+
+      </textarea>
+  </div>
+          <input type="button" value="Clear"
+           onclick="clearArea('wordlist');">
+         <input type="button" value="Submit"
+           onclick="sendWords('wordlist', 'Grid');">
+
+   <div>
+       {{language}} Grid:<br />
+      <textarea id="Grid">
+
+      </textarea>
+  </div>
+  </div>
+  </div>
+ </body>
