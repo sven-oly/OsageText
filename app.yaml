@@ -31,6 +31,9 @@ handlers:
 - url: /docx/.*
   script: processDocx.app
 
+- url: /games/.*
+  script: games.app
+
 - url: .*
   script: main.app
 
