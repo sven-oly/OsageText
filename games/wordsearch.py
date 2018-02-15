@@ -63,8 +63,8 @@ def attemptGrid(words, size):
     #Insert answers and store their locations
     answers = {}
     for word in words:
-        grid, answer = insertWord(word,grid)
-        answers[word] = answer
+        grid, answer, reversed = insertWord(word,grid)
+        answers[word] = [answer, reversed]
 
     #Add other characters to fill the empty space
     fillTokens = getTokens(letters)
@@ -153,11 +153,11 @@ def insertWord(word, grid, invalid=None):
 
     if line:
         if do_reverse:
-            line.reverse()
+            #line.reverse()
             print 'REVERSED'
         for i,cell in enumerate(line):
             grid[cell[0]][cell[1]] = tokens[i]
-        return grid, line
+        return grid, line, do_reverse
     else:
         # If it didn't work, we could try the reversed word.
         # But for now, just quit.
