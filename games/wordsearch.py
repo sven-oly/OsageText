@@ -74,11 +74,14 @@ def attemptGrid(words, size):
         answers[word] = answer
 
     #Add other characters to fill the empty space
-    for i,j in itertools.product(range(size[1]),range(size[0])):
+    fillTokens = getTokens(letters)
+    numTokens = len(fillTokens)
+    for i,j in itertools.product(range(size[1]), range(size[0])):
         if grid[i][j] == ' ':
-            grid[i][j] = letters[randint(0,len(letters)-1)]
+            grid[i][j] = fillTokens[randint(0, numTokens-1)]
 
     return grid, answers
+
 
 def insertWord(word, grid, invalid=None):
     '''Insert a word into the letter grid
@@ -96,15 +99,43 @@ def insertWord(word, grid, invalid=None):
     #Detect whether the word can fit horizontally or vertically.
     hori = width >= length + 1
     vert = height >= length + 1
+    diag = False
     if hori and vert:
         #If both can be true, flip a coin to decide which it will be
-        hori = bool(randint(0,1))
-        vert = not hori
-    # Try diagonal, too!
+        rint = randint(0, 1)
+        hori = vert = diag = False
+        if rint == 0:
+            hori = True
+        elif rint == 1:
+            vert = True
+        else:
+            # TODO: Try diagonal, too!
+            diag = True
+            print 'TRY DIAGONAL'
+    if hori:
+        direction = 'x'
+    elif vert:
+        direction = 'y'
+    else:
+        direction = 'd'
 
     line = [] #For storing the letters' locations
     if invalid is None:
         invalid = [[None,None,True],[None,None,False]]
+
+    # new: Generate all the positions at which this word can start.
+    positions = []
+    for x in xrange(0, width-length):
+        for y in xrange(0, height-length):
+            positions.append([x,y])
+
+    # Now generate a starting coordinate from the above.
+    num_positions = len(positions)
+    if num_positions < 1:
+        print 'only one position'
+    rand_pos = randint(0, num_positions - 1)
+    x = positions[rand_pos][0]
+    y = positions[rand_pos][1]
 
     #Height * width is an approximation of how many attempts we need
     for _ in range(height*width):
@@ -114,54 +145,60 @@ def insertWord(word, grid, invalid=None):
         else:
             x = randint(0,width-1)
             y = randint(0,height-1-length)
-        if [y,x,hori] not in invalid:
+        if [y,x,direction] not in invalid:
             break
     else:
         # Probably painted into a corner, raise an error to retry.
         raise(RuntimeError)
 
-    reverse_it = bool(randint(0,1))
-    print 'Reverse_it = %s' % reverse_it
+    start = [y, x, direction] #Saved in case of invalid placement
+    do_reverse = bool(randint(0,1))
 
-    start = [y, x, hori] #Saved in case of invalid placement
     #Now attempt to insert each letter
+    if do_reverse:
+        tokens.reverse()
+    line = tryPlacingWord(tokens, x, y, direction, grid)
+
+    if line:
+        if do_reverse:
+            line.reverse()
+            print 'REVERSED'
+        for i,cell in enumerate(line):
+            grid[cell[0]][cell[1]] = tokens[i]
+        return grid, line
+    else:
+        # If it didn't work, we could try the reversed word.
+        # But for now, just quit.
+
+        invalid.append(start)
+        return insertWord(word, grid, invalid)
+
+
+
+# Returns True if the word fits at the given spot with given direction.
+# Returns False if it doesn't fit.
+def tryPlacingWord(tokens, x, y, direction, grid):
+    line = [] #For storing the letters' locations
+
     for letter in tokens:
-        if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
-            if grid[y][x] != ' ':
-              print 'Created an overlap at [%s, %s]' % (y,x)
-            line.append([y,x])
-            if hori:
-                x += 1
+        try:
+            if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
+                line.append([y, x])
+                if direction == 'x':
+                 x += 1
+                elif direction == 'y':
+                    y += 1
+                else:
+                    # And handle diagonal, too!
+                    x += 1
+                    y += 1
             else:
-                y += 1
-            # TODO: And handle diagonal, too!
-        else:
-            #We found a place the word can't fit
-            #Mark the starting point as invalid
-            invalid.append(start)
-            return insertWord(word, grid, invalid)
+                return False
+        except IndexError:
+            print 'IndexError x,y: [%s, %s]' % (x, y)
 
-    # If it didn't work, try the reversed word.
+    return line
 
-    #Since it's a valid place, write to the grid and return
-    for i,cell in enumerate(line):
-        grid[cell[0]][cell[1]] = tokens[i]
-    return grid, line
-
-def tryPlacingWord(tokens, grid):
-    for letter in tokens:
-        if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
-            line.append([y, x])
-            if hori:
-                x += 1
-            else:
-                y += 1
-                # And handle diagonal, too!
-        else:
-            # We found a place the word can't fit
-            # Mark the starting point as invalid
-            invalid.append(start)
-            return insertWord(word, grid, invalid)
 
 def getTokens(word):
     '''Get the tokens, not code points.'''
@@ -194,9 +231,8 @@ def printGrid(grid):
     print ("+" + ('---+' * width))
 
     for i,line in enumerate(grid):
-        #for item in line:
-        #    print item.decode('utf-8')
-        print ("| " + " | ".join(line) + " |")
+
+        print (u"| " + u" | ".join(line) + u" |")
         print ("+" + ('---+' * width))
 
 
