@@ -34,8 +34,13 @@
         // Handle results
       }
     }
-	target = "/games/genwordsearch/";
-	target += "?words=" + wordlist;
+
+    // Prepare and send data.
+    var inputArea = document.getElementById(wordSrc);
+    var wordData = inputArea.value;
+
+	target = "/games/generatewordsearch/";
+	target += "?words=" + wordData;
     xmlhttp.open("GET", target, true);
 	var size = target.length;
 	xmlhttp.send(null);
