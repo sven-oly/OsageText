@@ -18,9 +18,23 @@
   <script src="/js/vk-debug.js"></script>
 
 <script>
+
+  function sendTestWords(resultArea, answerArea) {
+    var wordData = ['𐓏𐒻𐒷𐒻𐒷', '𐓀𐒰𐓓𐒻͘', '𐓏𐒰𐓓𐒰𐓓𐒷', '𐒻𐒷𐓏𐒻͘ ', '𐓈𐒻𐓍𐒷', '𐒹𐓂𐓏𐒷͘𐒼𐒻',
+           '𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', '𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐒼𐒰𐓆𐒻𐓈𐒰͘', '𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰',
+           '𐒻𐓏𐒻𐒼𐒻', '𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰'];
+    return sendWords(wordData, resultArea, answerArea);
+  }
+
+  function sendRegionWords(wordSrc, resultArea, answerArea) {
+    var inputArea = document.getElementById(wordSrc);
+    var wordData = inputArea.value;
+    return sendWords(wordData, resultArea, answerArea);
+  }
+
   // Code to request {{language}} data at index with optional filter.
   // Direction indicates previous (-1) or next (+1)
-  function sendWords(wordSrc, resultArea) {
+  function sendWords(wordData, resultArea, answerArea) {
     // Prepare for the call to the backendvar xmlhttp;
 	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
@@ -32,13 +46,19 @@
     xmlhttp.onreadystatechange=function() {
 	  if(xmlhttp.readyState==4) {
         // Handle results
+        var returned_json = xmlhttp.responseText;
+        var json_obj = JSON.parse(returned_json);
+        var outputArea = document.getElementById(resultArea);
+        var answersArea = document.getElementById(answerArea);
+        outputArea.value = json_obj.grid;
+        answersArea.value = json_obj.words;
+        words = json_obj.answers;
+        grid_width = json_obj.grid_width;
+        createGameGrid(json_obj.grid, grid_width);
       }
     }
 
     // Prepare and send data.
-    var inputArea = document.getElementById(wordSrc);
-    var wordData = inputArea.value;
-
 	target = "/games/generatewordsearch/";
 	target += "?words=" + wordData;
     xmlhttp.open("GET", target, true);
@@ -46,6 +66,31 @@
 	xmlhttp.send(null);
   }
 
+function createGameGrid(grid, grid_width) {
+    // Create table.
+    var table = document.getElementById('gridTable');
+    var rows = table.getElementsByTagName("tr")
+
+    // Clear all rows first.
+    for (var row = 0; row < rows.length; row++) {
+      table.deleteRow(0);
+    }
+
+    // Insert New Row for table at index '0'.
+
+    for (var row = 0; row < grid_width; row ++) {
+      var row1 = table.insertRow(row);
+      // Insert New Columns for Row1 at index '0'.
+      for (var col = 0; col < grid_width; col ++) {
+        var row1col1 = row1.insertCell(col);
+        row1col1.innerHTML = grid[row][col];
+      }
+    }
+
+    // Append Table into div.
+    var div = document.getElementById('divTable');
+    div.appendChild(table);
+}
   // Handle Keyboard
   var controller, visible = true;
   function initKeyboard(textAreaID) {
@@ -96,14 +141,30 @@
           <input type="button" value="Clear"
            onclick="clearArea('wordlist');">
          <input type="button" value="Submit"
-           onclick="sendWords('wordlist', 'Grid');">
-
+           onclick="sendRegionWords('wordlist', 'Grid', 'Answers');">
+         <input type="button" value="Test"
+           onclick="sendTestWords('Grid', 'Answers');">
    <div>
-       {{language}} Grid:<br />
+       {{language}} Answers:<br />
+      <textarea id="Answers">
+
+      </textarea>
+  <div>
+      {{language}} Words:<br />
       <textarea id="Grid">
 
       </textarea>
-  </div>
+  </div>  </div>
+
+      <div id="divTable">
+          <table id="gridTable">
+
+          </table>
+
+      </div>
+      <div id="answerList">
+
+      </div>
   </div>
   </div>
  </body>

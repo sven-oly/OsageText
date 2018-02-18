@@ -8,6 +8,8 @@ import itertools
 from copy import deepcopy
 from random import randint
 
+import logging
+
 import sys
 
 # Set up fill letters, including those with diacritics.
@@ -236,7 +238,45 @@ def printAnswers(answers):
         print answer, answers[answer]
 
 
-def main():
+# Runs with an array of words
+def generateWordsGrid(words):
+    words = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
+             u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
+             u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
+
+    # Set the size to be the maximum word length.
+    max_xy = 0
+    for word in words:
+        logging.info(word)
+        tokens = getTokens(word)
+        if len(tokens) > max_xy:
+            max_xy = len(tokens)
+    logging.info('max size = %s ' % (max_xy))
+    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1])
+    return grid, answers, words, max_xy + 1
+
+
+# Runs with a set grid
+def testGrid():
+    words = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
+           u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
+           u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
+    max_xy = 0
+    longest_word = None
+    for word in words:
+      tokens = getTokens(word)
+      # logging.info('word, tokens = %s, %s ' % (word, len(tokens)))
+
+      if len(tokens) > max_xy:
+          longest_word = word
+          max_xy = len(tokens)
+    logging.info('max size = %s, %s ' % (max_xy, longest_word))
+    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1])
+    return grid, answers, words, max_xy + 1
+
+
+
+def main(args):
   # The Osage works, with diacritics
   osageWords = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷',
                 u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬']
