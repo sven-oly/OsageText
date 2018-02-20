@@ -55,11 +55,13 @@ class GenerateWordSearchHandler(webapp2.RequestHandler):
     user = users.get_current_user()
 
     rawWordList = self.request.get('words', '')
+    logging.info('games WordSearchHandler rawWordList = %s' % rawWordList)
 
-    wordList = re.findall(r"[\w']+", rawWordList)
-    #logging.info('games WordSearchHandler wordList = %s' % wordList)
 
-    grid, answers, words, grid_width = wordsearch.testGrid()
+    wordList = rawWordList.replace(",", " ").replace("\r", " ").replace("\t", " ").split()
+    logging.info('games WordSearchHandler wordList = %s' % wordList)
+
+    grid, answers, words, grid_width = wordsearch.generateWordsGrid(wordList)
 
     #logging.info('games WordSearchHandler grid = %s' % grid)
     #logging.info('games WordSearchHandler answers = %s' % answers)
