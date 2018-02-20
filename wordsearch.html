@@ -1,33 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8"/>
+    <meta charset="utf-8"/>
 
-  <title>{{language}} wordsearch generator</title>
+    <title>{{language}} wordsearch generator</title>
 
-  <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
-  <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">
-  <!--[if lt IE 8]>
+    <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print">
+    <!--[if lt IE 8]>
     <link rel="stylesheet" href="/css/blueprint/ie.css" type="text/css" media="screen, projection">
-  <![endif]-->
+    <![endif]-->
 
-  <link rel="stylesheet" type="text/css" href="/css/fonts.css">
+    <link rel="stylesheet" type="text/css" href="/css/fonts.css">
 
-  <script src="/js/osage_utils.js"></script>
+    <script src="/js/osage_utils.js"></script>
 
-  <script src="/js/vk-debug.js"></script>
+    <script src="/js/vk-debug.js"></script>
 
-  <style>
-  p, table {
-	border: 2px solid #cccccc;
-	padding: 5px;
-	font-size: 24px;
-    font-variant-ligatures: normal;
-	}
-   .default {
-     font-family: "Courier New";
-   }
-  </style>
+    <style>
+    @media print {
+      .noprint {display:none;}
+    }
+    @media screen {
+    }
+    </style>
+    <style>
+        p, table {
+        border: 2px solid #cccccc;
+        padding: 5px;
+        font-size: 24px;
+        font-variant-ligatures: normal;
+        }
+        .default {
+          font-family: "Courier New";
+        }
+        td, th {
+          border: dashed 1px #dddddd;
+          text-align: center;
+        }
+        textarea {
+          font-size: 24px;
+
+        }
+        li {
+          font-size: 24px;
+        }
+        input {
+          font-size: 14px;
+        }
+    </style>
 <script>
 
   function sendTestWords(resultArea, answerArea) {
@@ -101,12 +122,17 @@ function createGameGrid(grid, grid_width, words, answers) {
     var wordArea = document.getElementById('wordList');
     var wordList = "";
     for (word in words) {
-        wordList += "   " + word;
+        wordList += " " + word + "\u00a0\u00a0\u00a0";
     }
     wordArea.innerHTML = wordList;
 
     // Prepare answers region
     var answerArea = document.getElementById('answerList');
+    // Remove old entries
+    while (answerArea.children.length > 0) {
+      answerArea.removeChild(answerArea.childNodes[0]);
+    }
+
     for (word in words) {
       answer = answers[word];
       var li = document.createElement("li");
@@ -115,6 +141,11 @@ function createGameGrid(grid, grid_width, words, answers) {
 
     }
 }
+
+  function clearArea(id) {
+    var obj = document.getElementById(id);
+    obj.innerHTML = obj.value = '';
+  }
 
   function toggle(id, toggle) {
     var obj = document.getElementById(id);
@@ -152,8 +183,32 @@ function createGameGrid(grid, grid_width, words, answers) {
     document.getElementById(outputId).focus();
   }
 
+  function toggleKeyboard() {
+    if (controller) {
+      controller.setVisible(visible = !visible);
+    }
+  }
+
+  function printPage() {
+    var wasVisible = visible;
+    if (controller) {
+          controller.setVisible(false);
+    }
+    window.print();
+    if (controller) {
+          controller.setVisible(wasVisible);
+    }
+  }
+
   function onPageLoaded() {
     initKeyboard("wordlist");
+
+    var doc = document;
+
+
+    if (controller) {
+      controller.className += " noprint";
+    }
   }
   </script>
 </head>
@@ -161,27 +216,29 @@ function createGameGrid(grid, grid_width, words, answers) {
 
 <body onload="onPageLoaded();">
 <div class="container">
-    <div class="span-1">
-    </div>
+
     <div class="span-16">
 
-        Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
-        <option value="osa">Osage Unicode</option>
-        </select>
-        <div>
-            {{language}} Words:<br />
-            <textarea id="wordlist">
-
-      </textarea>
+        <div class="noprint" id="uiOnly">
+            Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
+            <option value="osa">Osage Unicode</option>
+            </select>
+                        <input type='button' value='Toggle keyboard'
+                onClick="toggleKeyboard(); return false;" />
+                        <input type='button' value='Print page'
+                onClick="printPage(); return false;" />            <div>
+                {{language}} Words:<br />
+                <textarea id="wordlist"></textarea>
+            </div>
+            <input type="button" value="Clear"
+                   onclick="clearArea('wordlist');">
+            <input type="button" value="Submit"
+                   onclick="sendRegionWords('wordlist', 'Grid', 'Answers');">
+            <input type="button" value="Test"
+                   onclick="sendTestWords('Grid', 'Answers');">
         </div>
-        <input type="button" value="Clear"
-               onclick="clearArea('wordlist');">
-        <input type="button" value="Submit"
-               onclick="sendRegionWords('wordlist', 'Grid', 'Answers');">
-        <input type="button" value="Test"
-               onclick="sendTestWords('Grid', 'Answers');">
+    </div>
 
-        </div>
     <div id="printGamearea">
         <div id="divTable" class="break">
             <table id="gridTable">
@@ -196,9 +253,8 @@ function createGameGrid(grid, grid_width, words, answers) {
         </div>
 
         <div id="answers">
-            <h2>Answers:</h2>
-            <input type="checkbox" value="Show answers" id="toggleAnswers"
-                   onclick="toggle('answerBlock', 'toggleAnswers');"/>
+            <input type="checkbox" id="toggleAnswers"
+                   onclick="toggle('answerBlock', 'toggleAnswers');"/>Show answers?
             <div id="answerBlock" style="display:none;">
                 <ul id="answerList">
                 </ul>
