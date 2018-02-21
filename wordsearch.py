@@ -68,7 +68,21 @@ def attemptGrid(words, size):
     answers = {}
     for word in words:
         grid, answer, reversed = insertWord(word,grid)
-        answers[word] = [answer, reversed, word]
+        if answer[0][0] == answer[-1][0]:
+            logging.info('A ROW')
+            direction = 'ROW'
+        elif answer[0][1] == answer[-1][1]:
+            logging.info('A COLUMN')
+            direction = 'COLUMN'
+        else:
+            direction = 'DIAGONAL'
+            logging.info('A DIAGONAL')
+
+        if reversed:
+            # Put the coordinates in the right order
+            answer.reverse()
+
+        answers[word] = [answer, reversed, word, direction]
 
     #Add other characters to fill the empty space
     fillTokens = getTokens(letters)
