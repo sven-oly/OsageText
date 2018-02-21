@@ -58,8 +58,8 @@ def attemptGrid(words, size):
     sizeCap = (size[0] if size[0] >= size[1] else size[1])
     sizeCap -= 1
     if any(len(tokens) > sizeCap for tokens in tokenList):
-        print "ERROR: Too small a grid for supplied words: %s" % tokens
-        return
+        logging.info("ERROR: Too small a grid for supplied words: %s" % tokens)
+        return None, None
 
     grid = [[' ' for _ in range(size[0])] for __ in range(size[1])]
 
@@ -69,14 +69,14 @@ def attemptGrid(words, size):
     for word in words:
         grid, answer, reversed = insertWord(word,grid)
         if answer[0][0] == answer[-1][0]:
-            logging.info('A ROW')
+            #logging.info('A ROW')
             direction = 'ROW'
         elif answer[0][1] == answer[-1][1]:
-            logging.info('A COLUMN')
+            #logging.info('A COLUMN')
             direction = 'COLUMN'
         else:
             direction = 'DIAGONAL'
-            logging.info('A DIAGONAL')
+            #logging.info('A DIAGONAL')
 
         if reversed:
             # Put the coordinates in the right order
@@ -113,22 +113,22 @@ def insertWord(word, grid, invalid=None):
     diag = False
     if hori and vert:
         #If both can be true, flip a coin to decide which it will be
-        rint = randint(0, 2)
+        rint = randint(0, 3)
         hori = vert = diag = False
         if rint == 0:
             hori = True
+            direction = 'x'
         elif rint == 1:
             vert = True
-        else:
-            # TODO: Try diagonal, too!
+            direction = 'y'
+        elif rint == 2:
             diag = True
-            print 'TRY DIAGONAL'
-    if hori:
-        direction = 'x'
-    elif vert:
-        direction = 'y'
-    else:
-        direction = 'd'
+            direction = 'dd'
+            #print 'TRY DIAGONAL Down'
+        else:
+            diag = True
+            direction = 'du'
+            #print 'TRY DIAGONAL up'
 
     line = [] #For storing the letters' locations
     if invalid is None:
@@ -154,12 +154,16 @@ def insertWord(word, grid, invalid=None):
         if direction == 'x':
             x = randint(0,width-1-length)
             y = randint(0,height-1)
-        elif direction == 'f':
+        elif direction == 'y':
             x = randint(0,width-1)
             y = randint(0,height-1-length)
-        else:
-            x = randint(0, width-1-length)
+        elif direction == 'dd':
+            x = randint(0, width - 1 - length)
             y = randint(0, height - 1 - length)
+        else:
+            # Diagonal up
+            x = randint(0, width-1-length)
+            y = randint(length -1, height - 1)
 
         if [y,x,direction] not in invalid:
             break
@@ -168,6 +172,7 @@ def insertWord(word, grid, invalid=None):
         raise(RuntimeError)
 
     start = [y, x, direction] #Saved in case of invalid placement
+    logging.info('Start = %s' % start)
     do_reverse = bool(randint(0,1))
     #Now attempt to insert each letter
     if do_reverse:
@@ -176,8 +181,8 @@ def insertWord(word, grid, invalid=None):
 
     if line:
         if do_reverse:
-            #line.reverse()
-            print 'REVERSED'
+            line.reverse()
+            # print 'REVERSED'
         for i,cell in enumerate(line):
             grid[cell[0]][cell[1]] = tokens[i]
         return grid, line, do_reverse
@@ -200,13 +205,17 @@ def tryPlacingWord(tokens, x, y, direction, grid):
             if grid[y][x] in (' ', letter):  # Check if it's the letter or a blank.
                 line.append([y, x])
                 if direction == 'x':
-                 x += 1
+                    x += 1
                 elif direction == 'y':
                     y += 1
-                else:
-                    # And handle diagonal, too!
+                elif direction == 'dd':
+                    # And handle diagonal down, too!
                     x += 1
                     y += 1
+                else:
+                    # And handle diagonal up!
+                    x += 1
+                    y -= 1
             else:
                 return False
         except IndexError:
@@ -273,7 +282,7 @@ def generateWordsGrid(words):
         total_tokens += len(tokens)
         if len(tokens) > max_xy:
             max_xy = len(tokens)
-    logging.info('max size = %s ' % (max_xy))
+    #logging.info('max size = %s ' % (max_xy))
     grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1])
     return grid, answers, words, max_xy + 1
 
@@ -295,7 +304,7 @@ def testGrid():
         if len(tokens) > max_xy:
             longest_word = word
             max_xy = len(tokens)
-    logging.info('max size = %s, %s ' % (max_xy, longest_word))
+    #logging.info('max size = %s, %s ' % (max_xy, longest_word))
     grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1])
     return grid, answers, words, max_xy + 1
 
