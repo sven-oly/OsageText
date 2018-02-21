@@ -63,6 +63,11 @@ class GenerateWordSearchHandler(webapp2.RequestHandler):
 
     grid, answers, words, grid_width = wordsearch.generateWordsGrid(wordList)
 
+    if not grid:
+      message = 'Cannot create grid'
+    else:
+      message = 'Created a grid of size %s' % grid_width
+
     #logging.info('games WordSearchHandler grid = %s' % grid)
     #logging.info('games WordSearchHandler answers = %s' % answers)
     #logging.info('games WordSearchHandler words = %s' % words)

@@ -37,7 +37,7 @@ def makeGrid(words, size=[10,10], attempts=10):
             pass
     else:
         print "ERROR - Couldn't create valid board"
-        raise e
+        return None, None
 
 def attemptGrid(words, size):
     '''Attempt a grid of letters to be a wordsearch
@@ -113,7 +113,7 @@ def insertWord(word, grid, invalid=None):
     diag = False
     if hori and vert:
         #If both can be true, flip a coin to decide which it will be
-        rint = randint(0, 1)
+        rint = randint(0, 2)
         hori = vert = diag = False
         if rint == 0:
             hori = True
@@ -149,13 +149,18 @@ def insertWord(word, grid, invalid=None):
     y = positions[rand_pos][1]
 
     #Height * width is an approximation of how many attempts we need
+    # Get a random position that fits
     for _ in range(height*width):
-        if hori:
+        if direction == 'x':
             x = randint(0,width-1-length)
             y = randint(0,height-1)
-        else:
+        elif direction == 'f':
             x = randint(0,width-1)
             y = randint(0,height-1-length)
+        else:
+            x = randint(0, width-1-length)
+            y = randint(0, height - 1 - length)
+
         if [y,x,direction] not in invalid:
             break
     else:
