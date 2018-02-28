@@ -116,12 +116,7 @@
 function createGameGrid(grid, grid_width, words, answers) {
     // Create table.
     var table = document.getElementById('gridTable');
-    var rows = table.getElementsByTagName("tr")
-
-    // Clear all rows first.
-    while (rows.length > 0) {
-      table.deleteRow(0);
-    }
+  clearTableRows('gridTable');
 
     // Insert New Row for table at index '0'.
 
@@ -143,11 +138,8 @@ function createGameGrid(grid, grid_width, words, answers) {
     wordArea.innerHTML = wordList;
 
     // Prepare answers region
+    clearChildNodes('answerList');
     var answerArea = document.getElementById('answerList');
-    // Remove old entries
-    while (answerArea.children.length > 0) {
-      answerArea.removeChild(answerArea.childNodes[0]);
-    }
 
     for (word in words) {
       var answer = answers[word];
@@ -165,12 +157,32 @@ function createGameGrid(grid, grid_width, words, answers) {
         }
        );
       li.appendChild(btn);
-      var ans_text = document.createTextNode(" : " + positions + answer[3]);
+      var ans_text = document.createTextNode(" : " + positions + ' (' + answer[3] + ')');
       li.appendChild(ans_text);
       answerArea.appendChild(li);
 
     }
-}
+  }
+
+  function clearTableRows(tableId) {
+    var table = document.getElementById(tableId);
+    var rows = table.getElementsByTagName("tr")
+
+    // Clear all rows first.
+    while (rows.length > 0) {
+      table.deleteRow(0);
+    }
+  }
+
+  function clearChildNodes(regionId) {
+    // Prepare answers region
+    var answerArea = document.getElementById(regionId);
+    // Remove old entries
+    while (answerArea.children.length > 0) {
+      answerArea.removeChild(answerArea.childNodes[0]);
+    }
+  }
+
 
   function clearArea(id) {
     var obj = document.getElementById(id);
@@ -188,9 +200,7 @@ function createGameGrid(grid, grid_width, words, answers) {
   }
 
   function highlightAnswer(word, answer) {
-    var grid_table = document.getElementById('gridTable');
-    var rows = grid_table.getElementsByTagName("tr");
-    var cells = rows[0].cells;
+    clearTableRows('gridTable');
 
     var this_answer = all_answers[word][0];
     // For each position in the answer, highlight the cell with a color.
@@ -301,7 +311,7 @@ function createGameGrid(grid, grid_width, words, answers) {
                 <textarea id="wordlist"></textarea>
             </div>
             <input type="button" value="Clear"
-                   onclick="clearArea('wordlist');">
+                   onclick="clearArea('wordlist');clearArea('wordList');clearChildNodes('answerList');clearTableRows('gridTable');">
             <input type="button" value="Submit"
                    onclick="sendRegionWords('wordlist', 'Grid', 'Answers');">
             <input type="button" value="Test"
