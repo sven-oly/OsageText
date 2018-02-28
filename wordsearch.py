@@ -244,7 +244,7 @@ def insertWord(word, grid, invalid=None):
         raise(RuntimeError)
 
     start = [y, x, direction] #Saved in case of invalid placement
-    logging.info('Start = %s' % start)
+    # logging.info('Start = %s' % start)
     do_reverse = bool(randint(0,1))
     #Now attempt to insert each letter
     if do_reverse:
@@ -349,7 +349,7 @@ def generateWordsGrid(words):
     total_tokens = 0
 
     for word in words:
-        logging.info(word)
+        # logging.info(word)
         tokens = getTokens(word)
         total_tokens += len(tokens)
         if len(tokens) > max_xy:

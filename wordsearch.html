@@ -52,8 +52,8 @@
 <script>
 
   function sendTestWords(resultArea, answerArea) {
-    var wordData = ['𐓏𐒻𐒷𐒻𐒷', '𐓀𐒰𐓓𐒻͘', '𐓏𐒰𐓓𐒰𐓓𐒷', '𐒻𐒷𐓏𐒻͘ ', '𐓈𐒻𐓍𐒷', '𐒹𐓂𐓏𐒷͘𐒼𐒻',
-           '𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', '𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐒼𐒰𐓆𐒻𐓈𐒰͘', '𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰'];
+    var wordData = ['𐓷𐓣𐓟𐓣𐓟', '𐓨𐓘𐓻𐓣͘', '𐓷𐓘𐓻𐓘𐓻𐓟', '𐓣𐓟𐓷𐓣͘ ', '𐓰𐓣𐓵𐓟', '𐓡𐓪𐓷𐓟͘𐓤𐓣',
+           '𐓯𐓰𐓪͘𐓬𐓘𐓬𐓟', '𐓘̄𐓵𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐓤𐓘𐓮𐓣𐓰𐓘͘', '𐓷𐓘𐓯𐓝𐓣͘𐓧𐓘'];
            //           '𐒻𐓏𐒻𐒼𐒻', '𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰'];
     return sendWords(wordData, resultArea, answerArea);
   }
@@ -310,17 +310,20 @@ function createGameGrid(grid, grid_width, words, answers) {
                 {{language}} Words:<br />
                 <textarea id="wordlist"></textarea>
             </div>
-            <input type="button" value="Clear"
+            <input type="button" value="Clear words and solution"
                    onclick="clearArea('wordlist');clearArea('wordList');clearChildNodes('answerList');clearTableRows('gridTable');">
-            <input type="button" value="Submit"
+            <input type="button" value="Submit words from box above"
                    onclick="sendRegionWords('wordlist', 'Grid', 'Answers');">
-            <input type="button" value="Test"
+            <br />
+            <br />
+            <input type="button" value="Generate grid from sample words"
                    onclick="sendTestWords('Grid', 'Answers');">
         </div>
     </div>
 
     <div id="printGamearea">
-        <div id="divTable" class="break">
+        <div id="divTable">
+          <p class="break">
             <table id="gridTable">
 
             </table>
@@ -333,9 +336,11 @@ function createGameGrid(grid, grid_width, words, answers) {
         </div>
 
         <div id="testarea">
+          <!--
         <input type="button"
             onclick="highlightAnswer('test', [[2,3], [1, 1], [2, 1], [3, 2]]);"
             value="test highlight">
+        -->
     </div>
         <div id="answers">
             <input type="checkbox" id="toggleAnswers"
