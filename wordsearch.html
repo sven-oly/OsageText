@@ -236,7 +236,24 @@ function createGameGrid(grid, grid_width, words, answers) {
     }
   }
 
+  function onFontSelected(selected) {
+    var fontFam = selected.value + ", Arial, Osage";
+
+    var output_text = document.getElementById('wordlist');
+    output_text.style.fontFamily = fontFam;
+
+    var output_text = document.getElementById('wordList');
+    output_text.style.fontFamily = fontFam;
+
+    var output_text = document.getElementById('gridTable');
+    output_text.style.fontFamily = fontFam;
+
+    var output_text = document.getElementById('answers');
+    output_text.style.fontFamily = fontFam;
+ }
+
   function printPage() {
+    // Don't print keyboard
     var wasVisible = visible;
     if (controller) {
           controller.setVisible(false);
@@ -267,6 +284,12 @@ function createGameGrid(grid, grid_width, words, answers) {
     <div class="span-16">
 
         <div class="noprint" id="uiOnly">
+          Select font: <select onchange="onFontSelected(this);" id="selectFont">
+            {% for font in fontFamilies %}
+            <option value="{{font}}">{{font}}</option>
+            {% endfor %}
+          </select>
+
             Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
             <option value="osa">Osage Unicode</option>
             </select>

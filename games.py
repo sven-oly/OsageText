@@ -43,6 +43,7 @@ class WordSearchHandler(webapp2.RequestHandler):
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
       'language': main.Language,
+      'fontFamilies': main.OsageFonts,
     }
     path = os.path.join(os.path.dirname(__file__), 'wordsearch.html')
     self.response.out.write(template.render(path, template_values))
@@ -77,6 +78,7 @@ class GenerateWordSearchHandler(webapp2.RequestHandler):
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
       'language': main.Language,
+      'fontFamilies': main.OsageFonts,
       'grid': grid,
       'answers': answers,
       'words': words,
@@ -95,6 +97,8 @@ class CrossWordHandler(webapp2.RequestHandler):
       'words': words,
       'grid': grid,
       'clues': clues,
+      'language': main.Language,
+      'fontFamilies': main.OsageFonts,
     }
     path = os.path.join(os.path.dirname(__file__), 'crossword.html')
     self.response.out.write(template.render(path, template_values))
