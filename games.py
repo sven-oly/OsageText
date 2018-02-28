@@ -85,12 +85,27 @@ class GenerateWordSearchHandler(webapp2.RequestHandler):
     self.response.out.write(json.dumps(template_values))
 
 
+class CrossWordHandler(webapp2.RequestHandler):
+  def get(self):
+    logging.info('games CrossWordHandler')
+    words = ['test', 'game', 'osage', 'free']
+    grid = None
+    clues = ['exam', 'something to play', 'tribe from Pawhuska', 'without cost']
+    template_values = {
+      'words': words,
+      'grid': grid,
+      'clues': clues,
+    }
+    path = os.path.join(os.path.dirname(__file__), 'crossword.html')
+    self.response.out.write(template.render(path, template_values))
+
 class TestHandler(webapp2.RequestHandler):
   def get(self):
     logging.info('games TestHandler')
 
 app = webapp2.WSGIApplication([
     ('/games/wordsearch/', WordSearchHandler),
+    ('/games/crossword/', CrossWordHandler),
     ('/games/generatewordsearch/', GenerateWordSearchHandler),
     ('/games/test/', TestHandler),
 ], debug=True)

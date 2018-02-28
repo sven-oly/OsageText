@@ -20,9 +20,79 @@ letters = u'𐒰𐒱𐒲𐒳𐒴𐒵𐒶𐒷𐒸𐒹𐒺𐒻𐒼𐒽𐒾𐒿𐓀
 # letters = "qwertyuiopasdfghjklzxcvbnm"
 
 debug = False
+# Constants for word from the starting point
+RIGHT, DOWN, DOWNRIGHT, UPRIGHT = 0, 1, 2, 3
+RIGHT_OFFSET, DOWN_OFFSET, DOWNRIGHT_OFFSET, UPRIGHT_OFFSET = (
+    [0, 1], [1, 0], [1, 1], [1, -1]
+)
 
-# TODO: add diagonals, too.
-# TODO: add reversal of letters
+#### THE NEW IMPLEMENTATION.
+class Position():
+    def __init__(self):
+        self.tokens = []
+        self.x = 0
+        self.y = 0
+        self.positions = []  # The grid locations for all
+        self.direction  # right, down, down right, up right
+        self.reversed  # Are the tokens in inverse order?
+        self.clue  # For crossword, show this
+
+        self.directions = [RIGHT, DOWN, DOWNRIGHT, UPRIGHT]
+
+    def genPositions(self):
+        # Creates the positions from the start, size, direction, reverse
+        return
+
+
+class WordSearch():
+    def __init__(self):
+        self.grid = None
+        self.do_diagonal = True
+        self.do_reverse = True
+        self.size = 0
+        self.wordlist = None
+        self.answers = None
+        self.current_level = 0
+        self.level_answer = []  # Levels with tentative inserts
+        self.fill_tokens = []  # The tokens for the language
+        self.solution_list = []  # For storing multiple results
+        self.optimize_flag = False  # Set if the "best" one is desired
+        self.total_tests = 0  # How many testWordInsert calls made
+
+    def generateOptions(self, tokens):
+        # Given the grid and the token, find all the places
+        # where it could be placed, given grid size and
+        # number of tokens in the word
+        positions = []
+        for x in xrange(0, width - length):
+            for y in xrange(0, height - length):
+                for dir in self.directions:
+                    positions.append([x, y])
+        return positions
+
+    def tryWordInsert(self, tokens):
+        # Put the word at the next level
+        self.level += 1
+
+    def testWordInsert(self, tokens, position):
+        return False
+
+    def revertWordAtLevel(self):
+        return True
+
+    def evaluateGrid(self):
+        # Returns something about the compactness and overlap
+        return
+
+    def finishGrid(self):
+        # Fills in the blank spaces as needed
+        return
+
+    def deliverHints(self):
+        # Either the words in the list or the clues
+        return
+
+#### THE OLD IMPLEMENTATION.
 
 def makeGrid(words, size=[10,10], attempts=10):
     '''Run attemptGrid trying attempts number of times.

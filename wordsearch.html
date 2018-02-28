@@ -53,8 +53,8 @@
 
   function sendTestWords(resultArea, answerArea) {
     var wordData = ['𐓏𐒻𐒷𐒻𐒷', '𐓀𐒰𐓓𐒻͘', '𐓏𐒰𐓓𐒰𐓓𐒷', '𐒻𐒷𐓏𐒻͘ ', '𐓈𐒻𐓍𐒷', '𐒹𐓂𐓏𐒷͘𐒼𐒻',
-           '𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', '𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐒼𐒰𐓆𐒻𐓈𐒰͘', '𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰',
-           '𐒻𐓏𐒻𐒼𐒻', '𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰'];
+           '𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', '𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐒼𐒰𐓆𐒻𐓈𐒰͘', '𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰'];
+           //           '𐒻𐓏𐒻𐒼𐒻', '𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰'];
     return sendWords(wordData, resultArea, answerArea);
   }
 
@@ -63,6 +63,11 @@
     var wordData = inputArea.value;
     return sendWords(wordData, resultArea, answerArea);
   }
+
+  // The variables of the data.
+  var whole_grid = null;
+  var all_answers = null;
+  var all_words = null;
 
   // Code to request {{language}} data at index with optional filter.
   // Direction indicates previous (-1) or next (+1)
@@ -87,8 +92,15 @@
         var outputArea = document.getElementById(resultArea);
         var answersArea = document.getElementById(answerArea);
 
-        words = json_obj.answers;
+        words = json_obj.answers;  // get the keys
+
         grid_width = json_obj.grid_width;
+
+        // Globals
+        whole_grid = json_obj.grid;
+        all_words = words;
+        all_answers = json_obj.answers;
+
         createGameGrid(json_obj.grid, grid_width, words, json_obj.answers);
       }
     }
@@ -138,9 +150,23 @@ function createGameGrid(grid, grid_width, words, answers) {
     }
 
     for (word in words) {
-      answer = answers[word];
+      var answer = answers[word];
+      var positions = answer[0].concat();
       var li = document.createElement("li");
-      li.appendChild(document.createTextNode(word + ": " + answer[0]));
+      var btn = document.createElement("button");
+      var t = document.createTextNode(word);
+      var this_word = word;
+      btn.append(t);
+      btn.addEventListener ("click",
+        function() {
+          var w = this_word;
+          var p = positions;
+          return function() { return highlightAnswer(w, p); } // The positions.
+        }
+       );
+      li.appendChild(btn);
+      var ans_text = document.createTextNode(" : " + positions + answer[3]);
+      li.appendChild(ans_text);
       answerArea.appendChild(li);
 
     }
@@ -159,8 +185,25 @@ function createGameGrid(grid, grid_width, words, answers) {
       obj.style.display = 'block';
     else
       obj.style.display = 'none';
-    }
+  }
 
+  function highlightAnswer(word, answer) {
+    var grid_table = document.getElementById('gridTable');
+    var rows = grid_table.getElementsByTagName("tr");
+    var cells = rows[0].cells;
+
+    var this_answer = all_answers[word][0];
+    // For each position in the answer, highlight the cell with a color.
+    var count = this_answer.length;
+    for (var i = 0; i < count; i++) {
+      pos = answer[i];
+      var x = pos[0];
+      var y = pos[1];
+      var row = rows[y];
+      var col = row.cells[x];
+      col.style.backgroundColor = "yellow";
+    }
+  }
 
   // Handle Keyboard
   var controller, visible = true;
@@ -256,6 +299,11 @@ function createGameGrid(grid, grid_width, words, answers) {
             </p>
         </div>
 
+        <div id="testarea">
+        <input type="button"
+            onclick="highlightAnswer('test', [[2,3], [1, 1], [2, 1], [3, 2]]);"
+            value="test highlight">
+    </div>
         <div id="answers">
             <input type="checkbox" id="toggleAnswers"
                    onclick="toggle('answerBlock', 'toggleAnswers');"/>Show answers?
@@ -265,6 +313,8 @@ function createGameGrid(grid, grid_width, words, answers) {
             </div>
         </div>
     </div>
+
+</div>
 </div>
 </div>
 </div>
