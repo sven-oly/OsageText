@@ -52,8 +52,8 @@
 <script>
 
   function sendTestWords(resultArea, answerArea) {
-    var wordData = ['𐓏𐒻𐒷𐒻𐒷', '𐓀𐒰𐓓𐒻͘', '𐓏𐒰𐓓𐒰𐓓𐒷', '𐒻𐒷𐓏𐒻͘ ', '𐓈𐒻𐓍𐒷', '𐒹𐓂𐓏𐒷͘𐒼𐒻',
-           '𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', '𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐒼𐒰𐓆𐒻𐓈𐒰͘', '𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰'];
+    var wordData = ['𐓷𐓣𐓟𐓣𐓟', '𐓨𐓘𐓻𐓣͘', '𐓷𐓘𐓻𐓘𐓻𐓟', '𐓣𐓟𐓷𐓣͘ ', '𐓰𐓣𐓵𐓟', '𐓡𐓪𐓷𐓟͘𐓤𐓣',
+           '𐓯𐓰𐓪͘𐓬𐓘𐓬𐓟', '𐓘̄𐓵𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐓤𐓘𐓮𐓣𐓰𐓘͘', '𐓷𐓘𐓯𐓝𐓣͘𐓧𐓘'];
            //           '𐒻𐓏𐒻𐒼𐒻', '𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰'];
     return sendWords(wordData, resultArea, answerArea);
   }
@@ -116,12 +116,7 @@
 function createGameGrid(grid, grid_width, words, answers) {
     // Create table.
     var table = document.getElementById('gridTable');
-    var rows = table.getElementsByTagName("tr")
-
-    // Clear all rows first.
-    while (rows.length > 0) {
-      table.deleteRow(0);
-    }
+  clearTableRows('gridTable');
 
     // Insert New Row for table at index '0'.
 
@@ -143,11 +138,8 @@ function createGameGrid(grid, grid_width, words, answers) {
     wordArea.innerHTML = wordList;
 
     // Prepare answers region
+    clearChildNodes('answerList');
     var answerArea = document.getElementById('answerList');
-    // Remove old entries
-    while (answerArea.children.length > 0) {
-      answerArea.removeChild(answerArea.childNodes[0]);
-    }
 
     for (word in words) {
       var answer = answers[word];
@@ -165,12 +157,32 @@ function createGameGrid(grid, grid_width, words, answers) {
         }
        );
       li.appendChild(btn);
-      var ans_text = document.createTextNode(" : " + positions + answer[3]);
+      var ans_text = document.createTextNode(" : " + positions + ' (' + answer[3] + ')');
       li.appendChild(ans_text);
       answerArea.appendChild(li);
 
     }
-}
+  }
+
+  function clearTableRows(tableId) {
+    var table = document.getElementById(tableId);
+    var rows = table.getElementsByTagName("tr")
+
+    // Clear all rows first.
+    while (rows.length > 0) {
+      table.deleteRow(0);
+    }
+  }
+
+  function clearChildNodes(regionId) {
+    // Prepare answers region
+    var answerArea = document.getElementById(regionId);
+    // Remove old entries
+    while (answerArea.children.length > 0) {
+      answerArea.removeChild(answerArea.childNodes[0]);
+    }
+  }
+
 
   function clearArea(id) {
     var obj = document.getElementById(id);
@@ -188,9 +200,7 @@ function createGameGrid(grid, grid_width, words, answers) {
   }
 
   function highlightAnswer(word, answer) {
-    var grid_table = document.getElementById('gridTable');
-    var rows = grid_table.getElementsByTagName("tr");
-    var cells = rows[0].cells;
+    clearTableRows('gridTable');
 
     var this_answer = all_answers[word][0];
     // For each position in the answer, highlight the cell with a color.
@@ -236,7 +246,24 @@ function createGameGrid(grid, grid_width, words, answers) {
     }
   }
 
+  function onFontSelected(selected) {
+    var fontFam = selected.value + ", Arial, Osage";
+
+    var output_text = document.getElementById('wordlist');
+    output_text.style.fontFamily = fontFam;
+
+    var output_text = document.getElementById('wordList');
+    output_text.style.fontFamily = fontFam;
+
+    var output_text = document.getElementById('gridTable');
+    output_text.style.fontFamily = fontFam;
+
+    var output_text = document.getElementById('answers');
+    output_text.style.fontFamily = fontFam;
+ }
+
   function printPage() {
+    // Don't print keyboard
     var wasVisible = visible;
     if (controller) {
           controller.setVisible(false);
@@ -267,6 +294,12 @@ function createGameGrid(grid, grid_width, words, answers) {
     <div class="span-16">
 
         <div class="noprint" id="uiOnly">
+          Select font: <select onchange="onFontSelected(this);" id="selectFont">
+            {% for font in fontFamilies %}
+            <option value="{{font}}">{{font}}</option>
+            {% endfor %}
+          </select>
+
             Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
             <option value="osa">Osage Unicode</option>
             </select>
@@ -277,17 +310,19 @@ function createGameGrid(grid, grid_width, words, answers) {
                 {{language}} Words:<br />
                 <textarea id="wordlist"></textarea>
             </div>
-            <input type="button" value="Clear"
-                   onclick="clearArea('wordlist');">
-            <input type="button" value="Submit"
+            <input type="button" value="Clear words and solution"
+                   onclick="clearArea('wordlist');clearArea('wordList');clearChildNodes('answerList');clearTableRows('gridTable');">
+            <input type="button" value="Submit words from box above"
                    onclick="sendRegionWords('wordlist', 'Grid', 'Answers');">
-            <input type="button" value="Test"
+            <br />
+            <br />
+            <input type="button" value="Generate grid from sample words"
                    onclick="sendTestWords('Grid', 'Answers');">
         </div>
     </div>
 
     <div id="printGamearea">
-        <div id="divTable" class="break">
+        <div id="divTable">
             <table id="gridTable">
 
             </table>
@@ -300,10 +335,13 @@ function createGameGrid(grid, grid_width, words, answers) {
         </div>
 
         <div id="testarea">
+          <!--
         <input type="button"
             onclick="highlightAnswer('test', [[2,3], [1, 1], [2, 1], [3, 2]]);"
             value="test highlight">
+        -->
     </div>
+        <p style="page-break-before: always; border:none;">
         <div id="answers">
             <input type="checkbox" id="toggleAnswers"
                    onclick="toggle('answerBlock', 'toggleAnswers');"/>Show answers?

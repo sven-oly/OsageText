@@ -16,8 +16,10 @@ import sys
 # Should we done something with statistics?
 # Check for bad words?
 
-letters = u'𐒰𐒱𐒲𐒳𐒴𐒵𐒶𐒷𐒸𐒹𐒺𐒻𐒼𐒽𐒾𐒿𐓀𐓁𐓂𐓃𐓄𐓅𐓆𐓇𐓈𐓉𐓊𐓋𐓌𐓍𐓎𐓏𐓐𐓑𐓒𐓓'
-# letters = "qwertyuiopasdfghjklzxcvbnm"
+upper_letters = u'𐒰𐒱𐒲𐒳𐒴𐒵𐒶𐒷𐒸𐒹𐒺𐒻𐒼𐒽𐒾𐒿𐓀𐓁𐓂𐓃𐓄𐓅𐓆𐓇𐓈𐓉𐓊𐓋𐓌𐓍𐓎𐓏𐓐𐓑𐓒𐓓'
+lower_letters =u'𐓦𐓷𐓟𐓲𐓵𐓻𐓶𐓣𐓪𐓬𐓘𐓮𐓰𐓢𐓡𐓛𐓤𐓧𐓺𐓸𐓝𐓯𐓜𐓩𐓨𐓠𐓳𐓙𐓫𐓭𐓚𐓱𐓥𐓹𐓞'
+
+letters = lower_letters
 
 debug = False
 # Constants for word from the starting point
@@ -248,7 +250,7 @@ def insertWord(word, grid, invalid, is_wordsearch):
         raise(RuntimeError)
 
     start = [y, x, direction] #Saved in case of invalid placement
-    logging.info('Start = %s' % start)
+    # logging.info('Start = %s' % start)
     do_reverse = bool(randint(0,1))
     #Now attempt to insert each letter
     if do_reverse:
@@ -353,7 +355,7 @@ def generateWordsGrid(words):
     total_tokens = 0
 
     for word in words:
-        logging.info(word)
+        # logging.info(word)
         tokens = getTokens(word)
         total_tokens += len(tokens)
         if len(tokens) > max_xy:
@@ -373,7 +375,7 @@ def generateCrosswordsGrid():
 
 # Runs with a set grid
 def testGrid():
-    words = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
+    words = [u'𐓣𐓟𐓷𐓣͘', u' 𐓡𐓪𐓷𐓘͘𐓤', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
            u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
            u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
     max_xy = 0
@@ -399,7 +401,7 @@ def main(args):
   osageWords = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷',
                 u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬']
 
-  words = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
+  words = [u'𐓣𐓟𐓷𐓣͘', u' 𐓡𐓪𐓷𐓘͘𐓤', u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
            u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
            u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
 
