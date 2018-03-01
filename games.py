@@ -51,16 +51,16 @@ class WordSearchHandler(webapp2.RequestHandler):
 
 class GenerateWordSearchHandler(webapp2.RequestHandler):
   def get(self):
-    logging.info('games GenerateWordSearchHandler')
+    #logging.info('games GenerateWordSearchHandler')
     user_info = getUserInfo(self.request.url)
     user = users.get_current_user()
 
     rawWordList = self.request.get('words', '')
-    logging.info('games WordSearchHandler rawWordList = %s' % rawWordList)
+    # logging.info('games WordSearchHandler rawWordList = %s' % rawWordList)
 
 
     wordList = rawWordList.replace(",", " ").replace("\r", " ").replace("\t", " ").split()
-    logging.info('games WordSearchHandler wordList = %s' % wordList)
+    # logging.info('games WordSearchHandler wordList = %s' % wordList)
 
     grid, answers, words, grid_width = wordsearch.generateWordsGrid(wordList)
 
@@ -87,18 +87,36 @@ class GenerateWordSearchHandler(webapp2.RequestHandler):
     self.response.out.write(json.dumps(template_values))
 
 
+class CrosswordHandler(webapp2.RequestHandler):
+  def get(self):
+    logging.info('games CrosswordHandler')
+
+    user_info = getUserInfo(self.request.url)
+    user = users.get_current_user()
+
+    template_values = {
+      'user_nickname': user_info[1],
+      'user_logout': user_info[2],
+      'user_login_url': user_info[3],
+      'language': main.Language,
+      'fontFamilies': main.OsageFonts,
+    }
+    path = os.path.join(os.path.dirname(__file__), 'crossword.html')
+    self.response.out.write(template.render(path, template_values))
+
+
 class GenerateCrosswordHandler(webapp2.RequestHandler):
   def get(self):
-    logging.info('games GenerateWordSearchHandler')
+    logging.info('games CrossWordHandler')
     user_info = getUserInfo(self.request.url)
     user = users.get_current_user()
 
     rawWordList = self.request.get('words', '')
-    logging.info('games WordSearchHandler rawWordList = %s' % rawWordList)
-
+    logging.info('games CrossWordHandler rawWordList = %s' % rawWordList)
 
     wordList = rawWordList.replace(",", " ").replace("\r", " ").replace("\t", " ").split()
-    logging.info('games WordSearchHandler wordList = %s' % wordList)
+    logging.info('games CrossWordHandler wordList = %s' % wordList)
+    logging.info('games CrossWordHandler CALLING')
 
     grid, answers, words, grid_width = wordsearch.generateCrosswordsGrid(wordList)
 
@@ -107,15 +125,16 @@ class GenerateCrosswordHandler(webapp2.RequestHandler):
     else:
       message = 'Created a grid of size %s' % grid_width
 
-    #logging.info('games WordSearchHandler grid = %s' % grid)
-    #logging.info('games WordSearchHandler answers = %s' % answers)
-    #logging.info('games WordSearchHandler words = %s' % words)
+    logging.info('games WordSearchHandler grid = %s' % grid)
+    logging.info('games WordSearchHandler answers = %s' % answers)
+    logging.info('games WordSearchHandler words = %s' % words)
 
     template_values = {
       'user_nickname': user_info[1],
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
       'language': main.Language,
+      'fontFamilies': main.OsageFonts,
       'grid': grid,
       'answers': answers,
       'words': words,
@@ -124,30 +143,14 @@ class GenerateCrosswordHandler(webapp2.RequestHandler):
     self.response.out.write(json.dumps(template_values))
 
 
-class CrossWordHandler(webapp2.RequestHandler):
-  def get(self):
-    logging.info('games CrossWordHandler')
-    words = ['test', 'game', 'osage', 'free']
-    grid = None
-    clues = ['exam', 'something to play', 'tribe from Pawhuska', 'without cost']
-    template_values = {
-      'words': words,
-      'grid': grid,
-      'clues': clues,
-      'language': main.Language,
-      'fontFamilies': main.OsageFonts,
-    }
-    path = os.path.join(os.path.dirname(__file__), 'crossword.html')
-    self.response.out.write(template.render(path, template_values))
-
 class TestHandler(webapp2.RequestHandler):
   def get(self):
     logging.info('games TestHandler')
 
 app = webapp2.WSGIApplication([
     ('/games/wordsearch/', WordSearchHandler),
-    ('/games/crossword/', CrossWordHandler),
+    ('/games/crossword/', CrosswordHandler),
     ('/games/generatewordsearch/', GenerateWordSearchHandler),
-    ('/games/generatecrossword/', GenerateCrosswordHandler),
+    ('/games/generatecrossword', GenerateCrosswordHandler),
     ('/games/test/', TestHandler),
 ], debug=True)

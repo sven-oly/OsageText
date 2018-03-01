@@ -365,11 +365,22 @@ def generateWordsGrid(words):
     return grid, answers, words, max_xy + 1
 
 
-def generateCrosswordsGrid():
+def generateCrosswordsGrid(words):
     # Make a grid with no reversals, no diagonals
 
     # Don't fill in the empty spaces
+    max_xy = 0
+    total_tokens = 0
 
+    for word in words:
+        # logging.info(word)
+        tokens = getTokens(word)
+        total_tokens += len(tokens)
+        if len(tokens) > max_xy:
+            max_xy = len(tokens)
+    logging.info('generateCrosswordsGrid max size = %s ' % (max_xy))
+    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], False)
+    return grid, answers, words, max_xy + 1
     return
 
 
@@ -391,7 +402,7 @@ def testGrid():
             longest_word = word
             max_xy = len(tokens)
     #logging.info('max size = %s, %s ' % (max_xy, longest_word))
-    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1])
+    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], False)
     return grid, answers, words, max_xy + 1
 
 
