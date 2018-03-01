@@ -94,7 +94,7 @@ class WordSearch():
 
 #### THE OLD IMPLEMENTATION.
 
-def makeGrid(words, size=[10,10], attempts=10):
+def makeGrid(words, size=[10,10], attempts=10, is_wordsearch = True):
     '''Run attemptGrid trying attempts number of times.
 
     Size contains the height and width of the board.
@@ -102,14 +102,14 @@ def makeGrid(words, size=[10,10], attempts=10):
 
     for _ in range(attempts):
         try:
-            return attemptGrid(words, size)
+            return attemptGrid(words, size, is_wordsearch)
         except RuntimeError as e:
             pass
     else:
         print "ERROR - Couldn't create valid board"
         return None, None
 
-def attemptGrid(words, size):
+def attemptGrid(words, size, is_wordsearch=True):
     '''Attempt a grid of letters to be a wordsearch
 
     Size contains the height and width of the board.
@@ -137,7 +137,7 @@ def attemptGrid(words, size):
     #Insert answers and store their locations
     answers = {}
     for word in words:
-        grid, answer, reversed = insertWord(word,grid)
+        grid, answer, reversed = insertWord(word, grid, None, is_wordsearch)
         if answer[0][0] == answer[-1][0]:
             #logging.info('A ROW')
             direction = 'ROW'
@@ -154,17 +154,23 @@ def attemptGrid(words, size):
 
         answers[word] = [answer, reversed, word, direction]
 
-    #Add other characters to fill the empty space
-    fillTokens = getTokens(letters)
-    numTokens = len(fillTokens)
-    for i,j in itertools.product(range(size[1]), range(size[0])):
-        if grid[i][j] == ' ':
-            grid[i][j] = fillTokens[randint(0, numTokens-1)]
+    #Add other characters to fill the empty space, if needed.
+    if is_wordsearch:
+        fillEmptyGridSlots(letters, grid, size)
 
     return grid, answers
 
 
-def insertWord(word, grid, invalid=None):
+def fillEmptyGridSlots(letters, grid, size):
+    # Add other characters to fill the empty space
+    fillTokens = getTokens(letters)
+    numTokens = len(fillTokens)
+    for i, j in itertools.product(range(size[1]), range(size[0])):
+        if grid[i][j] == ' ':
+            grid[i][j] = fillTokens[randint(0, numTokens - 1)]
+
+
+def insertWord(word, grid, invalid, is_wordsearch):
     '''Insert a word into the letter grid
 
     'word' will be inserted into the 2D list grid.
@@ -261,7 +267,7 @@ def insertWord(word, grid, invalid=None):
         # But for now, just quit.
 
         invalid.append(start)
-        return insertWord(word, grid, invalid)
+        return insertWord(word, grid, invalid, is_wordsearch)
 
 
 
@@ -355,6 +361,14 @@ def generateWordsGrid(words):
     #logging.info('max size = %s ' % (max_xy))
     grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1])
     return grid, answers, words, max_xy + 1
+
+
+def generateCrosswordsGrid():
+    # Make a grid with no reversals, no diagonals
+
+    # Don't fill in the empty spaces
+
+    return
 
 
 # Runs with a set grid
