@@ -71,6 +71,8 @@ class GetWordsHandler(webapp2.RequestHandler):
     direction = int(self.request.get('direction', '0'))
     dbName = self.request.get('dbName', '')
     databases = self.request.GET.getall('databases')
+    soundFemaleLink = ''
+    soundMaleLink = ''
 
     phraseKey = self.request.get('phraseKey', None)
     logging.info('phraseKey = %s' % phraseKey)
@@ -142,9 +144,18 @@ class GetWordsHandler(webapp2.RequestHandler):
       oldtext = utext = english = status = ''
       comment = ''
 
+    try:
+      soundFemaleLink = result.soundFemaleLink
+    except:
+      soundFemaleLink = ''
+
+    try:
+      soundMaleLink = result.soundMaleLink
+    except:
+      soundMaleLink = ''
     # logging.info('PHRASE KEY = %s ' % phraseKey)
-    logging.info('soundMaleLink: %s' % result.soundMaleLink)
-    logging.info('soundFemaleLink: %s' % result.soundFemaleLink)
+    #logging.info('soundMaleLink: %s' % result.soundMaleLink)
+    #logging.info('soundFemaleLink: %s' % result.soundFemaleLink)
 
     obj = {
         'language': main.Language,
@@ -162,8 +173,8 @@ class GetWordsHandler(webapp2.RequestHandler):
         'user_nickname': user_info[1],
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
-        'soundMaleLink': result.soundMaleLink,
-        'soundFemaleLink': result.soundFemaleLink,
+        'soundMaleLink': soundMaleLink,
+        'soundFemaleLink': soundFemaleLink,
     }
     self.response.out.write(json.dumps(obj))
 
