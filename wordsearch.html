@@ -116,7 +116,7 @@
 function createGameGrid(grid, grid_width, words, answers) {
     // Create table.
     var table = document.getElementById('gridTable');
-  clearTableRows('gridTable');
+    clearTableRows('gridTable');
 
     // Insert New Row for table at index '0'.
 
@@ -141,21 +141,24 @@ function createGameGrid(grid, grid_width, words, answers) {
     clearChildNodes('answerList');
     var answerArea = document.getElementById('answerList');
 
-    for (word in words) {
+    for (var word in words) {
       var answer = answers[word];
       var positions = answer[0].concat();
       var li = document.createElement("li");
       var btn = document.createElement("button");
       var t = document.createTextNode(word);
       var this_word = word;
+      var this_upper = word.toLocaleUpperCase('osa-osge');
       btn.append(t);
+      //btn.onclick = function () {
+      //  alert(word);
+      //}
       btn.addEventListener ("click",
         function() {
-          var w = this_word;
-          var p = positions;
-          return function() { return highlightAnswer(w, p); } // The positions.
+          return highlightAnswer(word, positions); // The positions.
         }
-       );
+      );
+
       li.appendChild(btn);
       var ans_text = document.createTextNode(" : " + positions + ' (' + answer[3] + ')');
       li.appendChild(ans_text);
@@ -200,7 +203,9 @@ function createGameGrid(grid, grid_width, words, answers) {
   }
 
   function highlightAnswer(word, answer) {
-    clearTableRows('gridTable');
+    // Clear the highlighing of 'gridTable';
+    var table = document.getElementById('gridTable');
+    var rows = table.getElementsByTagName("tr")
 
     var this_answer = all_answers[word][0];
     // For each position in the answer, highlight the cell with a color.
@@ -209,8 +214,8 @@ function createGameGrid(grid, grid_width, words, answers) {
       pos = answer[i];
       var x = pos[0];
       var y = pos[1];
-      var row = rows[y];
-      var col = row.cells[x];
+      var row = rows[x];
+      var col = row.cells[y];
       col.style.backgroundColor = "yellow";
     }
   }
