@@ -107,7 +107,7 @@ class CrosswordHandler(webapp2.RequestHandler):
 
 class GenerateCrosswordHandler(webapp2.RequestHandler):
   def get(self):
-    logging.info('games CrossWordHandler')
+    logging.info('games GenerateCrosswordHandler')
     user_info = getUserInfo(self.request.url)
     user = users.get_current_user()
 
@@ -151,6 +151,6 @@ app = webapp2.WSGIApplication([
     ('/games/wordsearch/', WordSearchHandler),
     ('/games/crossword/', CrosswordHandler),
     ('/games/generatewordsearch/', GenerateWordSearchHandler),
-    ('/games/generatecrossword', GenerateCrosswordHandler),
+    ('/games/generatecrossword/', GenerateCrosswordHandler),
     ('/games/test/', TestHandler),
 ], debug=True)
