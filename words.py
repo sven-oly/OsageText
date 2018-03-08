@@ -153,14 +153,14 @@ class GetWordsHandler(webapp2.RequestHandler):
       soundMaleLink = result.soundMaleLink
     except:
       soundMaleLink = ''
-    logging.info('PHRASE KEY = %s ' % phraseKey)
+    #logging.info('PHRASE KEY = %s ' % phraseKey)
     #logging.info('soundMaleLink: %s' % result.soundMaleLink)
     #logging.info('soundFemaleLink: %s' % result.soundFemaleLink)
 
     obj = {
         'language': main.Language,
         'dbNames': dbNames,
-        'entry': result,  # All the data in one place
+        # 'entry': result,  # All the data in one place
         'index': index,
         'dbName': dbName,
         'phraseKey': phraseKey,
