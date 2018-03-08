@@ -186,7 +186,7 @@ function createGameGrid(grid, grid_width, words, answers) {
     }
 
     // Set all the background to gray.
-    // Then highlight each answer, with bold on the first letter.
+    // Then highlight each answer, with color on the first letter.
     for (var answer in all_answers) {
       // Get each cell and highlight.
       var cells = all_answers[answer][0];
@@ -195,15 +195,43 @@ function createGameGrid(grid, grid_width, words, answers) {
         rowcol = row1.cells[cells[i][1]];
         rowcol.bgColor = "white";
         if (i == 0) {
-          rowcol.style.fontWeight = "bold";
+          rowcol.bgColor = "yellow";
         }
 
       }
     }
-
-
-
+      drawLines(all_answers);
   }
+
+  function drawLines(answers) {
+    var grid = whole_grid;
+    var canvas = document.getElementById('myCanvas');
+    var ctx = canvas.getContext("2d");
+    ctx.font = "30px Pawhuska";
+    var xfactor = 50; xoff = 25;
+    var yfactor = 50; yoff = 25;
+    for (var answer in all_answers) {
+      // Get each cell and highlight.
+      var cells = all_answers[answer][0];
+      var word = all_answers[answer][2];
+      var last = cells.length - 1;
+      var y = cells[0][0] * xfactor;
+      var x = cells[0][1] * yfactor;
+      ctx.moveTo(cells[last][1] * xfactor + xoff, cells[last][0] * yfactor+yoff);
+      ctx.lineTo(x + xoff,y+yoff);
+      ctx.stroke();
+
+      word = all_words[answer];
+      for (var i = 0; i < cells.length; i++) {
+        var text = grid[cells[i][1], cells[i][0]];
+        var y = cells[i][0] * xfactor;
+        var x = cells[i][1] * yfactor;
+        ctx.fillText(text[i], x + xoff, y+yoff);
+      }
+    }
+  }
+
+
   function clearTableRows(tableId) {
     var table = document.getElementById(tableId);
     var rows = table.getElementsByTagName("tr")
@@ -395,6 +423,8 @@ function createGameGrid(grid, grid_width, words, answers) {
                 </ul>
             </div>
         </div>
+        <canvas id="myCanvas" width="800" height="800"></canvas>
+
     </div>
 
 </div>
