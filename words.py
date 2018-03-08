@@ -181,6 +181,9 @@ class GetWordsHandler(webapp2.RequestHandler):
 # Show data from word list converted for human verification
 class WordHandler(webapp2.RequestHandler):
     def get(self):
+      # Test
+      user_agent =str(self.request.headers['User-Agent'])
+
       user_info = getUserInfo(self.request.url)
       fontList = []
       index = 1
@@ -257,6 +260,7 @@ class WordHandler(webapp2.RequestHandler):
         'soundFemaleLink': soundFemaleLink,
         'soundMaleLink': soundMaleLink,
         'showSounds': True,
+        'user_agent': user_agent,
       }
       # logging.info('WORDS = %s' % template_values)
       path = os.path.join(os.path.dirname(__file__), 'words.html')

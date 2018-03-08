@@ -21,7 +21,8 @@ lower_letters =u'𐓦𐓷𐓟𐓲𐓵𐓻𐓶𐓣𐓪𐓬𐓘𐓮𐓰𐓢𐓡�
 
 letters = lower_letters
 
-debug = False
+debug = True
+
 # Constants for word from the starting point
 RIGHT, DOWN, DOWNRIGHT, UPRIGHT = 0, 1, 2, 3
 RIGHT_OFFSET, DOWN_OFFSET, DOWNRIGHT_OFFSET, UPRIGHT_OFFSET = (
@@ -101,15 +102,20 @@ def makeGrid(words, size=[10,10], attempts=10, is_wordsearch = True):
 
     Size contains the height and width of the board.
     Word is a list of words it should contain.'''
+    logging.info('makeGrid: size = %s, is_wordsearch = %s' %
+                 (size, is_wordsearch))
 
-    for _ in range(attempts):
+    tokenList = [getTokens(x) for x in words].sort(key=len, reverse=True)
+    for attempt in range(attempts):
+        if debug:
+            logging.info('makeGrid: try = %s' % (attempt))
         try:
             return attemptGrid(words, size, is_wordsearch)
         except RuntimeError as e:
+            logging.error('AttemptGrid error %s' % e)
             pass
-    else:
-        print "ERROR - Couldn't create valid board"
-        return None, None
+    logging.info("ERROR - Couldn't create valid board")
+    return None, None
 
 def attemptGrid(words, size, is_wordsearch=True):
     '''Attempt a grid of letters to be a wordsearch
@@ -119,14 +125,14 @@ def attemptGrid(words, size, is_wordsearch=True):
     Returns the 2D list grid and a dictionary of the words as keys and
     lists of their co-ordinates as values.'''
 
-    # Convert all the words to tokens first.
-    tokenList = [getTokens(x) for x in words]
-    tokens = ''
-    if debug:
-      for tokens in tokenList:
-        print 'Tokens: %s' % tokens
+    # logging.info('tokenList = %s', tokenList)
 
     #Make sure that the board is bigger than even the biggest set of tokens
+    tokenList = []
+    for w in words:
+      tokenList.append(getTokens(w))
+    logging.info('tokenList = %s', tokenList)
+
     sizeCap = (size[0] if size[0] >= size[1] else size[1])
     sizeCap -= 1
     if any(len(tokens) > sizeCap for tokens in tokenList):
@@ -139,6 +145,7 @@ def attemptGrid(words, size, is_wordsearch=True):
     #Insert answers and store their locations
     answers = {}
     for word in words:
+
         grid, answer, reversed = insertWord(word, grid, None, is_wordsearch)
         if answer[0][0] == answer[-1][0]:
             #logging.info('A ROW')
@@ -180,10 +187,17 @@ def insertWord(word, grid, invalid, is_wordsearch):
     These coordinates are denote starting points that don't work.
     Returns an updated grid as well as a list of the added word's indices.'''
 
+    if debug:
+      logging.info('insert word %s')
     height, width = len(grid), len(grid[0])
     # TODO: Use the number of combined characters, not just length.
     tokens = getTokens(word)
     length = len(tokens)
+
+    if is_wordsearch:
+      max_dir = 3
+    else:
+      max_dir = 1  # For crossword
 
     #Detect whether the word can fit horizontally or vertically.
     hori = width >= length + 1
@@ -191,7 +205,7 @@ def insertWord(word, grid, invalid, is_wordsearch):
     diag = False
     if hori and vert:
         #If both can be true, flip a coin to decide which it will be
-        rint = randint(0, 3)
+        rint = randint(0, max_dir)
         hori = vert = diag = False
         if rint == 0:
             hori = True
@@ -251,7 +265,11 @@ def insertWord(word, grid, invalid, is_wordsearch):
 
     start = [y, x, direction] #Saved in case of invalid placement
     # logging.info('Start = %s' % start)
-    do_reverse = bool(randint(0,1))
+    if is_wordsearch:
+      do_reverse = bool(randint(0,1))
+    else:
+      do_reverse = False  # Not for crossword
+
     #Now attempt to insert each letter
     if do_reverse:
         tokens.reverse()
@@ -361,7 +379,7 @@ def generateWordsGrid(words):
         if len(tokens) > max_xy:
             max_xy = len(tokens)
     #logging.info('max size = %s ' % (max_xy))
-    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1])
+    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], 10, True)
     return grid, answers, words, max_xy + 1
 
 
@@ -379,7 +397,7 @@ def generateCrosswordsGrid(words):
         if len(tokens) > max_xy:
             max_xy = len(tokens)
     logging.info('generateCrosswordsGrid max size = %s ' % (max_xy))
-    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], False)
+    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], 10, False)
     return grid, answers, words, max_xy + 1
     return
 
@@ -402,7 +420,7 @@ def testGrid():
             longest_word = word
             max_xy = len(tokens)
     #logging.info('max size = %s, %s ' % (max_xy, longest_word))
-    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], False)
+    grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], 10, False)
     return grid, answers, words, max_xy + 1
 
 
@@ -420,7 +438,7 @@ def main(args):
   Oldwords = [u"𐒰̄𐓂͘𐒴𐓎̄͘𐓒", u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', "python", "itertools", "wordsearch","code","review","functions",
               "dimensional", "dictionary", "lacklustre", 'google', 'unicode', u'𐓏𐒻𐒷𐒻𐒷']
 
-  grid, answers = makeGrid(words, [11,11])
+  grid, answers = makeGrid(words, [11,11], 10, False)  # Try with a crossword
   printGrid(grid)
   printAnswers(answers)
 

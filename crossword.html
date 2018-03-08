@@ -94,7 +94,6 @@
 	  if(xmlhttp.readyState==4) {
         // Handle results
         var returned_json = xmlhttp.responseText;
-        alert('Bad returned_json' + returned_json);
 
         var json_obj = JSON.parse(returned_json);
         if (json_obj == null) {
@@ -143,11 +142,13 @@ function createGameGrid(grid, grid_width, words, answers) {
       for (var col = 0; col < grid_width; col ++) {
         var row1col1 = row1.insertCell(col);
         if (grid[row][col] == ' ') {
-          rowcol1.style.background = "#000000;"
+          row1col1.bgColor = "black"
         } else {
-          rowcol1.style.background = "#ffffff;"
+          row1col1.bgColor = "white"
         }
         row1col1.innerHTML = "\u00a0" + grid[row][col] + "\u00a0";
+
+        row1col1.getBoundingClientRect();  // Just for test
       }
     }
 
