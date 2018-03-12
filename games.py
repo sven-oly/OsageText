@@ -15,8 +15,10 @@ import userDB
 import json
 import logging
 import os
+import sys
 import urllib
 import webapp2
+
 
 from google.appengine.api import users
 from google.appengine.ext.webapp import template
@@ -44,6 +46,7 @@ class WordSearchHandler(webapp2.RequestHandler):
       'user_login_url': user_info[3],
       'language': main.Language,
       'fontFamilies': main.OsageFonts,
+      'maxunicode': sys.maxunicode,
     }
     path = os.path.join(os.path.dirname(__file__), 'wordsearch.html')
     self.response.out.write(template.render(path, template_values))
@@ -83,6 +86,7 @@ class GenerateWordSearchHandler(webapp2.RequestHandler):
       'answers': answers,
       'words': words,
       'grid_width': grid_width,
+      'maxunicode': sys.maxunicode,
     }
     self.response.out.write(json.dumps(template_values))
 
@@ -139,6 +143,7 @@ class GenerateCrosswordHandler(webapp2.RequestHandler):
       'answers': answers,
       'words': words,
       'grid_width': grid_width,
+      'maxunicode': sys.maxunicode,
     }
     self.response.out.write(json.dumps(template_values))
 
