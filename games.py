@@ -9,7 +9,6 @@ import wordsearch
 
 from userDB import getUserInfo
 
-import blobstorage
 import userDB
 
 import json
@@ -18,7 +17,6 @@ import os
 import sys
 import urllib
 import webapp2
-
 
 from google.appengine.api import users
 from google.appengine.ext.webapp import template
