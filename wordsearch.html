@@ -178,7 +178,7 @@ function createGameGrid(grid, grid_width, words, answers) {
         var table = document.getElementById(tableId);
         var rows = table.getElementsByTagName("tr")
         var grid = whole_grid;
-        var grid_width = whole_grid.length;
+        var grid_width = grid_width;
         var answer = all_answers;
 
         for (var row = 0; row < grid_width; row ++) {
@@ -212,7 +212,7 @@ function createGameGrid(grid, grid_width, words, answers) {
 
   function drawLines(answers) {
     var grid = whole_grid;
-    var grid_size = grid.length;
+    var grid_size = grid_width;
 
     var canvas = document.getElementById('myCanvas');
     var ctx = canvas.getContext("2d");
@@ -350,8 +350,17 @@ function createGameGrid(grid, grid_width, words, answers) {
       controller.addEventListener('kc', function() { visible = false; });
       input.focus();
       var selector = document.getElementById('selectKeyboard');
-      onLayoutSelected(selector, controller, textAreaID);
-  }
+      onLayoutSelected(selector, null, textAreaID);
+
+      var selector = document.getElementById('selectFont');
+      onFontSelected(selector, 't1');
+
+      var kbd = document.getElementById(textAreaID);
+      if (kbd) {
+        kbd.style.fontFamily = 'Noto Sans Osage';
+        visible = true;
+      }
+    }
 
   function onLayoutSelected(selector, this_controller, outputId) {
     var layoutCode = selector.value;
@@ -375,7 +384,7 @@ function createGameGrid(grid, grid_width, words, answers) {
     var output_text = document.getElementById('wordlist');
     output_text.style.fontFamily = fontFam;
 
-    var output_text = document.getElementById('wordList');
+    var output_text = document.getElementById('wordsToFind');
     output_text.style.fontFamily = fontFam;
 
     var output_text = document.getElementById('gridTable');
@@ -424,7 +433,7 @@ function createGameGrid(grid, grid_width, words, answers) {
           </select>
 
             Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools');" id="selectKeyboard">
-            <option value="osa">Osage Unicode</option>
+            <option value="osa">{{language}} Unicode</option>
             </select>
                         <input type='button' value='Toggle keyboard'
                 onClick="toggleKeyboard(); return false;" />

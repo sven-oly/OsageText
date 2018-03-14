@@ -39,6 +39,8 @@ class WordSearchHandler(webapp2.RequestHandler):
     #logging.info('games WordSearchHandler grid = %s' % grid)
     #logging.info('games WordSearchHandler answers = %s' % answers)
     #logging.info('games WordSearchHandler words = %s' % words)
+    wordData = ['𐓷𐓣𐓟𐓣𐓟', '𐓨𐓘𐓻𐓣͘', '𐓷𐓘𐓻𐓘𐓻𐓟', '𐓣𐓟𐓷𐓣͘ ', '𐓰𐓣𐓵𐓟', '𐓡𐓪𐓷𐓟͘𐓤𐓣',
+           '𐓯𐓰𐓪͘𐓬𐓘𐓬𐓟', '𐓘̄𐓵𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐓤𐓘𐓮𐓣𐓰𐓘͘', '𐓷𐓘𐓯𐓝𐓣͘𐓧𐓘'];
 
     template_values = {
       'user_nickname': user_info[1],
@@ -46,6 +48,7 @@ class WordSearchHandler(webapp2.RequestHandler):
       'user_login_url': user_info[3],
       'language': main.Language,
       'fontFamilies': main.OsageFonts,
+      'wordTestData': wordData,
       'maxunicode': sys.maxunicode,
     }
     path = os.path.join(os.path.dirname(__file__), 'wordsearch.html')
