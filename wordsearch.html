@@ -148,7 +148,8 @@ function createGameGrid(grid, grid_width, words, answers) {
       var btn = document.createElement("button");
       var t = document.createTextNode(word);
       var this_word = word;
-      var this_upper = word.toLocaleUpperCase('osa-osge');
+      // Test smarter casing.
+      var this_lower = word.toLocaleLowerCase('osa-osge');
       btn.append(t);
       btn.onclick = onAnswerClickEvent;
 
@@ -462,11 +463,10 @@ function createGameGrid(grid, grid_width, words, answers) {
         <div>
             <h2>Words to find:</h2>
             <p id="wordsToFind">
-
             </p>
         </div>
-
     </div>
+
     <p style="page-break-before: always; border:none;"> </p>
     <input type="checkbox" id="toggleAnswers"
                    onclick="toggle('answers', 'toggleAnswers');"/>Show answers?

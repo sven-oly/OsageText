@@ -17,7 +17,7 @@ lower_letters = u'𐓦𐓷𐓟𐓲𐓵𐓻𐓶𐓣𐓪𐓬𐓘𐓮𐓰𐓢𐓡�
 
 letters = lower_letters
 
-debug = True
+debug = False
 
 # Constants for word from the starting point
 RIGHT, DOWN, DOWNRIGHT, UPRIGHT = 0, 1, 2, 3
@@ -104,8 +104,9 @@ def makeGrid(words, size=[10, 10], attempts=10, is_wordsearch=True):
 
     Size contains the height and width of the board.
     Word is a list of words it should contain.'''
-  logging.info('makeGrid: size = %s, is_wordsearch = %s' %
-               (size, is_wordsearch))
+  if debug:
+    logging.info('makeGrid: size = %s, is_wordsearch = %s' %
+                 (size, is_wordsearch))
 
   tokenList = [getTokens(x) for x in words].sort(key=len, reverse=True)
   for attempt in range(attempts):
@@ -134,7 +135,8 @@ def attemptGrid(words, size, is_wordsearch=True):
   tokenList = []
   for w in words:
     tokenList.append(getTokens(w))
-  logging.info('tokenList = %s', tokenList)
+  if debug:
+    logging.info('tokenList = %s', tokenList)
 
   sizeCap = (size[0] if size[0] >= size[1] else size[1])
   sizeCap -= 1
@@ -150,14 +152,11 @@ def attemptGrid(words, size, is_wordsearch=True):
 
     grid, answer, reversed = insertWord(word, grid, None, is_wordsearch)
     if answer[0][0] == answer[-1][0]:
-      # logging.info('A ROW')
-      direction = 'ROW'
+      direction = 'row'
     elif answer[0][1] == answer[-1][1]:
-      # logging.info('A COLUMN')
-      direction = 'COLUMN'
+      direction = 'column'
     else:
-      direction = 'DIAGONAL'
-      # logging.info('A DIAGONAL')
+      direction = 'diagonal'
 
     if reversed:
       # Put the coordinates in the right order
@@ -190,7 +189,7 @@ def insertWord(word, grid, invalid, is_wordsearch):
     Returns an updated grid as well as a list of the added word's indices.'''
 
   if debug:
-    logging.info('insert word %s')
+    logging.info('insert word %s' % word)
   height, width = len(grid), len(grid[0])
   # TODO: Use the number of combined characters, not just length.
   tokens = getTokens(word)
@@ -218,11 +217,9 @@ def insertWord(word, grid, invalid, is_wordsearch):
     elif rint == 2:
       diag = True
       direction = 'dd'
-      # print 'TRY DIAGONAL Down'
     else:
       diag = True
       direction = 'du'
-      # print 'TRY DIAGONAL up'
 
   line = []  # For storing the letters' locations
   if invalid is None:
