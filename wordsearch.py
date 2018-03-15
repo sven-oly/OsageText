@@ -17,7 +17,7 @@ lower_letters = u'𐓦𐓷𐓟𐓲𐓵𐓻𐓶𐓣𐓪𐓬𐓘𐓮𐓰𐓢𐓡�
 
 letters = lower_letters
 
-debug = False
+debug = True
 
 # Constants for word from the starting point
 RIGHT, DOWN, DOWNRIGHT, UPRIGHT = 0, 1, 2, 3
@@ -256,8 +256,16 @@ def insertWord(word, grid, invalid, is_wordsearch):
       x = randint(0, width - 1 - length)
       y = randint(length - 1, height - 1)
 
+    if not is_wordsearch:
+      # Make sure x and y are even values, so the grid is more open
+      if x % 2:
+        x -= 1
+      if y %2:
+        y -= 1
+
     if [y, x, direction] not in invalid:
       break
+
   else:
     # Probably painted into a corner, raise an error to retry.
     raise (RuntimeError)
@@ -393,6 +401,8 @@ def generateCrosswordsGrid(words):
     total_tokens += len(tokens)
     if len(tokens) > max_xy:
       max_xy = len(tokens)
+  # Updated max_xy since it will be an open grid.
+  max_xy = int(1.5 * max_xy)
   logging.info('generateCrosswordsGrid max size = %s ' % (max_xy))
   grid, answers = makeGrid(words, [max_xy + 1, max_xy + 1], 10, False)
   return grid, answers, words, max_xy + 1
