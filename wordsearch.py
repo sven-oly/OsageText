@@ -57,7 +57,7 @@ class WordSearch():
     self.current_level = 0
     self.all_directions = ['r', 'd', 'dr', 'ur']
     self.level_answer = []  # Levels with tentative inserts
-    self.fill_tokens = []  # The tokens for the language
+    self.fill_tokens = letters  # The tokens for the language
     self.solution_list = []  # For storing multiple results
     self.optimize_flag = False  # Set if the "best" one is desired
     self.total_tests = 0  # How many testWordInsert calls made
@@ -90,6 +90,10 @@ class WordSearch():
 
   def finishGrid(self):
     # Fills in the blank spaces as needed
+    numTokens = len(self.fill_tokens)
+    for i, j in itertools.product(range(self.width), range(height)):
+      if self.grid[i][j] == ' ':
+        self.grid[i][j] = self.fill_tokens[randint(0, numTokens - 1)]
     return
 
   def deliverHints(self):
