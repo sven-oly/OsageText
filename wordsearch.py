@@ -97,8 +97,6 @@ class WordSearch():
       # TODO: evaluate the results
       pass
 
-    return result
-
   def setFillLetters(self, fill_letters):
     self.fill_tokens = fill_letters
 
@@ -572,7 +570,7 @@ def testNewWordSearch(words):
   print '%s words = %s' % (len(ws.token_list), [len(x) for x in ws.token_list])
   print 'max tokens = %s' % ws.size
   print 'grid = %s' % ws.grid
-
+  print '%s solutions found' % len(ws.solutions_list)
 
 def main(args):
   # The Osage works, with diacritics
