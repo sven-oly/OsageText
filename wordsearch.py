@@ -5,6 +5,7 @@
 #   https://codereview.stackexchange.com/questions/98247/wordsearch-generator
 import itertools
 import logging
+import random
 import sys
 from random import randint
 
@@ -20,33 +21,46 @@ letters = lower_letters
 debug = True
 
 # Constants for word from the starting point
-RIGHT, DOWN, DOWNRIGHT, UPRIGHT = 0, 1, 2, 3
-RIGHT_OFFSET, DOWN_OFFSET, DOWNRIGHT_OFFSET, UPRIGHT_OFFSET = (
-  [0, 1], [1, 0], [1, 1], [1, -1]
-)
+RIGHT, DOWN, DOWNRIGHT, UPRIGHT, LEFT, UP, UPLEFT, DOWNLEFT = 0, 1, 2, 3, 4, 5, 6, 7
+DIRECTIONS = [RIGHT, DOWN, DOWNRIGHT, UPRIGHT, LEFT, UP, UPLEFT, DOWNLEFT]
+DIR_OFFSETS = {
+  RIGHT: [0,1],
+  DOWN: [1, 0],
+  DOWNRIGHT:[1, 1],
+  UPRIGHT:[1, -1],
+  LEFT: [0, -1],
+  UP: [-1, 0],
+  UPLEFT: [-1, -1],
+  DOWNLEFT: [1, -1],
+}
 
 
 #### THE NEW IMPLEMENTATION.
 class Position():
-  def __init__(self):
+  def __init__(self, x=0, y=0, dir=RIGHT):
     self.tokens = []
-    self.x = 0
-    self.y = 0
+    self.x = x
+    self.y = y
     self.positions = []  # The grid locations for all
-    self.direction = ''  # right, down, down right, up right
-    self.reversed = None  # Are the tokens in inverse order?
+    self.direction = dir
+    self.reversed = dir > UPRIGHT # Are the tokens in inverse order?
     self.clue = None  # For crossword, show this
 
-    self.directions = [RIGHT, DOWN, DOWNRIGHT, UPRIGHT]
-
-  def genPositions(self):
+  def genPositions(self, length):
     # Creates the positions from the start, size, direction, reverse
+    offset = DIR_OFFSETS[self.direction]
+    self.positions = [(self.x, self.y)]
+    for i in range(1, length):
+      self.positions.append((self.positions[i-1][0] + offset[0],
+                             self.positions[i-1][1] + offset[1]))
     return
 
 
 class WordSearch():
-  def __init__(self):
+  def __init__(self, words=None):
     self.grid = None
+    self.words = words  # The original inputs
+    self.token_list = None  # The tokenized word lists.
     self.do_diagonal = True
     self.do_reverse = True
     self.size = 0
@@ -55,31 +69,124 @@ class WordSearch():
     self.wordlist = None
     self.answers = None
     self.current_level = 0
+    self.max_level = 0
+    self.current_solution = []  # List of the positions for the tokens in order.
+    self.solutions_list = []
+
     self.all_directions = ['r', 'd', 'dr', 'ur']
     self.level_answer = []  # Levels with tentative inserts
-    self.fill_tokens = []  # The tokens for the language
+    self.fill_tokens = letters  # The tokens for the language
     self.solution_list = []  # For storing multiple results
     self.optimize_flag = False  # Set if the "best" one is desired
     self.total_tests = 0  # How many testWordInsert calls made
+
+    if self.words:
+      self.token_list = []
+      for word in self.words:
+        self.token_list.append(self.getTokens(word))
+    # By reversed length of token list.
+    self.token_list.sort(key=len, reverse=True)
+      #self.token_list = [self.getTokens(x) for x in self.words].sort(key=len, reverse=True)
+    self.max_level = len(self.token_list)
+
+    self.generateGrid()
+
+    result = self.generateLevel()
+
+    if result:
+      # TODO: evaluate the results
+      pass
+
+  def setFillLetters(self, fill_letters):
+    self.fill_tokens = fill_letters
+
+  def generateGrid(self):
+    # set it up based on the
+    if not self.token_list:
+      return None
+
+    self.size = len(self.token_list[0])
+    self.width = self.height = self.size
+
+    self.grid = [[' ' for _ in xrange(self.size)] for __ in xrange(self.size)]
+
+  def generateLevel(self):
+    # A depth first search for positioning the word at current level
+    # Are we done?
+    this_level = self.current_level
+    if this_level >= self.max_level:
+      # This one is OK.
+      self.rememberSolution()
+      return True
+
+    # Otherwise, this level needs to be searched.
+    # Generate the possible positions for this word
+    these_tokens = self.token_list[this_level]
+    possible_positions = self.generateOptions(these_tokens)
+    # Randomize the order of these.
+    random.shuffle(possible_positions)
+
+    # Take the last one and try to position it. If it fits, then go to next level.
+    while len(possible_positions) > 0:
+      test_position = possible_positions[-1]  # The last one
+      placed_ok = self.testWordInsert(these_tokens, test_position)
+      if placed_ok:
+        self.insertToGrid(these_tokens, test_position)
+        self.current_level += 1
+        result = self.generateLevel()  # The recursive call.
+        if result == True:
+          return True
+
+      # Remove this item and try again
+      possible_positions.pop()
+
+  # TODO: Remove from the grid.
+
+    self.current_level -= 1
+    return False  # At this point, all the possibilites are exhausted at this level.
+
+  def rememberSolution(self):
+    # Keep this solution as
+    self.solutions_list.append(self.current_solution)
+    # TODO: evaluate this solution?
 
   def generateOptions(self, tokens):
     # Given the grid and the token, find all the places
     # where it could be placed, given grid size and
     # number of tokens in the word
     positions = []
-    length = len(tokens)
-    for x in xrange(0, self.width - length):
-      for y in xrange(0, self.height - length):
-        for dir in self.all_directions:
-          positions.append([x, y])
+    length1 = len(tokens) - 1
+    for dir in DIRECTIONS:
+      offset = (DIR_OFFSETS[dir][0] * length1, DIR_OFFSETS[dir][1] * length1)
+      for x in xrange(0, self.width):
+        for y in xrange(0, self.height):
+          xend, yend = x + offset[0], y + offset[1]
+          if xend >= 0 and xend < self.width and yend >= 0 and yend < self.height:
+            pos = Position(x, y, dir)
+            pos.genPositions(length1)
+            positions.append(pos)
     return positions
 
-  def tryWordInsert(self, tokens):
+  def insertToGrid(self, tokens, position):
     # Put the word at the next level
-    self.current_level += 1
+    for i in xrange(len(position.positions)):
+      pos = position.positions[i]
+      current_val = self.grid[pos[0]][pos[1]]
+      if current_val and current_val == ' ':
+        # Add at this level
+        self.grid[pos[0]][pos[1]] = [tokens[i], self.current_level]
+      else:
+        # Value is already set at a previous level
+        pass
 
   def testWordInsert(self, tokens, position):
-    return False
+    fits = True
+    for i in xrange(len(position.positions)):
+      pos = position.positions[i]
+      current_val = self.grid[pos[0]][pos[1]]
+      if current_val and current_val != ' ' and current_val[0] != tokens[i]:
+        return False
+    return fits
 
   def revertWordAtLevel(self):
     return True
@@ -90,11 +197,38 @@ class WordSearch():
 
   def finishGrid(self):
     # Fills in the blank spaces as needed
+    numTokens = len(self.fill_tokens)
+    for i, j in itertools.product(range(self.width), range(self.height)):
+      if self.grid[i][j] == ' ':
+        self.grid[i][j] = self.fill_tokens[randint(0, numTokens - 1)]
     return
 
   def deliverHints(self):
     # Either the words in the list or the clues
     return
+
+  def getTokens(self, word):
+    '''Get the tokens, not code points.'''
+    # TODO: make this smarter utf-16 and diacritics.
+    vals = list(word)
+    retval = []
+    index = 0
+    while index < len(vals):
+      item = ''
+      v = ord(vals[index])
+
+      if v >= 0xd800 and v < + 0xdbff:
+        item += vals[index] + vals[index + 1]
+        index += 2
+      else:
+        item += vals[index]
+        index += 1
+      while index < len(vals) and ord(vals[index]) >= 0x300 and ord(vals[index]) <= 0x365:
+        # It's a combining character. Add to the growing item.
+        item += vals[index]
+        index += 1
+      retval.append(item)
+    return retval
 
 
 #### THE OLD IMPLEMENTATION.
@@ -430,6 +564,14 @@ def testGrid():
   return grid, answers, words, max_xy + 1
 
 
+def testNewWordSearch(words):
+  ws = WordSearch(words)
+
+  print '%s words = %s' % (len(ws.token_list), [len(x) for x in ws.token_list])
+  print 'max tokens = %s' % ws.size
+  print 'grid = %s' % ws.grid
+  print '%s solutions found' % len(ws.solutions_list)
+
 def main(args):
   # The Osage works, with diacritics
   osageWords = [u'𐓏𐒻𐒷𐒻𐒷', u'𐓀𐒰𐓓𐒻͘', u'𐓏𐒰𐓓𐒰𐓓𐒷', u'𐒻𐒷𐓏𐒻͘ ', u'𐓈𐒻𐓍𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻',
@@ -441,12 +583,12 @@ def main(args):
            u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
            u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
 
-  Oldwords = [u"𐒰̄𐓂͘𐒴𐓎̄͘𐓒", u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', "python", "itertools", "wordsearch", "code", "review", "functions",
-              "dimensional", "dictionary", "lacklustre", 'google', 'unicode', u'𐓏𐒻𐒷𐒻𐒷']
 
-  grid, answers = makeGrid(words, [11, 11], 10, False)  # Try with a crossword
-  printGrid(grid)
-  printAnswers(answers)
+  testNewWordSearch(words)
+
+  #grid, answers = makeGrid(words, [12, 12], 10, False)  # Try with a crossword
+  #printGrid(grid)
+  #printAnswers(answers)
 
 
 if __name__ == "__main__":

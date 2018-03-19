@@ -64,8 +64,16 @@
     var output_text = document.getElementById('Unicode_font_output_text');
      var fontFam = selected.value + ", Arial, Osage";
     output_text.style.fontFamily = fontFam;
+    setKeyCapsFont(fontFam);
   }
-  
+
+  function setKeyCapsFont(newFontFamily) {
+    var keycaps = document.getElementsByClassName("vk-cap");
+    for (var i = 0; i < keycaps.length; i++ ) {
+      keycaps[i].style.fontFamily = newFontFamily;
+    }
+  }
+
   function toOsageFonts(area1, area2) {
     // Open a comparison window with the resulting text.
     var area1Elem = document.getElementById(area1);
