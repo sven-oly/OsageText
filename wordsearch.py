@@ -33,6 +33,7 @@ DIR_OFFSETS = {
   UPLEFT: [-1, -1],
   DOWNLEFT: [1, -1],
 }
+DIR_WORDS = ['right', 'down', 'down right', 'up right', 'left', 'up', 'up left', 'down left']
 
 
 #### THE NEW IMPLEMENTATION.
@@ -70,15 +71,20 @@ class WordSearch():
     self.answers = None
     self.current_level = 0
     self.max_level = 0
-    self.current_solution = []  # List of the positions for the tokens in order.
-    self.solutions_list = []
+
+    self.max_solutions = 2  # Maximum number of solutions to be returned.
 
     self.all_directions = ['r', 'd', 'dr', 'ur']
     self.level_answer = []  # Levels with tentative inserts
-    self.fill_tokens = letters  # The tokens for the language
-    self.solution_list = []  # For storing multiple results
+    self.setFillLetters(letters)  # The tokens for the language
+
+    self.current_solution = []  # List of the positions for the tokens in order.
+    self.solutions_list = []  # For storing multiple results
     self.optimize_flag = False  # Set if the "best" one is desired
     self.total_tests = 0  # How many testWordInsert calls made
+    self.backtracks = 0  # Number of failed word inserts
+    self.failed_inserts = 0  # Number of failed word inserts
+    self.cells_filled = 0  # Now many filled with words.
 
     if self.words:
       self.token_list = []
@@ -93,12 +99,14 @@ class WordSearch():
 
     result = self.generateLevel()
 
+    self.finishGrid()
+
     if result:
       # TODO: evaluate the results
       pass
 
   def setFillLetters(self, fill_letters):
-    self.fill_tokens = fill_letters
+    self.fill_tokens = self.getTokens(fill_letters)
 
   def generateGrid(self):
     # set it up based on the
@@ -133,20 +141,39 @@ class WordSearch():
       if placed_ok:
         self.insertToGrid(these_tokens, test_position)
         self.current_level += 1
+        self.current_solution.append(test_position)
+        test_position.tokens = these_tokens
         result = self.generateLevel()  # The recursive call.
         if result == True:
+          # Should we continue?
+          num_solutions_found = len(self.solutions_list)
+          # TODO: decide if we replace the solution, keep it in the list, or just end
           return True
+        else:
+          # Next level didn't work
+          # Remove from grid if set at this level
+          self.backtracks += 1
+          for pos in test_position.positions:
+            y, x = pos[0], pos[1]
+            value = self.grid[y][x]
+            if value[-1] == self.current_level:
+              self.grid[y][x] = ' '  # Clear/
 
-      # Remove this item and try again
+      # Remove this possible position and try again
+      self.failed_inserts += 1
       possible_positions.pop()
 
-  # TODO: Remove from the grid.
+      # TODO: Remove from the grid.
+
+
+    self.current_solution.pop()
 
     self.current_level -= 1
     return False  # At this point, all the possibilites are exhausted at this level.
 
   def rememberSolution(self):
     # Keep this solution as
+    # TODO: Get the solution as a list of all the placements.
     self.solutions_list.append(self.current_solution)
     # TODO: evaluate this solution?
 
@@ -163,7 +190,7 @@ class WordSearch():
           xend, yend = x + offset[0], y + offset[1]
           if xend >= 0 and xend < self.width and yend >= 0 and yend < self.height:
             pos = Position(x, y, dir)
-            pos.genPositions(length1)
+            pos.genPositions(length1 + 1)
             positions.append(pos)
     return positions
 
@@ -180,6 +207,7 @@ class WordSearch():
         pass
 
   def testWordInsert(self, tokens, position):
+    self.total_tests += 1
     fits = True
     for i in xrange(len(position.positions)):
       pos = position.positions[i]
@@ -197,10 +225,14 @@ class WordSearch():
 
   def finishGrid(self):
     # Fills in the blank spaces as needed
+    self.cells_filled = 0
+
     numTokens = len(self.fill_tokens)
     for i, j in itertools.product(range(self.width), range(self.height)):
-      if self.grid[i][j] == ' ':
+      if self.grid[i][j] == ' ' or self.grid[i][j] == '':
         self.grid[i][j] = self.fill_tokens[randint(0, numTokens - 1)]
+      else:
+        self.cells_filled += 1
     return
 
   def deliverHints(self):
@@ -230,6 +262,32 @@ class WordSearch():
       retval.append(item)
     return retval
 
+  def printGrid(self):
+    print 'GRID SOLUTION'
+    for row in self.grid:
+      for item in row:
+        if type(item) is list:
+          print ' %s%s ' % (item[0].encode('utf-8'), item[1]),
+        else:
+          # Put in a flag to print _ in the fill spaces.
+          print ' %s  ' % item,  # '_'.encode('utf-8'),
+      print
+
+  def printSolution(self):
+    print 'Solution:'
+    for sol in self.solutions_list:
+      for pos in sol:
+        print '%s, %s, reversed = %s' % (''.join(pos.tokens),
+          DIR_WORDS[pos.direction], pos.reversed)
+        print '  %s' % pos.positions
+
+  def printStats(self):
+    # Output information about the last run.
+    print '%s solutions' % len(self.solutions_list)
+    print '%s total tests' % self.total_tests
+    print '%s total backtracks' % self.backtracks
+    print '%s failed insert' % self.failed_inserts
+    print '%s cells filled by words' % self.cells_filled
 
 #### THE OLD IMPLEMENTATION.
 
@@ -569,8 +627,12 @@ def testNewWordSearch(words):
 
   print '%s words = %s' % (len(ws.token_list), [len(x) for x in ws.token_list])
   print 'max tokens = %s' % ws.size
-  print 'grid = %s' % ws.grid
+  print
+  ws.printGrid()
   print '%s solutions found' % len(ws.solutions_list)
+  print 'Statistics\n'
+  ws.printStats()
+  ws.printSolution()
 
 def main(args):
   # The Osage works, with diacritics
@@ -583,8 +645,9 @@ def main(args):
            u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
            u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
 
-
-  testNewWordSearch(words)
+  three_words = [u'𐓣𐓟𐓷𐓣͘', u'𐓡𐓪𐓷𐓘͘𐓤', u'𐓏𐒻𐒷𐒻𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐒼𐒰𐓆𐒻𐓈𐒰͘',  u'𐒻𐓏𐒻𐒼𐒻', u'𐓀𐒰𐓓𐒻͘', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰',  u'𐓏𐒰𐓓𐒰𐓓𐒷',
+                 u'𐒰̄𐓍𐓣𐓟𐓸𐓟']
+  testNewWordSearch(three_words)
 
   #grid, answers = makeGrid(words, [12, 12], 10, False)  # Try with a crossword
   #printGrid(grid)
