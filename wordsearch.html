@@ -51,17 +51,17 @@
     </style>
 <script>
 
-  function sendTestWords(resultArea, answerArea) {
+  function sendTestWords(resultArea, answerArea, useDfs) {
     var wordData = ['𐓷𐓣𐓟𐓣𐓟', '𐓨𐓘𐓻𐓣͘', '𐓷𐓘𐓻𐓘𐓻𐓟', '𐓣𐓟𐓷𐓣͘ ', '𐓰𐓣𐓵𐓟', '𐓡𐓪𐓷𐓟͘𐓤𐓣',
            '𐓯𐓰𐓪͘𐓬𐓘𐓬𐓟', '𐓘̄𐓵𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', '𐓤𐓘𐓮𐓣𐓰𐓘͘', '𐓷𐓘𐓯𐓝𐓣͘𐓧𐓘'];
            //           '𐒻𐓏𐒻𐒼𐒻', '𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰'];
-    return sendWords(wordData, resultArea, answerArea);
+    return sendWords(wordData, resultArea, answerArea, useDfs);
   }
 
-  function sendRegionWords(wordSrc, resultArea, answerArea) {
+  function sendRegionWords(wordSrc, resultArea, answerArea, useDfs) {
     var inputArea = document.getElementById(wordSrc);
     var wordData = inputArea.value;
-    return sendWords(wordData, resultArea, answerArea);
+    return sendWords(wordData, resultArea, answerArea, useDfs);
   }
 
   // The variables of the data.
@@ -71,7 +71,7 @@
 
   // Code to request {{language}} data at index with optional filter.
   // Direction indicates previous (-1) or next (+1)
-  function sendWords(wordData, resultArea, answerArea) {
+  function sendWords(wordData, resultArea, answerArea, useDFS) {
     // Prepare for the call to the backendvar xmlhttp;
 	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
@@ -446,13 +446,12 @@ function createGameGrid(grid, grid_width, words, answers) {
             <input type="button" value="Clear words and solution"
                    onclick="clearArea('wordlist');clearArea('wordList');clearChildNodes('answerList');clearTableRows('gridTable');">
             <input type="button" value="Submit words from box above"
-                   onclick="sendRegionWords('wordlist', 'Grid', 'Answers');">
+                   onclick="sendRegionWords('wordlist', 'Grid', 'Answers', false);">
             <br />
             <br />
             <input type="button" value="Generate grid from sample words"
-                   onclick="sendTestWords('Grid', 'Answers');">
+                   onclick="sendTestWords('Grid', 'Answers', false);">
         </div>
-    </div>
 
     <div id="printGamearea">
         <div id="divTable">
@@ -479,6 +478,34 @@ function createGameGrid(grid, grid_width, words, answers) {
             <canvas id="myCanvas" width="800" height="800"></canvas>
         </div>
 
+    </div>
+  <div class="span-4 last">
+    {% if user_nickname %}
+    <h4>Welcome {{user_nickname}}
+    {% if user_logout %}
+    <a href={{user_logout}}>Logout</a>
+    {% endif %}
+    {% else %}
+    <a href='{{user_login_url}}'>Log in</a>
+    {% endif %}
+    <br />
+    <br />
+    <input type="button" value="Submit words from box to left"
+                   onclick="sendRegionWords('wordlist', 'Grid', 'Answers', true);">
+    <br />
+    <br />
+
+    <input type="button" value="DFS: Generate grid from sample words"
+                   onclick="sendTestWords('Grid', 'Answers', true);">
+
+    Grid size:
+    <input id='grid_size' type=text value='' size=''/>
+    Max tries:
+    <input id='max_tries' type=text value='' size=''/>
+    Num solutions:
+    <input id='num_solutions type=text value='' size=''/>
+
+  </div>
     </div>
 
 </body>

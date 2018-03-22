@@ -92,6 +92,59 @@ class GenerateWordSearchHandler(webapp2.RequestHandler):
     self.response.out.write(json.dumps(template_values))
 
 
+# Calls the depth first search method, along with parameters to support it.
+class GenerateWordSearchDFSHandler(webapp2.RequestHandler):
+  def get(self):
+    logging.info('games GenerateWordSearchDFSHandler')
+
+    user_info = getUserInfo(self.request.url)
+    user = users.get_current_user()
+
+    rawWordList = self.request.get('words', '')
+
+    # Suggested size for the grid
+    grid_width = self.request.get('grid_width', None)
+    # A measure of when to quit the search
+    max_tries =  self.request.get('max_tries', 1000)
+    # How many solutions to generated
+    max_solution_count =  self.request.get('max_solution_count', 1)
+
+    # logging.info('games WordSearchHandler rawWordList = %s' % rawWordList)
+
+    # Strip out white space.
+    wordList = rawWordList.replace(",", " ").replace("\r", " ").replace("\t", " ").split()
+    # logging.info('games WordSearchDFS Handler wordList = %s' % wordList)
+
+    ws = wordsearch.WordSearch(words)
+    grid = ws.grid
+    answers = ws.self.solutions_list
+    grid_width = ws.width
+    words = ws.words
+
+    if not grid:
+      message = 'Cannot create grid'
+    else:
+      message = 'Created a grid of size %s' % grid_width
+
+    #logging.info('games WordSearchHandler grid = %s' % grid)
+    #logging.info('games WordSearchHandler answers = %s' % answers)
+    #logging.info('games WordSearchHandler words = %s' % words)
+
+    template_values = {
+      'user_nickname': user_info[1],
+      'user_logout': user_info[2],
+      'user_login_url': user_info[3],
+      'language': main.Language,
+      'fontFamilies': main.OsageFonts,
+      'grid': grid,
+      'answers': answers,
+      'words': words,
+      'grid_width': grid_width,
+      'maxunicode': sys.maxunicode,
+    }
+    self.response.out.write(json.dumps(template_values))
+
+
 class CrosswordHandler(webapp2.RequestHandler):
   def get(self):
     logging.info('games CrosswordHandler')
@@ -157,6 +210,7 @@ app = webapp2.WSGIApplication([
     ('/games/wordsearch/', WordSearchHandler),
     ('/games/crossword/', CrosswordHandler),
     ('/games/generatewordsearch/', GenerateWordSearchHandler),
+    ('/games/generatewordsearchDFS/', GenerateWordSearchDFSHandler),
     ('/games/generatecrossword/', GenerateCrosswordHandler),
     ('/games/test/', TestHandler),
 ], debug=True)
