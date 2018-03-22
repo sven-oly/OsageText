@@ -281,10 +281,10 @@ class WordSearch():
       print
 
   def formatAnswers(self):
-    answers = []
+    answers = {}
     for sol in self.solutions_list:
       for pos in sol:
-        answers.append((pos.positions, pos.word, pos.reversed, pos.direction))
+        answers[pos.word] = (pos.positions, pos.word, pos.reversed, DIR_WORDS[pos.direction])
     return answers
 
   def printSolution(self):
