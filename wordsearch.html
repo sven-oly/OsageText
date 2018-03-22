@@ -71,7 +71,7 @@
 
   // Code to request {{language}} data at index with optional filter.
   // Direction indicates previous (-1) or next (+1)
-  function sendWords(wordData, resultArea, answerArea, useDFS) {
+  function sendWords(wordData, resultArea, answerArea, useDfs) {
     // Prepare for the call to the backendvar xmlhttp;
 	if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
@@ -105,9 +105,17 @@
       }
     }
 
-    // Prepare and send data.
-	target = "/games/generatewordsearch/";
-	target += "?words=" + wordData;
+    if (useDfs) {
+      target = "/games/generatewordsearchDFS/";
+      target += "?words=" + wordData;
+      target += "&size=" + document.getElementById("grid_size").value;
+
+    } else {
+      // Prepare and send data.
+      target = "/games/generatewordsearch/";
+      target += "?words=" + wordData;
+    }
+
     xmlhttp.open("GET", target, true);
 	var size = target.length;
 	xmlhttp.send(null);
@@ -125,7 +133,11 @@ function createGameGrid(grid, grid_width, words, answers) {
       // Insert New Columns for Row1 at index '0'.
       for (var col = 0; col < grid_width; col ++) {
         var row1col1 = row1.insertCell(col);
-        row1col1.innerHTML = "\u00a0" + grid[row][col] + "\u00a0";
+        if (Array.isArray(grid[row][col])) {
+          row1col1.innerHTML = "\u00a0" + grid[row][col][0] + "\u00a0";
+         } else {
+          row1col1.innerHTML = "\u00a0" + grid[row][col] + "\u00a0";
+         }
       }
     }
 
@@ -154,7 +166,7 @@ function createGameGrid(grid, grid_width, words, answers) {
       btn.onclick = onAnswerClickEvent;
 
       li.appendChild(btn);
-      var ans_text = document.createTextNode(" : " + positions + ' (' + answer[3] + ')');
+      var ans_text = document.createTextNode(" : (" + positions[0] + ') (' + answer[3] + ')');
       li.appendChild(ans_text);
       answerArea.appendChild(li);
 
@@ -199,7 +211,11 @@ function createGameGrid(grid, grid_width, words, answers) {
           var cells = all_answers[answer][0];
           for (var i = 0; i < cells.length; i++) {
             row1 = rows[cells[i][0]];
-            rowcol = row1.cells[cells[i][1]];
+            if (cells[i][1].isArray()) {
+              rowcol = row1.cells[cells[i][1][0]];
+            } else {
+              rowcol = row1.cells[cells[i][1]];
+            }
             rowcol.bgColor = "white";
             if (i == 0) {
               rowcol.bgColor = "yellow";
@@ -259,7 +275,12 @@ function createGameGrid(grid, grid_width, words, answers) {
       for (var i = 0; i < cells.length; i++) {
         var row = cells[i][0];
         var col = cells[i][1];
-        var text = grid[row][col];
+        var text;
+        if (Array.isArray(grid[row][col])) {
+          text = grid[row][col][0];
+        } else {
+          text = grid[row][col];
+        }
         var y = cells[i][0] * yfactor;
         var x = cells[i][1] * xfactor;
         ctx.fillText(text, x + xoff, y+yoff);

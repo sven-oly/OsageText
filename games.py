@@ -103,7 +103,13 @@ class GenerateWordSearchDFSHandler(webapp2.RequestHandler):
     rawWordList = self.request.get('words', '')
 
     # Suggested size for the grid
-    grid_width = self.request.get('grid_width', None)
+    raw_size = self.request.get('size', '0')
+    logging.info('games WordSearchHandler raw_size = >%s<' % raw_size)
+    if not raw_size or raw_size is '' or raw_size is ' ':
+      grid_width = 0
+    else:
+      grid_width = int(raw_size)
+
     # A measure of when to quit the search
     max_tries =  self.request.get('max_tries', 1000)
     # How many solutions to generated
@@ -114,12 +120,12 @@ class GenerateWordSearchDFSHandler(webapp2.RequestHandler):
     # Strip out white space.
     wordList = rawWordList.replace(",", " ").replace("\r", " ").replace("\t", " ").split()
     # logging.info('games WordSearchDFS Handler wordList = %s' % wordList)
+    logging.info('games WordSearchDFS Handler size = %s' % grid_width)
 
-    ws = wordsearch.WordSearch(words)
+    ws = wordsearch.generateDFSWordSearch(wordList,
+                               grid_width, max_tries, max_solution_count)
+
     grid = ws.grid
-    answers = ws.self.solutions_list
-    grid_width = ws.width
-    words = ws.words
 
     if not grid:
       message = 'Cannot create grid'
@@ -137,9 +143,9 @@ class GenerateWordSearchDFSHandler(webapp2.RequestHandler):
       'language': main.Language,
       'fontFamilies': main.OsageFonts,
       'grid': grid,
-      'answers': answers,
-      'words': words,
-      'grid_width': grid_width,
+      'answers': ws.formatAnswers(),
+      'words': ws.words,
+      'grid_width': ws.size,
       'maxunicode': sys.maxunicode,
     }
     self.response.out.write(json.dumps(template_values))

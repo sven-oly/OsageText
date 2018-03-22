@@ -40,6 +40,7 @@ DIR_WORDS = ['right', 'down', 'down right', 'up right', 'left', 'up', 'up left',
 class Position():
   def __init__(self, x=0, y=0, dir=RIGHT):
     self.tokens = []
+    self.word = ''
     self.x = x
     self.y = y
     self.positions = []  # The grid locations for all
@@ -56,6 +57,9 @@ class Position():
                              self.positions[i-1][1] + offset[1]))
     return
 
+  def setTokens(self, tokens):
+    self.tokens = tokens
+    self.word = ''.join(tokens)
 
 class WordSearch():
   def __init__(self, words=None):
@@ -95,15 +99,21 @@ class WordSearch():
       #self.token_list = [self.getTokens(x) for x in self.words].sort(key=len, reverse=True)
     self.max_level = len(self.token_list)
 
-    self.generateGrid()
+    self.size = len(self.token_list[0])
+    logging.info('INIT self.size = %s' % self.size)
+    self.width = self.height = self.size
+
+
+  def generate(self, size=0, tries=None, num_solutions=None):
+    logging.info('generate size = %s' % size)
+    logging.info('generate self.size = %s' % self.size)
+    if size > 0:
+      self.size = self.width = self.height = max(size, self.size)
+      self.generateGrid()
 
     result = self.generateLevel()
 
     self.finishGrid()
-
-    if result:
-      # TODO: evaluate the results
-      pass
 
   def setFillLetters(self, fill_letters):
     self.fill_tokens = self.getTokens(fill_letters)
@@ -112,9 +122,6 @@ class WordSearch():
     # set it up based on the
     if not self.token_list:
       return None
-
-    self.size = len(self.token_list[0])
-    self.width = self.height = self.size
 
     self.grid = [[' ' for _ in xrange(self.size)] for __ in xrange(self.size)]
 
@@ -142,7 +149,7 @@ class WordSearch():
         self.insertToGrid(these_tokens, test_position)
         self.current_level += 1
         self.current_solution.append(test_position)
-        test_position.tokens = these_tokens
+        test_position.setTokens(these_tokens)
         result = self.generateLevel()  # The recursive call.
         if result == True:
           # Should we continue?
@@ -263,7 +270,7 @@ class WordSearch():
     return retval
 
   def printGrid(self):
-    print 'GRID SOLUTION'
+    print 'GRID SOLUTION of size %s' % self.size
     for row in self.grid:
       for item in row:
         if type(item) is list:
@@ -272,6 +279,13 @@ class WordSearch():
           # Put in a flag to print _ in the fill spaces.
           print ' %s  ' % item,  # '_'.encode('utf-8'),
       print
+
+  def formatAnswers(self):
+    answers = []
+    for sol in self.solutions_list:
+      for pos in sol:
+        answers.append((pos.positions, pos.word, pos.reversed, pos.direction))
+    return answers
 
   def printSolution(self):
     print 'Solution:'
@@ -580,6 +594,16 @@ def generateWordsGrid(words):
   return grid, answers, words, max_xy + 1
 
 
+# Use the new Depth First Search method with size suggestion, etc.
+def generateDFSWordSearch(words, size=0, tries=None, num_solutions=1):
+  ws = WordSearch(words)
+  logging.info('words = %s' % words)
+  logging.info('size = %s, tries = %s, num_solutions = %s' % (size, tries, num_solutions))
+  ws.generate(size, tries, num_solutions)
+
+  return ws
+
+
 def generateCrosswordsGrid(words):
   # Make a grid with no reversals, no diagonals
 
@@ -622,8 +646,15 @@ def testGrid():
   return grid, answers, words, max_xy + 1
 
 
-def testNewWordSearch(words):
-  ws = WordSearch(words)
+def testNewWordSearch(words, args):
+  print 'args = %s' % args
+  if args > 1:
+    size = int(args[1])
+  else:
+    size = 13
+  max_tries = 1000
+  num_solutions = 1
+  ws = generateDFSWordSearch(words, size, max_tries, num_solutions)
 
   print '%s words = %s' % (len(ws.token_list), [len(x) for x in ws.token_list])
   print 'max tokens = %s' % ws.size
@@ -645,9 +676,9 @@ def main(args):
            u'𐓇𐓈𐓂͘𐓄𐒰𐓄𐒷', u'𐒰̄𐓍𐓣𐓟𐓸𐓟̄𐓛𐓣̄𐓬', u'𐒼𐒰𐓆𐒻𐓈𐒰͘', u'𐓏𐒰𐓇𐒵𐒻͘𐒿𐒰 ',
            u'𐒻𐓏𐒻𐒼𐒻', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰']
 
-  three_words = [u'𐓣𐓟𐓷𐓣͘', u'𐓡𐓪𐓷𐓘͘𐓤', u'𐓏𐒻𐒷𐒻𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐒼𐒰𐓆𐒻𐓈𐒰͘',  u'𐒻𐓏𐒻𐒼𐒻', u'𐓀𐒰𐓓𐒻͘', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎𐒼𐒰',  u'𐓏𐒰𐓓𐒰𐓓𐒷',
+  three_words = [u'𐓣𐓟𐓷𐓣͘', u'𐓡𐓪𐓷𐓘͘𐓤', u'𐓏𐒻𐒷𐒻𐒷', u'𐒹𐓂𐓏𐒷͘𐒼𐒻', u'𐒼𐒰𐓆𐒻𐓈𐒰͘',  u'𐒻𐓏𐒻𐒼𐒻', u'𐓀𐒰𐓓𐒻͘', u'𐓂𐓍𐒰𐒰𐒾𐓎𐓓𐓎',  u'𐓏𐒰𐓓𐒰𐓓𐒷',
                  u'𐒰̄𐓍𐓣𐓟𐓸𐓟']
-  testNewWordSearch(three_words)
+  testNewWordSearch(three_words, args)
 
   #grid, answers = makeGrid(words, [12, 12], 10, False)  # Try with a crossword
   #printGrid(grid)
