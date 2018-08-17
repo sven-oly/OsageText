@@ -489,9 +489,6 @@ def insertWord(word, grid, invalid, is_wordsearch):
   line = tryPlacingWord(tokens, x, y, direction, grid)
 
   if line:
-    if do_reverse:
-      line.reverse()
-      # print 'REVERSED'
     for i, cell in enumerate(line):
       grid[cell[0]][cell[1]] = tokens[i]
     return grid, line, do_reverse

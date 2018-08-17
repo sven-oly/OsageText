@@ -14,12 +14,12 @@ indexes:
   properties:
   - name: dbName
   - name: index
-    direction: desc
 
 - kind: OsagePhraseDB
   properties:
   - name: dbName
   - name: index
+    direction: desc
 
 - kind: OsagePhraseDB
   properties:

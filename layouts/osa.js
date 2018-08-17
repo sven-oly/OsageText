@@ -1,4 +1,4 @@
-// Choctaw virtual keyboard.
+// Osage virtual keyboard.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ var OSA_UNICODE_LAYOUT = {
     '\ud801\udcd8\ud801\udce3': '\ud801\udcd9', // ai.
     '\ud801\udcd8\ud801\udcbb': '\ud801\udcd9', // aI.
 
-    '\ud801\udcb0\ud801\udcbb\u0358': '\ud801\udcb2', // AI.
+    '\ud801\udcb0\ud801\udcbb\u0358': '\ud801\udcb2', // AI.  Questions about hese rules actually firing...
     '\ud801\udcb7\ud801\udcbb\u0358': '\ud801\udcb8', // EI.
     '\ud801\udcc2\ud801\udcbb\u0358': '\ud801\udcc3', // OI.
     '\ud801\udcb0\ud801\udce3\u0358': '\ud801\udcb2', // AI.
