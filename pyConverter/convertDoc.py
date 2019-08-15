@@ -20,6 +20,8 @@ TIMESTAMP = "Version 2017-12-20 07:55"
 # https://docs.python.org/2/library/xml.etree.elementtree.html
 # https://docs.python.org/2/library/zipfile.html
 
+# https://python-docx.readthedocs.io/en/latest/user/text.html
+
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
 FONTS_TO_CONVERT = [OfficialOsageFont]

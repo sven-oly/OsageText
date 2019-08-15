@@ -39,7 +39,7 @@ def checkAndConvertText(textIn):
     return textIn
 
   # Handle text in font-labeled regions
-  result = quinteroConversion.oldOsageToUnicode(textIn)
+  result = quinteroConversion.quiteroOsageToUnicode(textIn)
   return result
 
 
@@ -70,6 +70,7 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
   extractedLine = []
   extractedCount = 0
 
+  missingConversions = set([])
   for para in paragraphs:
 
     para_format = para.paragraph_format
@@ -79,18 +80,18 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
 
     if debugInfo:
       print ('  Paragraph %d' % paraNum)
-      print ('    para format = %s' % para_format)
-      print ('    para style = %s' % para_style)
+      # print ('    para format = %s' % para_format)
+      # print ('    para style = %s' % para_style)
       print ('    para style.font.name = %s' % para_style.font.name)
       print ('    para style.name = %s' % para_style.name)
-      print ('    para alignment = %s' % para_alignment)
-      print ('    para part = %s' % para_part)
+      # print ('    para alignment = %s' % para_alignment)
+      # print ('    para part = %s' % para_part)
       if para_part:
         print ('    inline_shapes = %s' % para_part.inline_shapes)
 
     runs = para.runs
     print ('    %d runs in paragraph' % (len(runs)))
-    print ('    paragraph text = %s' % (para.text))
+    print ('    paragraph text = %s' % (para.text.encode("utf-8")))
     runNum = 0
     runNum = 1
     for run in runs:
@@ -102,17 +103,24 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
           fontName = para_style.font.name
 
         if debugInfo:
-          print ('    Run %d text(%d) =  >%s<' % (runNum, len(run.text), run.text))
+          print ('    Run %d text(%d) =  >%s<' % (
+              runNum, len(run.text.encode('utf-8')),
+              run.text.encode('utf-8')))
           print ('      run bold = %s, italic = %s' % (
               run.font.bold, run.font.italic))
-          print ('      run font = %s' % run.font)
+          #print ('      run font = %s' % run.font)
           print ('      fontName = %s' % fontName)
 
         ## DECIDE IF CONVERSION IS NEEDED
-        if run.font.italic and fontName in FONTS_TO_CONVERT and thisText:
-          print('!!!!!!!! CONVERTING %s' % thisText)
-          convertedText = checkAndConvertText(thisText)
-          print('         Converted =  %s' % convertedText)
+        if (((runNum == 1 and run.font.bold) or run.font.italic) and
+            fontName in FONTS_TO_CONVERT and thisText):
+          print('!!!!!!!! CONVERTING %s' % thisText.encode('utf-8'))
+          convertedText, notFound = checkAndConvertText(thisText)
+          print('NOT FOUND: %s' % notFound)
+          for a in notFound:
+            missingConversions.add(a)
+
+          print('         Converted =  %s' % convertedText.encode('utf-8'))
           if thisText != convertedText:
             numConverts += 1
             run.text = convertedText
@@ -125,6 +133,7 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
       runNum += 1
     paraNum += 1
 
+  print('All missing characters = %s' % missingConversions)
   if extractedFile:
      extractedFile.close()
 
