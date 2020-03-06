@@ -2,6 +2,8 @@
 #!/usr/bin/env python
 #
 
+#from future import standard_library
+#standard_library.install_aliases()
 from userDB import getUserInfo
 
 import blobstorage
@@ -10,7 +12,7 @@ import userDB
 import json
 import logging
 import os
-import urllib
+#import urllib.request, urllib.parse, urllib.error
 import webapp2
 
 from google.appengine.api import users

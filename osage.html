@@ -104,6 +104,7 @@
       controller = new i18n.input.keyboard.Keyboard();
       controller.loadLayout('osa_traditional');
       controller.loadLayout('osa');
+      controller.loadLayout('osa_dict');
       controller.reposition(input, 2, 0, [1, 0, 0, 0]);
       controller.register(input);
       controller.addEventListener('kc', function() { visible = false; });
@@ -206,6 +207,7 @@
     Keyboard: <select onchange="onLayoutSelected(this, null, 'UnicodeOsageTools')")" id="selectKeyboard">
       <option value="osa">Osage Unicode</option>
       <option value="osa_traditional">Osage Traditional</option>
+      <option value="osa_dict">Osage Dictionary</option>
     </select>
     <input type="checkbox" name="showUTools" id="showUTools"
       onchange="toggle('UnicodeOsageTools', 'showUTools');">Tools?<br />

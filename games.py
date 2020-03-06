@@ -2,6 +2,8 @@
 #!/usr/bin/env python
 #
 
+from future import standard_library
+standard_library.install_aliases()
 import re
 import main
 
@@ -15,7 +17,7 @@ import json
 import logging
 import os
 import sys
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import webapp2
 
 from google.appengine.api import users

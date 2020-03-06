@@ -8,6 +8,8 @@
 # Based on https://cloud.google.com/appengine/docs/standard/python/blobstore/
 
 
+#from future import standard_library
+#standard_library.install_aliases()
 from userDB import getUserInfo
 
 import database
@@ -18,7 +20,7 @@ import words
 import json
 import logging
 import os
-import urllib
+#import urllib.request, urllib.parse, urllib.error
 import webapp2
 
 from google.appengine.api import users
@@ -106,7 +108,7 @@ class SoundUploadHandler(blobstore_handlers.BlobstoreUploadHandler,
             upload_list = self.get_uploads()
             logging.info(' get_uploads = (%d) %s' %
                          (len(upload_list), upload_list))
-            items = self.request.POST.items()
+            items = list(self.request.POST.items())
             logging.info('ITEMS = %s' % items)
 
             app_id = app_identity.get_application_id()

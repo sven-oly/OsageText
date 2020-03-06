@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
+#from __future__ import print_function
+#from future import standard_library
+#standard_library.install_aliases()
+#from builtins import str
 import main
 from userDB import getUserInfo
 
@@ -8,7 +12,7 @@ import csv
 import json
 import logging
 import os
-import StringIO
+import io
 
 import webapp2
 
@@ -61,7 +65,7 @@ class GetWordsHandler(webapp2.RequestHandler):
   def post(self):
     self.response.headers['Content-Type'] = 'text/plain'
 
-    print 'GetWordsHandler received.'
+    print('GetWordsHandler received.')
     self.response.out.write('GetWordsHandler received.\n')
 
   def get(self):
@@ -122,7 +126,7 @@ class GetWordsHandler(webapp2.RequestHandler):
       results = q.run()  # Use get_multi for more than one?
       logging.info(' RESULTS ITERATOR = %s' % results)
       try:
-        result = results.next()
+        result = next(results)
         logging.info(' RESULT = %s' % result)
       except:
         result = None
@@ -287,7 +291,7 @@ class ProcessUpload(webapp2.RequestHandler):
     self.response.out.write('### Starting at index %d' % numEntries)
     startIndex = numEntries + 1
     currentIndex = startIndex
-    stringReader = unicode_csv_reader(StringIO.StringIO(fileInfo))
+    stringReader = unicode_csv_reader(io.StringIO(fileInfo))
     for row in stringReader:
       entry = processRow(currentIndex, row)
       currentIndex += 1
@@ -544,7 +548,7 @@ def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
                             dialect=dialect, **kwargs)
     for row in csv_reader:
         # decode UTF-8 back to Unicode, cell by cell:
-        yield [unicode(cell, 'utf-8') for cell in row]
+        yield [str(cell, 'utf-8') for cell in row]
 
 def utf_8_encoder(unicode_csv_data):
     for line in unicode_csv_data:
