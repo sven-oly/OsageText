@@ -285,33 +285,6 @@
     <a href='{{user_login_url}}'>Log in</a>
     {% endif %}
 
-    <h3>Useful links</h3>
-      <ul>
-        <li>
-          <a href="javascript:toOsageFonts('Unicode_font_output_text', 'old_font_input_text');">Test Osage Fonts</a>
-        </li>
-        <li>
-          <a href="/keyboard/">Osage keyboard</a>
-        </li>
-        <li>
-          <a href="/downloads/">Download Osage Nation fonts</a>
-        </li>
-        <li>
-          <a href="/words/">Review Osage phrases</a>
-       </li>
-       <li>
-         <a href="/words/getPhrases/">View database</a>       
-          <br />
-          <br />
-       </li>
-        <li>
-          <a href="http://www.unicode.org/charts/PDF/U104B0.pdf">Unicode Osage</a>
-        </li>
-        <li>
-           <a href="http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4619.pdf">Osage Unicode proposal</a>
-        </li>
-
-        </ul>
          {% if isAdmin %}
         <hr>
         <h4>Admin Functions</h4>
@@ -321,8 +294,18 @@
           <!-- <li><a href="/db/resetDbEntries/">Reset Database Entries</a> -->
         </ul>
         {% endif %}
-    </div>
-  </div> <!-- container -->
+
+   {% if links %}
+   <h4>Useful links</h4>
+     <ul>
+   {% for link in links %}
+      <li>
+        <a href="{{link.ref}}" target="_blank">{{link.linkText}}</a>
+     </li>
+   {% endfor %}
+     </ul>
+   {% endif %}
+  </div>  </div> <!-- container -->
 
 </body>
 </html>

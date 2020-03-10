@@ -25,6 +25,14 @@ OsageFonts = ['Pawhuska', 'Wynona', 'Avant', 'Barnsdall', 'Nelagoney',
 
 Language = 'Osage'
 
+links = [
+  { "ref": "/keyboard/", "linkText": "Osage keyboard" },
+  {"ref": "/downloads/", "linkText": "Downloads Osage fonts"},
+  {"ref": "/words/", "linkText": "Review Osage phrases"},
+  {"ref": "/words/getPhrases/", "linkText": "View database"},
+  {"ref": "http://www.unicode.org/charts/PDF/U104B0.pdf", "linkText": "Unicode Osage"},
+  {"ref": "http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4619.pdf", "linkText": " Osage Unicode proposal"},
+]
 class MainHandler(webapp2.RequestHandler):
     def get(self):
       user_info = getUserInfo(self.request.url)
@@ -42,6 +50,7 @@ class MainHandler(webapp2.RequestHandler):
         'user_logout': user_info[2],
         'user_login_url': user_info[3],
         'isAdmin': user_info[4],
+        'links': links,
       }
       path = os.path.join(os.path.dirname(__file__), 'osage.html')
       self.response.out.write(template.render(path, template_values))
@@ -55,6 +64,7 @@ class ConverterTestHandler(webapp2.RequestHandler):
       'osageText': osageText,
       'utext': utext,
       'language': Language,
+      'links': links,
     }
 
     path = os.path.join(os.path.dirname(__file__), 'testConvert.html')
@@ -74,6 +84,7 @@ class OsageFontTest(webapp2.RequestHandler):
       'user_nickname': user_info[1],
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
+      'links': links,
     }
 
     path = os.path.join(os.path.dirname(__file__), 'osageFonts.html')
@@ -88,6 +99,7 @@ class OsageKeyboard(webapp2.RequestHandler):
       'user_nickname': user_info[1],
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
+      'links': links,
     }
 
     path = os.path.join(os.path.dirname(__file__), 'keyboard_osa.html')
@@ -105,6 +117,7 @@ class OsageUload(webapp2.RequestHandler):
       'user_nickname': user_info[1],
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
+      'links': links,
     }
 
     path = os.path.join(os.path.dirname(__file__), 'osageUpload.html')
@@ -118,6 +131,7 @@ class OsageDownload(webapp2.RequestHandler):
       'infile': infile,
       'outfile': outfile,
       'language': Language,
+      'links': links,
     }
 
     path = os.path.join(os.path.dirname(__file__), 'osageDownloads.html')
@@ -169,9 +183,32 @@ class LoginPageHandler(webapp2.RequestHandler):
       'user_logout': user_info[2],
       'user_login_url': user_info[3],
       'language': Language,
+      'links': links,
     }
     path = os.path.join(os.path.dirname(__file__), 'login.html')
     self.response.out.write(template.render(path, template_values))
+
+class DictionaryInput(webapp2.RequestHandler):
+    def get(self):
+      user_info = getUserInfo(self.request.url)
+
+      oldOsageInput = self.request.get("text", "")
+      unicodeInput = self.request.get("utext", "")
+      latinInput = self.request.get("latintext", "")
+
+      template_values = {
+        'osageInput': oldOsageInput,
+        'unicodeInput': unicodeInput,
+        'latinInput': latinInput,
+        'fontFamilies': OsageFonts,
+        'user_nickname': user_info[1],
+        'user_logout': user_info[2],
+        'user_login_url': user_info[3],
+        'isAdmin': user_info[4],
+        'links': links,
+      }
+      path = os.path.join(os.path.dirname(__file__), 'osageLatinInput.html')
+      self.response.out.write(template.render(path, template_values))
 
 
 app = webapp2.WSGIApplication([
@@ -182,8 +219,9 @@ app = webapp2.WSGIApplication([
     ('/keyboard/', OsageKeyboard),
     ('/downloads/', OsageDownload),
     ('/upload/', OsageUload),
+    ('/dictionaryinput/', DictionaryInput),
 
-    ('/login/', LoginPageHandler),
+  ('/login/', LoginPageHandler),
 
     ('/slides/', ProcessSlides),
 
