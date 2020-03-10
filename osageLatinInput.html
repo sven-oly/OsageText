@@ -112,7 +112,7 @@ table tr:nth-child(even){background-color: #f2f2f2;}
       controller.reposition(input, 1, 0, [1, 0, 0, 0]);
       controller.register(input);
       controller.addEventListener('kc', function() { visible = false; });
-      input.focus();
+      // input.focus();
       var selector = document.getElementById('selectKeyboard');
       onLayoutSelected(selector, controller, textAreaID);
   }
@@ -163,10 +163,13 @@ console.log(csv);
 
   function onPageLoaded() {
     initKeyboard('osage_latin_input');
+    init();
   }  
 
   function init() {
     // Fill in if needed.
+    var en_input = document.getElementById("english_input")
+    en_input.focus();
   }
 
   </script>
