@@ -143,23 +143,39 @@ function addRow() {
 
 // Download CSV
 function download_csv() {
-    var csv = 'English,Dictionary Osage\n';
-    var table = document.getElementById("output_table");
-    var rows = table.rows;
-    for (var i = 0; i < rows.length; i++) {
-      var cells = rows.item(i).cells;
-      csv += cells[0].innerText;
-      csv += ",";
-      csv += cells[1].innerText;
-      csv += "\n";
-    };
-console.log(csv);
-    var hiddenElement = document.createElement('a');
-    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-    hiddenElement.target = '_blank';
-    hiddenElement.download = 'dictionary.csv';
-    hiddenElement.click();
+  var table = document.getElementById("output_table");
+  var rows = table.rows;
+  var num_rows = rows.length;
+  var csv = '';
+  for (var i = 0; i < num_rows; i++) {
+    var cells = rows.item(i).cells;
+    csv += cells[0].innerText;
+    csv += "\t";
+    csv += cells[1].innerText;
+    csv += "\n";
+  };
+  console.log(csv);
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:text/tsv;charset=utf-8,' + encodeURI(csv);
+  hiddenElement.target = '_blank';
+  var page_element = document.getElementById("pagenumber");
+  var page_num = page_element.value;
+
+  hiddenElement.download = 'dictionary_' + page_num + '.tsv';
+  hiddenElement.click();
+
+  // Clear table contents after first row.
+  for (var i = 0; i < num_rows -1; i++) {
+    table.deleteRow(-1);
+  };
 };
+
+function submitOnEnter(event){
+    if(event.which === 13){
+        event.preventDefault(); // Prevents the addition of a new line in the text field (not needed in a lot of cases)
+        addRow();
+    }
+}
 
   function onPageLoaded() {
     initKeyboard('osage_latin_input');
@@ -184,19 +200,31 @@ console.log(csv);
      <textarea class="English Meaning" id="english_input" style="font-family:'Courier New';"></textarea>
   </div>
 
-  <div class="span-10">
+  <div class="span-10 last">
     <h3>Dictionary Osage text</h3>
-      <textarea id="osage_latin_input" style="font-family:'Arial';"></textarea>
-<!--
-    <input type="text" size="30" id="osage_latin_input" style="font-family:'Courier New';font-size:20px;">
--->
-  <div>Keyboard: <select onchange="onLayoutSelected(this, null, 'osage_latin_input')")" id="selectKeyboard">
-      <option value="osa_dict">Osage Dictionary</option>
-    </select>
+      <textarea id="osage_latin_input" style="font-family:'Arial';"
+                onkeypress="submitOnEnter(event);"></textarea>
+  <button type="button" onclick="addRow()">Data OK</button>
 
   </div>
-  </div>
-  <div class="span-4 last">
+
+      <div class="span-16">
+  Page number <input id="pagenumber" width='4'>
+  <button onclick="download_csv()">Download CSV</button>
+          <br />
+<br />
+
+          <table id="output_table">
+             <tr>
+                 <td>English</td>
+                 <td>Osage Latin</td>
+             </tr>
+          </table>
+
+          <button onclick="download_csv()">Download CSV</button>
+
+      </div>
+       <div class="span-4 last">
     {% if user_nickname %}
     <h4>Welcome {{user_nickname}}
     {% if user_logout %}
@@ -226,20 +254,12 @@ console.log(csv);
    {% endfor %}
      </ul>
    {% endif %}
+    <div>Keyboard: <select onchange="onLayoutSelected(this, null, 'osage_latin_input')")" id="selectKeyboard">
+      <option value="osa_dict">Osage Dictionary</option>
+    </select>
+
+    </div>
   </div>
-      <div class="span-16">
-                <button type="button" onclick="addRow()">Data OK</button>
-
-          <table id="output_table">
-             <tr>
-                 <td>English</td>
-                 <td>Osage Latin</td>
-             </tr>
-          </table>
-
-          <button onclick="download_csv()">Download CSV</button>
-
-      </div>
   </div> <!-- container -->
 
 </body>
