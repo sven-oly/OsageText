@@ -141,22 +141,22 @@ function addRow() {
   en_input.focus();
 }
 
-// Download CSV
-function download_csv() {
+// Download TSV
+function download_tsv() {
   var table = document.getElementById("output_table");
   var rows = table.rows;
   var num_rows = rows.length;
-  var csv = '';
+  var tsv = '';
   for (var i = 0; i < num_rows; i++) {
     var cells = rows.item(i).cells;
-    csv += cells[0].innerText;
-    csv += "\t";
-    csv += cells[1].innerText;
-    csv += "\n";
+    tsv += cells[0].innerText;
+    tsv += "\t";
+    tsv += cells[1].innerText;
+    tsv += "\n";
   };
-  console.log(csv);
+  console.log(tsv);
   var hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:text/tsv;charset=utf-8,' + encodeURI(csv);
+  hiddenElement.href = 'data:text/tsv;charset=utf-8,' + encodeURI(tsv);
   hiddenElement.target = '_blank';
   var page_element = document.getElementById("pagenumber");
   var page_num = page_element.value;
@@ -210,7 +210,7 @@ function submitOnEnter(event){
 
       <div class="span-16">
   Page number <input id="pagenumber" width='4'>
-  <button onclick="download_csv()">Download CSV</button>
+  <button onclick="download_tsv()">Download TSV</button>
           <br />
 <br />
 
@@ -221,7 +221,7 @@ function submitOnEnter(event){
              </tr>
           </table>
 
-          <button onclick="download_csv()">Download CSV</button>
+          <button onclick="download_tsv()">Download TSV</button>
 
       </div>
        <div class="span-4 last">
