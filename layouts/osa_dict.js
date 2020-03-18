@@ -17,8 +17,8 @@ var OSA_DICTIONARY = {
   'mappings': {
     ',c': {
       '': '`1234567890-=' +
-          'qwe{{\u030c}}t{{\u1d95}}uiop[]\\' +
-          'as{{\u00f0}}{{\u02c0}}{{\u0263}}hjkl;{{\u0301}}' +
+          'qwert{{\u1d95}}uiop[]\\' +
+          'as{{\u00f0}}{{\u02c0}}{{\u0263}}hjkl{{\u030c}}{{\u0301}}' +
           'zxc{{\u0328}}bnm,./'
     },
     's,sc': {

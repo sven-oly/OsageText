@@ -26,6 +26,7 @@
 table {
   border: 1px solid #ddd;
   padding: 8px;
+  font-size: 16px;
 }
 table tr:nth-child(even){background-color: #f2f2f2;}
   {
@@ -40,7 +41,9 @@ table tr:nth-child(even){background-color: #f2f2f2;}
   <script src="/js/vk-debug.js"></script>
 
   <script>
-  var diff_list = [];
+  // Keeping track for editing rows of text.
+  let edit_mode = false;
+  let edit_row_num = -1;
 
   // When an area is changed, set the hex characters, too.
   function updateHex(inArea, outArea) {
@@ -132,12 +135,59 @@ function addRow() {
   var row = table.insertRow(-1);
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
-  var en_input = document.getElementById("english_input")
-  var dict_input = document.getElementById("osage_latin_input")
+  var en_input = document.getElementById("english_input");
+  var dict_input = document.getElementById("osage_latin_input");
   cell1.innerHTML = en_input.value;
+  cell1.contentEditable = true;
   cell2.innerHTML = dict_input.value;
+  cell2.contentEditable = true;
+  cell2.spellcheck = false;
   en_input.value = '';
   dict_input.value = '';
+  en_input.focus();
+
+  var rows = table.rows;
+  var new_row_num = rows.length - 1;
+  var cell3 = row.insertCell(2);
+  var btn_name = 'Edit ' + new_row_num;
+  var btn = document.createElement('input');
+  btn.type = "button";
+  btn.className = "btn_edit";
+  btn.value = "Edit "  + new_row_num;
+  btn.onclick = (function(entry) {return function() {editRow(entry);}})(new_row_num);
+  cell3.appendChild(btn);
+  //cell3.innerHTML = "<button id='" + btn_name + "';>" + btn_name + "</button>";
+}
+
+function editRow(row_num) {
+  var table = document.getElementById("output_table");
+  var rows = table.rows;
+  var edit_row = rows.item(row_num);
+
+  var en_input = document.getElementById("english_input");
+  var dict_input = document.getElementById("osage_latin_input");
+  en_input.value = edit_row.cells[0].innerText;
+  dict_input.value = edit_row.cells[1].innerText;
+  edit_mode = true;
+  edit_row_num = row_num;
+  document.getElementById("updateButton").disabled = false;
+  document.getElementById("addRowButton").disabled = true;
+  en_input.focus();
+}
+
+function updateRow() {
+  var table = document.getElementById("output_table");
+  var rows = table.rows;
+  var edit_row = rows.item(edit_row_num);
+  var en_input = document.getElementById("english_input");
+  var dict_input = document.getElementById("osage_latin_input");
+  edit_row.cells[0].innerHTML = en_input.value;
+  edit_row.cells[1].innerHTML = dict_input.value;
+  en_input.value = '';
+  dict_input.value = '';
+  edit_mode = false;
+  document.getElementById("updateButton").disabled = true;
+  document.getElementById("addRowButton").disabled = false;
   en_input.focus();
 }
 
@@ -147,7 +197,8 @@ function download_tsv() {
   var rows = table.rows;
   var num_rows = rows.length;
   var tsv = '';
-  for (var i = 0; i < num_rows; i++) {
+  // Skip the headers.
+  for (var i = 1; i < num_rows; i++) {
     var cells = rows.item(i).cells;
     tsv += cells[0].innerText;
     tsv += "\t";
@@ -171,9 +222,14 @@ function download_tsv() {
 };
 
 function submitOnEnter(event){
-    if(event.which === 13){
-        event.preventDefault(); // Prevents the addition of a new line in the text field (not needed in a lot of cases)
-        addRow();
+    if(event.which === 13) {
+      // Prevents the addition of a new line in the text field (not needed in a lot of cases)
+      event.preventDefault();
+      if (edit_mode) {
+       updateRow();
+       } else {
+         addRow();
+       }
     }
 }
 
@@ -196,19 +252,27 @@ function submitOnEnter(event){
   <div class="container">
 
   <div class="span-10">
-    <h3>Old Osage font data</h3>
+    <h3>English definition</h3>
      <textarea class="English Meaning" id="english_input" style="font-family:'Courier New';"></textarea>
   </div>
 
-  <div class="span-10 last">
+  <div class="span-10">
     <h3>Dictionary Osage text</h3>
       <textarea id="osage_latin_input" style="font-family:'Arial';"
-                onkeypress="submitOnEnter(event);"></textarea>
-  <button type="button" onclick="addRow()">Data OK</button>
-
+                onkeypress="submitOnEnter(event);" spellcheck="false"></textarea>
   </div>
 
-      <div class="span-16">
+  <div class="span-1 last">
+      <br /><br/><br/>
+      <button id="addRowButton"
+              type="button" onclick="addRow()">Data OK</button>
+      <br />
+      <br />
+      <button id="updateButton"
+              type="button" onclick="updateRow()" disabled="disabled">Updated edited row</button>
+  </div>
+
+  <div class="span-19">
   Page number <input id="pagenumber" width='4'>
   <button onclick="download_tsv()">Download TSV</button>
           <br />
@@ -216,8 +280,9 @@ function submitOnEnter(event){
 
           <table id="output_table">
              <tr>
-                 <td>English</td>
-                 <td>Osage Latin</td>
+                 <td width="450px">English</td>
+                 <td width="450px">Osage Latin</td>
+                 <td width="50px">Edit</td>
              </tr>
           </table>
 
