@@ -130,21 +130,24 @@ table tr:nth-child(even){background-color: #f2f2f2;}
     document.getElementById(outputId).focus();
   }
 
-function addRow() {
+function addRowValues() {
+  var en_input = document.getElementById("english_input");
+  var dict_input = document.getElementById("osage_latin_input");
+  addRow(en_input.value, dict_input.value);
+}
+
+function addRow(first_value, second_value) {
   var table = document.getElementById("output_table");
   var row = table.insertRow(-1);
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
-  var en_input = document.getElementById("english_input");
-  var dict_input = document.getElementById("osage_latin_input");
-  cell1.innerHTML = en_input.value;
+  //var en_input = document.getElementById("english_input");
+  //var dict_input = document.getElementById("osage_latin_input");
+  cell1.innerHTML = first_value;
   cell1.contentEditable = true;
-  cell2.innerHTML = dict_input.value;
+  cell2.innerHTML = second_value;
   cell2.contentEditable = true;
   cell2.spellcheck = false;
-  en_input.value = '';
-  dict_input.value = '';
-  en_input.focus();
 
   var rows = table.rows;
   var new_row_num = rows.length - 1;
@@ -228,10 +231,48 @@ function submitOnEnter(event){
       if (edit_mode) {
        updateRow();
        } else {
-         addRow();
-       }
+        var en_input = document.getElementById("english_input");
+        var dict_input = document.getElementById("osage_latin_input");
+        addRow(en_input.value, dict_input.value);
+        en_input.value = '';
+        dict_input.value = '';
+        en_input.focus();       }
     }
 }
+
+
+ function Upload() {
+   // Load with data from file, split by last period.
+   // Or split by tab.
+        var fileUpload = document.getElementById("fileUpload");
+        var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.tsv|.txt)$/;
+        if (regex.test(fileUpload.value.toLowerCase())) {
+            if (typeof (FileReader) != "undefined") {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                var table = document.getElementById("output_table");
+                    var rows = e.target.result.split("\n");
+                    for (var i = 0; i < rows.length; i++) {
+                        var index = rows[i].lastIndexOf(".");
+                        if (index < 0) {
+                          // Try a tab.
+                          index = rows[i].lastIndexOf("\t");
+                        }
+                        if (index >= 0) {
+                          var first = rows[i].substr(0, index );
+                          var last = rows[i].substr(index + 1);
+                          addRow(first, last);
+                        }
+                    }
+                }
+                reader.readAsText(fileUpload.files[0]);
+            } else {
+                alert("This browser does not support HTML5.");
+            }
+        } else {
+            alert("Please upload a valid text file.");
+        }
+  }
 
   function onPageLoaded() {
     initKeyboard('osage_latin_input');
@@ -265,7 +306,7 @@ function submitOnEnter(event){
   <div class="span-1 last">
       <br /><br/><br/>
       <button id="addRowButton"
-              type="button" onclick="addRow()">Data OK</button>
+              type="button" onclick="addRowValues()">Data OK</button>
       <br />
       <br />
       <button id="updateButton"
@@ -273,25 +314,27 @@ function submitOnEnter(event){
   </div>
 
   <div class="span-19">
-  Page number <input id="pagenumber" width='4'>
-  <button onclick="download_tsv()">Download TSV</button>
-          <br />
-<br />
+    Page number <input id="pagenumber" width='4'>
+    <button onclick="download_tsv()">Download TSV</button>
+    &ensp;&ensp;&ensp;&ensp;&ensp;
+    <input type="button" id="upload" value="Upload data file (.tsv / .txt)" onclick="Upload()" />
+    <input type="file" id="fileUpload" />
+    <br />
+    <br />
 
-          <table id="output_table">
-             <tr>
-                 <td width="450px">English</td>
-                 <td width="450px">Osage Latin</td>
-                 <td width="50px">Edit</td>
-             </tr>
-          </table>
+    <table id="output_table">
+       <tr>
+           <td width="450px">English</td>
+           <td width="450px">Osage Latin</td>
+           <td width="50px">Edit</td>
+       </tr>
+    </table>
 
-          <button onclick="download_tsv()">Download TSV</button>
-
-      </div>
-       <div class="span-4 last">
+    <button onclick="download_tsv()">Download TSV</button>
+  </div>
+  <div class="span-4 last">
     {% if user_nickname %}
-    <h4>Welcome {{user_nickname}}
+           <h4>Welcome {{user_nickname}}</h4>
     {% if user_logout %}
     <a href={{user_logout}}>Logout</a>
     {% endif %}
