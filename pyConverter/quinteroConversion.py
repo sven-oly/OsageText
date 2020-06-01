@@ -20,20 +20,53 @@ osageCaseOffset = 40  # Amount to add to get lower case from upper.
 firstOsageUpper = 0x104B0
 lastOsageUpper = 0x104D3
 
-minOsageU = unichr(0xd801)+unichr(0xdcb0)
-maxOsageU = unichr(0xd801)+unichr(0xdcd8)
+minOsageU = chr(firstOsageUpper)
+maxOsageU = chr(lastOsageUpper)
 lowerCaseOffset = 0x28
 oldOsageDot = u'\uf02e'
+
+# Special cases of text that may appear italicized but should not be converted
+# to Osage characters
+do_not_convert_italics = [
+  "LAK", "OM", "OP", "Osage Grammar", "PO", "QU", "WI"
+]
+
+grammatical_terms = [
+  "1st", "2nd", "3rd", "ADJ", "ADJP", "CUA",
+  "(intr.)", "(trans.)",
+  # TODO: Add the rest from page xlii.
+]
+
+silDoulsQ_to_Unicode_map = {
+  u'\u00b0': '\u00f8', # o with bar
+  u'\u00b5': '\u00f0', # lowercase eth
+  u'\u00bc': 'p\u0323', # p with dot below
+  u'\u00be': '\u1eb6', # t with dot below
+  u'\u00c3': '\u0194', # capital Latin gamma
+  u'\u00c7': '\u0161', # s with caron
+  u'\u00cb': '\u017d', # Z with caron
+  u'\u00d0': '\u1e33', # k with dot below
+  u'\u00d8': '\u02c0', # glottal stop
+  u'\u00e0': '\u0105',  # a with ogonek
+  u'\u00e2': '\u0105\u0301',  # a acute with ogonek
+  u'\u00e3': '\u0263',  # small Latin gamma
+  u'\u00e6': '\u207f',  # n superscript
+  u'\u00e7': '\u0106',  # s with caron
+  u'\u00eb': '\u017e',  # z with caron
+  u'\u00ec': '\u02db',  # i with ogonek
+  u'\u00f2': '\u01eb',  # o with ogonek
+  u'\u00f4': '\u01eb\u0301',  # o acute with ogonek
+}
 
 osage_quitero_latin_to_unicode_map = {
   u'\u0020': ' ',
   u'\u0027': '\'',
   u'\u0029': ')',
 
-  u'ã': u'??',
+  u'ã': u'𐓹',
   u'â': u'𐓘͘',  # Plus acute??
   u'à': u'𐓘͘',
-  u'á': u'𐓘͘',
+  u'á': u'𐓘',
   u'a': u'𐓘',
   u'aa': u'𐓘',
   u'ą̄': u'𐓘͘',
@@ -41,17 +74,17 @@ osage_quitero_latin_to_unicode_map = {
   u'aį': u'𐓚',
   u'ąį': u'𐓚',
   u'æ': u'\u207f',
-  u'b': u'𐓬',  # unichr(0xd801)+unichr(0xdcdc),
+  u'b': u'𐓬',  # chr(0xd801)+chr(0xdcdc),
   u'br': u'𐓜',
-  u'hc': u'𐓲',  #unichr(0xd801)+unichr(0xdcde),
-  u'c':  u'𐓲',  #unichr(0xd801)+unichr(0xdcdd),
+  u'hc': u'𐓲',  #chr(0xd801)+chr(0xdcde),
+  u'c':  u'𐓲',  #chr(0xd801)+chr(0xdcdd),
   u'cɂ': u'𐓲’',
   u'č': u'𐓝',
   u'ç': u'𐓮',
-  u'Đ': u'\u1e33',
+  u'Đ': u'𐓍',
   u'ð': u'𐓵',
   u'é': u'𐓟',
-  u'd': unichr(0xd801)+unichr(0xdcf0),
+  u'd': chr(0x104f0),
   u'e': u'𐓟',
   u'ee': u'𐓟',
   u'ë': u'𐓻',  # Same as 'ž'
@@ -63,10 +96,11 @@ osage_quitero_latin_to_unicode_map = {
   u'įį': u'𐓣͘',
   u'î': u'𐓣',
   u'í': u'𐓣',
-  u'ì': u'???',
+  u'ì': u'𐓣',
   u'k': u'𐓤',
   u'kk': u'𐓤',
   u'kɂ': u'𐓤’',
+  u'k\u00d8': u'𐓤’',
   u'l': u'𐓧',
   u'm': u'𐓨',
   u'n': u'𐓩',
@@ -74,11 +108,11 @@ osage_quitero_latin_to_unicode_map = {
   u'oo': u'𐓪',
   u'oi': u'𐓫',
   u'oį': u'𐓫',
-  u'ô': '???',  # TODO
-  u'ó': '???',
-  u'ò': u'??',
+  u'ô': u'𐓪',
+  u'ó': u'𐓪',
+  u'ò': u'𐓪',
   u'hp': u'𐓬',
-  u'p':  u'𐓬',
+  u'p': u'𐓬',
   u'pɂ': u'𐓬’',
   u's': u'𐓮',
   u'š': u'𐓯',
@@ -91,12 +125,9 @@ osage_quitero_latin_to_unicode_map = {
   u'z': u'𐓺',
   u'ž': u'𐓻',
   u'ᶕ': u'𐓛͘',
-  u'ð': u'ð',  # TODO: fix this
-  u'¾': u'\u1ebd',
+  u'Ø': u'\'',
 
-  u'Ø': u'??',
-
-  # TODOL Upper case input.
+  # TODO Upper case input.
   u'C': u'𐓊',
   u'D': u'𐓈',
   u'I': u'𐒻',
@@ -116,11 +147,11 @@ osage_quitero_latin_to_unicode_map = {
   '(': '(',
   '-': '-',
 }
-
+ 
 # For parsing input
 osage_latin_chars = u"[AÁáEÉéOÓóòôžįëìâàA-Za-zčððæɣĐ]"
 osage_latin_chars += u"|aa|ee|ii|oo|uu|br|"
-osage_latin_chars += u"br|aį|ąį|hc|cɂ|"
+osage_latin_chars += u"aį|ąį|hc|cɂ|"
 
 # Comma and period special cases
 osage_latin_chars += u"!\(\)\[\]\{\},\.|\;$"
@@ -141,9 +172,18 @@ def replaceDotSequence(matchobj):
 def replaceOsageSyllableDot(matchobj):
   # Omit the dot between two non-space, non-period characters.
   result = matchobj.group(0)[0] + matchobj.group(0)[-1]
-  # print 'Removing dot from %s giving %s' % (matchobj.group(0).encode('utf-8'),
-  #                                          result.encode('utf-8'))
+  # print('Removing dot from %s giving %s' % (matchobj.group(0).encode('utf-8'),
+  #                                          result.encode('utf-8')))
   return result
+
+def convertSILDoulousQtoUnicode(intext):
+  result_list = []
+  for c in intext:
+    out = c
+    if c in silDoulsQ_to_Unicode_map:
+      out = silDoulsQ_to_Unicode_map[c]
+    result_list.append(out)
+  return ''.join(result_list)
 
 def quiteroOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
                       clearOsageDot=True, clearDotSequence=False):
@@ -155,15 +195,12 @@ def quiteroOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
   textIn = re.sub(u'(\uf02e{2,})', replaceDotSequence, textIn)
 
   parsedInput = preParseOldOsage(textIn)
-  if debug:
-    print('&&&& Text in = >%s<' % textIn.encode('utf-8'))
-    print('&&& Convert parsed input = %s' % parsedInput)
 
   if not parsedInput:
-    print '!!!! preParse fails'
+    print('!!!! preParse fails')
     return ''
 
-  for index in xrange(len(parsedInput)):
+  for index in range(len(parsedInput)):
     c = parsedInput[index];
 
     # Handle ASCII period between two non-white space characters
@@ -177,33 +214,60 @@ def quiteroOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
         out = osage_quitero_latin_to_unicode_map[c]
       else:
         for cc in c:
-          print '!!!! Character %s not found (0x%x) in %s' % (
-              cc.encode('utf-8'), ord(cc), textIn.encode('utf-8'))
+          print('!!!! Character %s not found (0x%x) in %s' % (
+              cc.encode('utf-8'), ord(cc), textIn.encode('utf-8')))
         notFound.add(c)
         out = c
       convertResult += out
 
-  if convertResult == textIn:
-    print ('!!! No change in input %s' % (textIn.encode('utf-8')))
+  # Now look for combinations that need replacement,
+  # e.g., a, aa, á, áa -> 𐓘,
+  # c, hc, ch=𐓲
 
-  if debug:
-    print('&&&& Text out = >%s<' % convertResult.encode('utf-8'))
+  convertResult = re.sub("𐓘𐓘", "𐓘", convertResult)
+  convertResult = re.sub("𐓘͘𐓘͘", "𐓘͘", convertResult)
+  convertResult = re.sub("𐓟𐓟", "𐓟", convertResult)
+  convertResult = re.sub("𐓣𐓣", "𐓣", convertResult)
+  convertResult = re.sub("𐓣͘𐓣͘", "𐓣͘", convertResult)
+  convertResult = re.sub("𐓪𐓪", "𐓪͘", convertResult)
+  convertResult = re.sub("𐓪͘𐓪͘", "𐓪͘͘", convertResult)
+  convertResult = re.sub("𐓙𐓙", "𐓙", convertResult)
+  convertResult = re.sub("𐓚𐓚", "𐓚", convertResult)
+  convertResult = re.sub("𐓫𐓫", "𐓫", convertResult)
+
+  convertResult = re.sub("𐒰𐒰", "𐒰", convertResult)
+  convertResult = re.sub("𐒰͘𐒰͘", "𐒰͘", convertResult)
+  convertResult = re.sub("𐒷𐒷", "𐒷͘", convertResult)
+  convertResult = re.sub("𐒻𐒻", "𐒻", convertResult)
+  convertResult = re.sub("𐒻͘𐒻͘", "𐒻͘", convertResult)
+  convertResult = re.sub("𐓂͘𐓂͘", "𐓂͘͘", convertResult)
+  convertResult = re.sub("𐓂𐓂", "𐓂", convertResult)
+  convertResult = re.sub("𐒱𐒱", "𐒱͘", convertResult)
+  convertResult = re.sub("𐓃𐓃", "𐓃", convertResult)
+
+  convertResult = re.sub("𐓡𐓲", "𐓲", convertResult)
+  convertResult = re.sub("𐓡𐓤", "𐓤͘", convertResult)
+  convertResult = re.sub("𐓡𐓬", "𐓬", convertResult)
+  convertResult = re.sub("𐒹𐓊", "𐓊", convertResult)
+  convertResult = re.sub("𐒹𐒼", "𐒼͘", convertResult)
+  convertResult = re.sub("𐒹𐓄", "𐓄", convertResult)
   return convertResult, notFound
 
 
 def testConvertOld():
   # Debug!
-  print '\nOLD OSAGE'
+  print('\nOLD OSAGE')
   oldOsageText = u'\uf044\uf041\uf04e\uf059\uf020\uf057\uf041\uf04c\uf059\uf05e'  # u'\'
   expected = u'𐓈𐒰𐓁𐒻 𐓏𐒰𐒿𐒻͘'
 
   result = oldOsageToUnicode(oldOsageText)
 
   if result != expected:
-    print 'Old Osage = %s' % oldOsageText.encode('utf-8')
-    print '** Not converting Old Osage: expected(%d) >%s<. Result(%d) = >%s<' % (len(expected), expected, len(result), result)
+    print('Old Osage = %s' % oldOsageText.encode('utf-8'))
+    print( '** Not converting Old Osage: expected(%d) >%s<. Result(%d) = >%s<' %
+           (len(expected), expected, len(result), result))
 
-  print '\nOLD OSAGE Punctuation'
+  print('\nOLD OSAGE Punctuation')
   oldOsagePunctuation = [(u'\uf02d' '-'), (u'\uf020', ' '),
                          (u'\uf05e', '^'), (u'\uf02e', '.')]
 
@@ -211,10 +275,10 @@ def testConvertOld():
     result = oldOsageToUnicode(punct[0])
     expected = punct[1]
     if result == expected:
-      print '  Punctuation is as expected = %s' % result
+      print('  Punctuation is as expected = %s' % result)
     else:
-      print '  Punctuation is *NOT* as expected(%d) = >%s< vs. result(%d) = >%s<' % (
-          len(expected), expected, len(result), result)
+      print('  Punctuation is *NOT* as expected(%d) = >%s< vs. result(%d) = >%s<' % (
+          len(expected), expected, len(result), result))
 
 
 def testConvertLatin():
@@ -236,11 +300,10 @@ def testConvertLatin():
   expected = u" !𐓇#$%&'()*+𐒺-𐒾0123456789:𐓆𐒼<=>𐒾@𐒰𐒴𐒵𐓈𐒷𐒹𐒱𐒳𐒼𐒿𐓀𐓁𐓂𐓄𐓆𐓍𐓎𐓇𐓏𐓐𐒻𐓒𐓓𐓆𐓈𐓊͘_`𐒲𐒸𐓃{|}~¶"
 
 
-
 def testCommaPeriod():
-  print '!!!! testCommanPeriod'
+  print('!!!! testCommanPeriod')
   intext = 'A,B A,'
-  expected = u'\ud801\udcb0\ud801\udcba\u0042\u0020\ud801\udcb0\u002c'
+  expected = u'\U000104b0\U000104ba\u0042\u0020\U000104b0\u002c'
   result = oldOsageToUnicode(intext)
   if result != expected:
     print('textCommaPeriod fails on input %s' % intext)
@@ -259,6 +322,7 @@ def printResult(expected, result, msg):
            expected.encode('utf-8'), result.encode('utf-8')))
   else:
     print('%s: test passes!' % msg)
+
 
 def testRemoveDots():
   t = u'A. W.a'
@@ -296,7 +360,7 @@ def testRemoveDots():
   expected = u'𐒹𐓎𐒹𐒰𐓆𐒼𐒰.'
   printResult(expected, result, 'testRemoveDots 7')
 
-  print '** testRemoveDots done'
+  print('** testRemoveDots done')
 
 
 def testCharacterConversions():
@@ -322,7 +386,7 @@ def testCharacterConversions():
 
   t = 'o  e o a . WEO^O'
   result = oldOsageToUnicode(t)
-  print result
+  print(result)
   expected = u'𐓃  𐒸 𐓃 𐒲 . 𐓏𐒷𐓂͘𐓂'
   printResult(expected, result, 'Lower case vowels eoa')
 

@@ -19,9 +19,11 @@ QuinteroDictionaryOsageFont = 'Ss Do SILDoulos Q'
 FONTS_TO_CONVERT = [QuinteroDictionaryOsageFont]
 
 from docx import Document
+from docx.enum.style import WD_STYLE_TYPE
+from docx import shared
 
 import convertUtil
-import osageConversion
+#import osageConversion
 import quinteroConversion
 
 extractedFileName = False
@@ -29,6 +31,8 @@ extractedFileName = False
 # Flag for handling all characters in an Old font.
 convertAllInOldFontRange = True
 
+angle_pattern = r'(<[^>]*>)'
+angle_prog = prog = re.compile(angle_pattern)
 
 # Converts Osage text that is labeld with the old font encoding
 # It assumes that the font has been detected.
@@ -42,6 +46,9 @@ def checkAndConvertText(textIn):
   result = quinteroConversion.quiteroOsageToUnicode(textIn)
   return result
 
+# Fixes contents of string in angle brackets with SIL font replacements
+def fixAngleString(match):
+  return quinteroConversion.convertSILDoulousQtoUnicode(match.group(1))
 
 def convertDoc(doc, unicodeFont, debugInfo=None,
                extractedFile=None):
@@ -54,11 +61,9 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
   print ('  %d tables' % len(doc.tables))
   if debugInfo and doc.inline_shapes:
     print ('  %d inline_shapes' % len(doc.inline_shapes))
-  if debugInfo and doc.part:
-   print (' %s part' % dir(doc.part))
 
   if debugInfo:
-    print ('    doc dir: %s' % dir(doc))
+#    print ('    doc dir: %s' % dir(doc))
     for section in sections:
       print ('Section = %s' % section)
 
@@ -73,64 +78,92 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
   missingConversions = set([])
   for para in paragraphs:
 
-    para_format = para.paragraph_format
+    #para_format = para.paragraph_format
     para_style = para.style
-    para_alignment = para.alignment
-    para_part = para.part
+    #para_alignment = para.alignment
+    #para_part = para.part
 
-    if debugInfo:
-      print ('  Paragraph %d' % paraNum)
-      # print ('    para format = %s' % para_format)
-      # print ('    para style = %s' % para_style)
-      print ('    para style.font.name = %s' % para_style.font.name)
-      print ('    para style.name = %s' % para_style.name)
-      # print ('    para alignment = %s' % para_alignment)
-      # print ('    para part = %s' % para_part)
-      if para_part:
-        print ('    inline_shapes = %s' % para_part.inline_shapes)
-
+    para_style_id = para_style.style_id
     runs = para.runs
     print ('    %d runs in paragraph' % (len(runs)))
-    print ('    paragraph text = %s' % (para.text.encode("utf-8")))
+    #print ('    paragraph text = %s' % (para.text))
     runNum = 0
     runNum = 1
+    afterVariant = False  # For bold words after "variant of" or "variant:"
+
     for run in runs:
       if len(run.text):
         thisText = run.text
+        originalText = thisText
         fontObj = run.font
         fontName = fontObj.name
         if not fontName:
           fontName = para_style.font.name
 
-        if debugInfo:
-          print ('    Run %d text(%d) =  >%s<' % (
-              runNum, len(run.text.encode('utf-8')),
-              run.text.encode('utf-8')))
-          print ('      run bold = %s, italic = %s' % (
-              run.font.bold, run.font.italic))
-          #print ('      run font = %s' % run.font)
-          print ('      fontName = %s' % fontName)
+        # Fix SIL font encoded text within angle brackets
+        thisText = angle_prog.sub(fixAngleString, thisText)
 
-        ## DECIDE IF CONVERSION IS NEEDED
-        if (((runNum == 1 and run.font.bold) or run.font.italic) and
+        ## DECIDE IF further CONVERSION IS NEEDED
+        convertedText = thisText
+        if (((runNum == 1 and run.font.bold) or
+             (afterVariant and run.font.bold) or run.font.italic) and
             fontName in FONTS_TO_CONVERT and thisText):
-          print('!!!!!!!! CONVERTING %s' % thisText.encode('utf-8'))
-          convertedText, notFound = checkAndConvertText(thisText)
-          print('NOT FOUND: %s' % notFound)
-          for a in notFound:
-            missingConversions.add(a)
 
-          print('         Converted =  %s' % convertedText.encode('utf-8'))
-          if thisText != convertedText:
-            numConverts += 1
-            run.text = convertedText
-            fontObj.name = unicodeFont
-            if extractedFile:
-              extractedFile.write('%s\t%s\t%s\n' % (
-                  fontName, thisText, convertedText))
+          # Omit conversions within angle brackets.
+          # For each in the split, check if it matches
+          # if not, convert, else just copy
+          sp = angle_prog.split(convertedText)
+          pieces = []
+          convertItem = True
+          for s in sp:
+            if angle_prog.match(s):
+              pieces.append(s)
+            else:
+              if s != '':
+                # See it it contains a grammatical term or "do not convert"
+                for term in quinteroConversion.grammatical_terms:
+                  if re.search(term, s):
+                    convertItem = False
+                for term in quinteroConversion.do_not_convert_italics:
+                  if re.search(term, s):
+                    convertItem = False
+
+                if convertItem:
+                  newText, notFound = checkAndConvertText(s)
+                else:
+                  newText = s
+                pieces.append(newText)
+                if notFound:
+                  print('NOT FOUND in string %s: %s' % (thisText, notFound))
+                  for a in notFound:
+                    missingConversions.add(a)
+
+          convertedText = ''.join(pieces)
+          afterVariant = False
+          #print('!!!!!!!! CONVERTING %s to %s' % (originalText, convertedText))
+        else:
+          # Check for variant
+          m = re.search(r'\(variant', thisText)
+          if (m):
+            # Remember that variant precedes the next bold item.
+            afterVariant = True
           else:
+            afterVariant = False  # Reset
+
+        if originalText != convertedText:
+          numConverts += 1
+          run.text = convertedText
+          if convertedText != thisText:
+            # It was changed from ASCII to Osage
+            fontObj.name = unicodeFont
+          if extractedFile:
+            extractedFile.write('%s\t%s\t%s\n' % (
+                fontName, thisText, convertedText))
+        else:
             notConverted += 1
       runNum += 1
+    if para.text:
+      print ('    paragraph text = %s' % (para.text))
     paraNum += 1
 
   print('All missing characters = %s' % missingConversions)
@@ -142,14 +175,23 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
 
 
 # Process one DOCX, substituting the
-def convertOneDoc(path_to_doc, unicodeFont='Pawhuska',
+def convertOneDoc(path_to_doc, unicodeFont='Noto Sans Osage',
                   outpath=None, isString=False):
 
   print('TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
-      TIMESTAMP, osageConversion.TIMESTAMP))
+      TIMESTAMP, quinteroConversion.TIMESTAMP))
   print ('Converting Osage in file: %s' % path_to_doc)
 
+
   doc = Document(path_to_doc)
+
+  # Set up the Unicode font.
+  styles = doc.styles
+  style_obj = styles.add_style('Osage_font', WD_STYLE_TYPE.CHARACTER)
+  obj_font = style_obj.font
+  basic_font_size = 10
+  obj_font.size = shared.Pt(basic_font_size)
+  obj_font.name = unicodeFont
 
   if extractedFileName:
     extractedFile = codecs.open(extractedFileName, 'w', 'utf-8')
@@ -161,7 +203,7 @@ def convertOneDoc(path_to_doc, unicodeFont='Pawhuska',
 
   if numConverts:
     newName = os.path.splitext(path_to_doc)[0]
-    unicode_path_to_doc = newName + '.unicode.docs'
+    unicode_path_to_doc = newName + '.unicode.docx'
     doc.save(unicode_path_to_doc)
     print ('  ** Saved new version to file %s\n' % unicode_path_to_doc)
   else:
