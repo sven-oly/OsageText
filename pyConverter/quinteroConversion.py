@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 
 import re
+import unicodedata
 
 # Convert Osage Latin text from Quintero Dictionary to Unicode.
 
@@ -66,13 +67,12 @@ osage_quitero_latin_to_unicode_map = {
   u'ã': u'𐓹',
   u'â': u'𐓘͘',  # Plus acute??
   u'à': u'𐓘͘',
-  u'á': u'𐓘',
-  u'á': u'𐓘',
+  u'àà': u'𐓘͘',
   u'á': u'𐓘',
   u'a': u'𐓘',
   u'aa': u'𐓘',
-  u'áa': u'𐓘',
-  u'ą̄': u'𐓘͘',
+  u'áa': u'𐓘',
+  u'ą̄': u'𐓘͘',
   u'ą': u'𐓘͘',
   u'ąą': u'𐓘͘',
   u'ą́ą': u'𐓘͘',
@@ -82,9 +82,9 @@ osage_quitero_latin_to_unicode_map = {
   u'ąį': u'𐓚',
   u'aį́': u'𐓚',
   u'ą́i': u'𐓚',
-  u'aí': u'𐓙',
+  u'aí': u'𐓙',
   u'æ': u'\u207f',
-  u'ái': u'𐓙',
+  u'ái': u'𐓙',
   u'ą́i': u'𐓚',
   u'b': u'𐓬',
   u'br': u'𐓜',
@@ -97,8 +97,7 @@ osage_quitero_latin_to_unicode_map = {
   u'Đ': u'𐓍',
   u'ð': u'𐓵',
   u'é': u'𐓟',
-  u'é': u'𐓟',
-  u'ée': u'𐓟',
+  u'ée': u'𐓟',
   u'd': chr(0x104f0),
   u'e': u'𐓟',
   u'ee': u'𐓟',
@@ -107,10 +106,10 @@ osage_quitero_latin_to_unicode_map = {
   u'h': u'𐓡',
   u'hk': u'𐓤',
   u'i': u'𐓣',
-  u'í': u'𐓣',
+  u'í': u'𐓣',
   u'ii': u'𐓣',
-  u'íi': u'𐓣',
-  u'íi': u'𐓣',
+  u'íi': u'𐓣',
+  u'íi': u'𐓣',
   u'į': u'𐓣͘',
   u'įį': u'𐓣͘',
   u'į́į': u'𐓣͘',
@@ -127,12 +126,12 @@ osage_quitero_latin_to_unicode_map = {
   u'm': u'𐓨',
   u'n': u'𐓩',
   u'o': u'𐓪',
-  u'ó': u'𐓪',
-  u'óo': u'𐓪',
+  u'ó': u'𐓪',
+  u'óo': u'𐓪',
   u'oo': u'𐓪',
   u'oi': u'𐓫',
   u'oį': u'𐓫',
-  u'óį': u'𐓫',
+  u'óį': u'𐓫',
   u'ǫį́': u'𐓫',
   u'ǫ́i': u'𐓫',
   u'ô': u'𐓪',
@@ -185,14 +184,41 @@ osage_quitero_latin_to_unicode_map = {
 }
 
 # For parsing input
-osage_latin_chars = u'áa|áa|ąą|aį́|aí|ą́ą|ai|ái|aį|ąį|ą́i|aa|br|ch|cɂ|ée|ee|' +\
-                    'hc|hk|hp|ht|íi|įį|į́į|ii|' +\
-                    'kɂ|óo|ǫǫ|ǫ́ǫ|oo|oį|óį|ǫį́|ǫ́i|oi|' +\
-                    'ą́|ą|á|á|a|b|č|c|ð|é|e|ɣ|h|į́|í|į|i|k|l|m|n|' +\
-                    'ǫ́|ǫ|ó|o|p|s|š|t|u|w|x|ž|z|ᶕ| |[\U00010400-\U000104f0]'
+osage_latin_chars = u'áa|àà|ąą|aį́|aí|ą́ą|ai|ái|aį|ąį|ą́i|aa|br|ch|cɂ|ée|ee|' +\
+                    'hc|hk|hp|ht|íi|íi|įį|į́į|ii|' +\
+                    'kɂ|óo|ǫǫ|ǫ́ǫ|oo|oį|óį|ǫį́|ǫ́i|oi|' +\
+                    'ą́|ą̄|ą|á|á|a|b|č|c|ð|é|e|ɣ|h|į́|í|į|i|k|l|m|n|' +\
+                    'ǫ́|ǫ|ó|o|p|s|š|t|u|w|x|ž|z|ᶕ| |[\U00010400-\U000104f0]'
 
-combined_chars = osage_latin_chars + "|."
+osage_keys = osage_latin_chars.split('|')
+for k in osage_keys:
+  norm_k = unicodedata.normalize('NFC', k)
+  if norm_k != k:
+    print('osage_latin_chars >%s< --> >%s< not normalized' % (k, norm_k))
+
+# Make sure everything is normalized for matching!
+combined_chars = unicodedata.normalize('NFC', osage_latin_chars + "|.")
 regex_parse = re.compile(combined_chars, flags=re.I)
+
+# Make sure everything is normalized for matching!
+updates = {}
+for k in osage_quitero_latin_to_unicode_map.keys():
+  norm_k = unicodedata.normalize('NFC', k)
+  if norm_k != k:
+    print('NOT NORMALIZED: >%s< (%s) --> >%s<' % (k, norm_k, osage_quitero_latin_to_unicode_map[k]))
+    updates[norm_k] = osage_quitero_latin_to_unicode_map[k]
+  norm_data = unicodedata.normalize('NFC', osage_quitero_latin_to_unicode_map[k])
+  if norm_data != osage_quitero_latin_to_unicode_map[k]:
+    print('NOT NORMALIZED DATA: >%s< (%s) --> >%s<' % (k, norm_data, osage_quitero_latin_to_unicode_map[k]))
+
+for norm_k in updates:
+  osage_quitero_latin_to_unicode_map[norm_k] = updates[norm_k]
+  print('Added normalized for for >%s<' % norm_k)
+
+for k in osage_keys:
+  if k not in osage_quitero_latin_to_unicode_map:
+    print('Missing data for >%s<?' % k)
+# TODO: Check if there are any missing parse keys...
 
 def preParseOldOsage(instring):
     outList = regex_parse.findall(instring)
@@ -225,6 +251,8 @@ def quiteroOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
   # Replace sequence of Old Osage dots with periods.
   # TODO: use the flag.
   textIn = re.sub(u'(\uf02e{2,})', replaceDotSequence, textIn)
+  # Make sure input text is NFC normalized to prevent matching problems with decomposed characters
+  textIn = unicodedata.normalize('NFC', textIn)
 
   parsedInput = preParseOldOsage(textIn)
 

@@ -85,11 +85,12 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
 
     para_style_id = para_style.style_id
     runs = para.runs
-    print ('    %d runs in paragraph' % (len(runs)))
+    #print ('    %d runs in paragraph' % (len(runs)))
     #print ('    paragraph text = %s' % (para.text))
     runNum = 0
     runNum = 1
     afterVariant = False  # For bold words after "variant of" or "variant:"
+    original_para_text = para.text
 
     for run in runs:
       if len(run.text):
@@ -162,11 +163,15 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
         else:
             notConverted += 1
       runNum += 1
-    if para.text:
-      print ('    paragraph text = %s' % (para.text))
+    if para.text != original_para_text and debugInfo:
+      print ('    Converted paragraph text = %s' % (para.text))
     paraNum += 1
 
-  print('All missing characters = %s' % missingConversions)
+  if missingConversions:
+    print('All missing characters = %s' % missingConversions)
+  else:
+    print('There are no missing characters = %s' % missingConversions)
+
   if extractedFile:
      extractedFile.close()
 
