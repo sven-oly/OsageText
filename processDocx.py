@@ -4,11 +4,13 @@
 
 # from docx import *
 
+from future import standard_library
+standard_library.install_aliases()
 import csv
 import json
 import logging
 import os
-import StringIO
+import io
 
 import webapp2
 

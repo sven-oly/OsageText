@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
 
-  <title>Testing Osage Unicode and conversion</title>
+  <title>Enter data for {{lang}} translations</title>
 
   <link rel="stylesheet" href="/css/blueprint/screen.css" type="text/css" media="screen">
   <link rel="stylesheet" href="/css/blueprint/print.css" type="text/css" media="print"> 
@@ -35,9 +35,7 @@ table tr:nth-child(even){background-color: #f2f2f2;}
   </style>
   <script src="/js/text_utils.js"></script>
   <script src="/js/utils.js"></script>
-  <script src="/js/osageConverter.js"></script>
-  <script src="/js/osage_utils.js"></script>
-  
+
   <script src="/js/vk-debug.js"></script>
 
   <script>
@@ -71,7 +69,7 @@ table tr:nth-child(even){background-color: #f2f2f2;}
 
   function onFontSelected(selected) {
     var output_text = document.getElementById('Unicode_font_output_text');
-     var fontFam = selected.value + ", Arial, Osage";
+     var fontFam = selected.value + ", Arial";
     output_text.style.fontFamily = fontFam;
     setKeyCapsFont(fontFam);
   }
@@ -84,19 +82,6 @@ table tr:nth-child(even){background-color: #f2f2f2;}
     }
   }
 
-  function toOsageFonts(area1, area2) {
-    // Open a comparison window with the resulting text.
-    var area1Elem = document.getElementById(area1);
-    var text1 = area1Elem.value;
-
-    var area2Elem = document.getElementById(area2);
-    var text2= area2Elem.value;
-
-    compareUrl = "/OsageFonts/?utext=" + text1 + "&osageText=" + text2;
-
-    window.location=compareUrl;   
-  }
-  
   function toggle(id, toggle) {
     var obj = document.getElementById(id);
     var checkBox = document.getElementById(toggle);
@@ -111,7 +96,7 @@ table tr:nth-child(even){background-color: #f2f2f2;}
   function initKeyboard(textAreaID) {
       var input = document.getElementById(textAreaID);
       controller = new i18n.input.keyboard.Keyboard();
-      controller.loadLayout('osa_dict');
+      controller.loadLayout('{{kb2}}');
       controller.reposition(input, 1, 0, [1, 0, 0, 0]);
       controller.register(input);
       controller.addEventListener('kc', function() { visible = false; });
@@ -132,7 +117,7 @@ table tr:nth-child(even){background-color: #f2f2f2;}
 
 function addRowValues() {
   var en_input = document.getElementById("english_input");
-  var dict_input = document.getElementById("osage_latin_input");
+  var dict_input = document.getElementById("lang2_input");
   addRow(en_input.value, dict_input.value);
 }
 
@@ -142,7 +127,7 @@ function addRow(first_value, second_value) {
   var cell1 = row.insertCell(0);
   var cell2 = row.insertCell(1);
   //var en_input = document.getElementById("english_input");
-  //var dict_input = document.getElementById("osage_latin_input");
+  //var dict_input = document.getElementById("lang2_input");
   cell1.innerHTML = first_value;
   cell1.contentEditable = true;
   cell2.innerHTML = second_value;
@@ -168,7 +153,7 @@ function editRow(row_num) {
   var edit_row = rows.item(row_num);
 
   var en_input = document.getElementById("english_input");
-  var dict_input = document.getElementById("osage_latin_input");
+  var dict_input = document.getElementById("lang2_input");
   en_input.value = edit_row.cells[0].innerText;
   dict_input.value = edit_row.cells[1].innerText;
   edit_mode = true;
@@ -183,7 +168,7 @@ function updateRow() {
   var rows = table.rows;
   var edit_row = rows.item(edit_row_num);
   var en_input = document.getElementById("english_input");
-  var dict_input = document.getElementById("osage_latin_input");
+  var dict_input = document.getElementById("lang2_input");
   edit_row.cells[0].innerHTML = en_input.value;
   edit_row.cells[1].innerHTML = dict_input.value;
   en_input.value = '';
@@ -232,7 +217,7 @@ function submitOnEnter(event){
        updateRow();
        } else {
         var en_input = document.getElementById("english_input");
-        var dict_input = document.getElementById("osage_latin_input");
+        var dict_input = document.getElementById("lang2_input");
         addRow(en_input.value, dict_input.value);
         en_input.value = '';
         dict_input.value = '';
@@ -275,7 +260,7 @@ function submitOnEnter(event){
   }
 
   function onPageLoaded() {
-    initKeyboard('osage_latin_input');
+    initKeyboard('lang2_input');
     init();
   }  
 
@@ -298,8 +283,8 @@ function submitOnEnter(event){
   </div>
 
   <div class="span-10">
-    <h3>Dictionary Osage text</h3>
-      <textarea id="osage_latin_input" style="font-family:'Arial';"
+    <h3>Dictionary {{lang}} text</h3>
+      <textarea id="lang2_input" style="font-family:'Arial';"
                 onkeypress="submitOnEnter(event);" spellcheck="false"></textarea>
   </div>
 
@@ -324,8 +309,8 @@ function submitOnEnter(event){
 
     <table id="output_table">
        <tr>
-           <td width="450px">English</td>
-           <td width="450px">Osage Latin</td>
+           <td width="450px">{{lang1}}Lang1</td>
+           <td width="450px">{{lang2}}Lang2</td>
            <td width="50px">Edit</td>
        </tr>
     </table>
@@ -362,8 +347,8 @@ function submitOnEnter(event){
    {% endfor %}
      </ul>
    {% endif %}
-    <div>Keyboard: <select onchange="onLayoutSelected(this, null, 'osage_latin_input')")" id="selectKeyboard">
-      <option value="osa_dict">Osage Dictionary</option>
+    <div>Keyboard: <select onchange="onLayoutSelected(this, null, 'lang2_input')")" id="selectKeyboard">
+      <option value="{{kb2}}">{{lang}} Dictionary</option>
     </select>
 
     </div>

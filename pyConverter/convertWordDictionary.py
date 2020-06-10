@@ -15,8 +15,8 @@ import sys
 TIMESTAMP = "Version 2017-12-19 13:45"
 
 OfficialOsageFont = 'Official Osage Language'
-QuinteroDictionaryOsageFont = 'Ss Do SILDoulos Q'
-FONTS_TO_CONVERT = [QuinteroDictionaryOsageFont]
+QuinteroDictionaryOsageFonts = ['Ss Do SILDoulos Q', 'Doulos SIL']
+FONTS_TO_CONVERT = QuinteroDictionaryOsageFonts
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
@@ -40,11 +40,11 @@ def checkAndConvertText(textIn):
 
   if textIn[0] == '=':
     # Ignore function calls
-    return textIn
+    return textIn, None
 
   # Handle text in font-labeled regions
-  result = quinteroConversion.quiteroOsageToUnicode(textIn)
-  return result
+  result, notFound = quinteroConversion.quiteroOsageToUnicode(textIn)
+  return result, notFound
 
 # Fixes contents of string in angle brackets with SIL font replacements
 def fixAngleString(match):
@@ -129,7 +129,7 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
                     convertItem = False
 
                 if convertItem:
-                  newText, notFound = checkAndConvertText(s)
+                  (newText, notFound) = checkAndConvertText(s)
                 else:
                   newText = s
                 pieces.append(newText)

@@ -197,6 +197,11 @@ class DictionaryInput(webapp2.RequestHandler):
       latinInput = self.request.get("latintext", "")
 
       template_values = {
+        'lang': Language,
+        'lang1': "English",
+        'lang2': "Osage Latin",
+        'kb1': 'en',
+        'kb2': 'osa_dict',
         'osageInput': oldOsageInput,
         'unicodeInput': unicodeInput,
         'latinInput': latinInput,

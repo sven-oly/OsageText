@@ -67,50 +67,81 @@ osage_quitero_latin_to_unicode_map = {
   u'â': u'𐓘͘',  # Plus acute??
   u'à': u'𐓘͘',
   u'á': u'𐓘',
+  u'á': u'𐓘',
+  u'á': u'𐓘',
   u'a': u'𐓘',
   u'aa': u'𐓘',
+  u'áa': u'𐓘',
   u'ą̄': u'𐓘͘',
-  u'ai': u'𐓙u',
+  u'ą': u'𐓘͘',
+  u'ąą': u'𐓘͘',
+  u'ą́ą': u'𐓘͘',
+  u'ą́': u'𐓘͘',
+  u'ai': u'𐓙',
   u'aį': u'𐓚',
   u'ąį': u'𐓚',
+  u'aį́': u'𐓚',
+  u'ą́i': u'𐓚',
+  u'aí': u'𐓙',
   u'æ': u'\u207f',
-  u'b': u'𐓬',  # chr(0xd801)+chr(0xdcdc),
+  u'ái': u'𐓙',
+  u'ą́i': u'𐓚',
+  u'b': u'𐓬',
   u'br': u'𐓜',
-  u'hc': u'𐓲',  #chr(0xd801)+chr(0xdcde),
-  u'c':  u'𐓲',  #chr(0xd801)+chr(0xdcdd),
+  u'hc': u'𐓲',
+  u'c':  u'𐓲',
   u'cɂ': u'𐓲’',
+  u'ch':  u'𐓲',
   u'č': u'𐓝',
   u'ç': u'𐓮',
   u'Đ': u'𐓍',
   u'ð': u'𐓵',
   u'é': u'𐓟',
+  u'é': u'𐓟',
+  u'ée': u'𐓟',
   u'd': chr(0x104f0),
   u'e': u'𐓟',
   u'ee': u'𐓟',
   u'ë': u'𐓻',  # Same as 'ž'
   u'ɣ': u'𐓹',
   u'h': u'𐓡',
+  u'hk': u'𐓤',
   u'i': u'𐓣',
+  u'í': u'𐓣',
   u'ii': u'𐓣',
+  u'íi': u'𐓣',
+  u'íi': u'𐓣',
   u'į': u'𐓣͘',
   u'įį': u'𐓣͘',
+  u'į́į': u'𐓣͘',
   u'î': u'𐓣',
   u'í': u'𐓣',
   u'ì': u'𐓣',
+  u'į': u'𐓣͘',
+  u'į́': u'𐓣͘',
   u'k': u'𐓤',
   u'kk': u'𐓤',
   u'kɂ': u'𐓤’',
-  u'k\u00d8': u'𐓤’',
+  u'kØ': u'𐓤’',
   u'l': u'𐓧',
   u'm': u'𐓨',
   u'n': u'𐓩',
   u'o': u'𐓪',
+  u'ó': u'𐓪',
+  u'óo': u'𐓪',
   u'oo': u'𐓪',
   u'oi': u'𐓫',
   u'oį': u'𐓫',
+  u'óį': u'𐓫',
+  u'ǫį́': u'𐓫',
+  u'ǫ́i': u'𐓫',
   u'ô': u'𐓪',
   u'ó': u'𐓪',
   u'ò': u'𐓪',
+  u'ǫ': u'𐓪͘',
+  u'ǫ́': u'𐓪͘',
+  u'ǫǫ': u'𐓪͘',
+  u'ǫ́ǫ': u'𐓪͘',
   u'hp': u'𐓬',
   u'p': u'𐓬',
   u'pɂ': u'𐓬’',
@@ -118,7 +149,7 @@ osage_quitero_latin_to_unicode_map = {
   u'š': u'𐓯',
   u't': u'𐓰',
   u'ht': u'𐓰',
-  u'ú': u'𐓰',
+  u'ú': u'𐓶͘',
   u'u': u'𐓶',
   u'w': u'𐓷',
   u'x': u'𐓸',
@@ -129,11 +160,13 @@ osage_quitero_latin_to_unicode_map = {
 
   # TODO Upper case input.
   u'C': u'𐓊',
-  u'D': u'𐓈',
+  u'D': u'𐓍',
   u'I': u'𐒻',
   u'U': u'𐓎',
+  u'Ú': u'𐓎͘',
   u'T': u'𐓈',
 
+  u'ɂ': u'’',
   # Handle comma and period and other special cases
   '!': '!',
   '[': '[',
@@ -146,23 +179,24 @@ osage_quitero_latin_to_unicode_map = {
   ',': ',',
   '(': '(',
   '-': '-',
+  '=': '=',
+  ' ': ' ',
+  '’': '’',
 }
- 
-# For parsing input
-osage_latin_chars = u"[AÁáEÉéOÓóòôžįëìâàA-Za-zčððæɣĐ]"
-osage_latin_chars += u"|aa|ee|ii|oo|uu|br|"
-osage_latin_chars += u"aį|ąį|hc|cɂ|"
 
-# Comma and period special cases
-osage_latin_chars += u"!\(\)\[\]\{\},\.|\;$"
+# For parsing input
+osage_latin_chars = u'áa|áa|ąą|aį́|aí|ą́ą|ai|ái|aį|ąį|ą́i|aa|br|ch|cɂ|ée|ee|' +\
+                    'hc|hk|hp|ht|íi|įį|į́į|ii|' +\
+                    'kɂ|óo|ǫǫ|ǫ́ǫ|oo|oį|óį|ǫį́|ǫ́i|oi|' +\
+                    'ą́|ą|á|á|a|b|č|c|ð|é|e|ɣ|h|į́|í|į|i|k|l|m|n|' +\
+                    'ǫ́|ǫ|ó|o|p|s|š|t|u|w|x|ž|z|ᶕ| |[\U00010400-\U000104f0]'
 
 combined_chars = osage_latin_chars + "|."
-regex2 = re.compile(combined_chars, flags=re.I)
-
+regex_parse = re.compile(combined_chars, flags=re.I)
 
 def preParseOldOsage(instring):
-    outList = regex2.findall(instring)
-    return outList;
+    outList = regex_parse.findall(instring)
+    return outList
 
 
 def replaceDotSequence(matchobj):
@@ -172,8 +206,6 @@ def replaceDotSequence(matchobj):
 def replaceOsageSyllableDot(matchobj):
   # Omit the dot between two non-space, non-period characters.
   result = matchobj.group(0)[0] + matchobj.group(0)[-1]
-  # print('Removing dot from %s giving %s' % (matchobj.group(0).encode('utf-8'),
-  #                                          result.encode('utf-8')))
   return result
 
 def convertSILDoulousQtoUnicode(intext):
@@ -201,7 +233,7 @@ def quiteroOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
     return ''
 
   for index in range(len(parsedInput)):
-    c = parsedInput[index];
+    c = parsedInput[index]
 
     # Handle ASCII period between two non-white space characters
     #  as if it were an oldOsageDot.
@@ -214,43 +246,12 @@ def quiteroOsageToUnicode(textIn, convertToLower=True, convertLatin=True,
         out = osage_quitero_latin_to_unicode_map[c]
       else:
         for cc in c:
-          print('!!!! Character %s not found (0x%x) in %s' % (
-              cc.encode('utf-8'), ord(cc), textIn.encode('utf-8')))
+          print('!!!! Character >%s< not found (0x%x) in %s' % (
+              cc, ord(cc), textIn))
         notFound.add(c)
         out = c
       convertResult += out
 
-  # Now look for combinations that need replacement,
-  # e.g., a, aa, á, áa -> 𐓘,
-  # c, hc, ch=𐓲
-
-  convertResult = re.sub("𐓘𐓘", "𐓘", convertResult)
-  convertResult = re.sub("𐓘͘𐓘͘", "𐓘͘", convertResult)
-  convertResult = re.sub("𐓟𐓟", "𐓟", convertResult)
-  convertResult = re.sub("𐓣𐓣", "𐓣", convertResult)
-  convertResult = re.sub("𐓣͘𐓣͘", "𐓣͘", convertResult)
-  convertResult = re.sub("𐓪𐓪", "𐓪͘", convertResult)
-  convertResult = re.sub("𐓪͘𐓪͘", "𐓪͘͘", convertResult)
-  convertResult = re.sub("𐓙𐓙", "𐓙", convertResult)
-  convertResult = re.sub("𐓚𐓚", "𐓚", convertResult)
-  convertResult = re.sub("𐓫𐓫", "𐓫", convertResult)
-
-  convertResult = re.sub("𐒰𐒰", "𐒰", convertResult)
-  convertResult = re.sub("𐒰͘𐒰͘", "𐒰͘", convertResult)
-  convertResult = re.sub("𐒷𐒷", "𐒷͘", convertResult)
-  convertResult = re.sub("𐒻𐒻", "𐒻", convertResult)
-  convertResult = re.sub("𐒻͘𐒻͘", "𐒻͘", convertResult)
-  convertResult = re.sub("𐓂͘𐓂͘", "𐓂͘͘", convertResult)
-  convertResult = re.sub("𐓂𐓂", "𐓂", convertResult)
-  convertResult = re.sub("𐒱𐒱", "𐒱͘", convertResult)
-  convertResult = re.sub("𐓃𐓃", "𐓃", convertResult)
-
-  convertResult = re.sub("𐓡𐓲", "𐓲", convertResult)
-  convertResult = re.sub("𐓡𐓤", "𐓤͘", convertResult)
-  convertResult = re.sub("𐓡𐓬", "𐓬", convertResult)
-  convertResult = re.sub("𐒹𐓊", "𐓊", convertResult)
-  convertResult = re.sub("𐒹𐒼", "𐒼͘", convertResult)
-  convertResult = re.sub("𐒹𐓄", "𐓄", convertResult)
   return convertResult, notFound
 
 
@@ -263,7 +264,7 @@ def testConvertOld():
   result = oldOsageToUnicode(oldOsageText)
 
   if result != expected:
-    print('Old Osage = %s' % oldOsageText.encode('utf-8'))
+    print('Old Osage = %s' % oldOsageText)
     print( '** Not converting Old Osage: expected(%d) >%s<. Result(%d) = >%s<' %
            (len(expected), expected, len(result), result))
 
@@ -287,11 +288,11 @@ def testConvertLatin():
   expected = u"𐓀𐒻̄͘𐓂͘𐓄𐒰 𐓏𐒷𐓈𐓂̄𐓄𐒰"
 
   result = oldOsageToUnicode(intext)
-  print('TEST      in = %s' % intext.encode("utf-8"))
+  print('TEST      in = %s' % intext)
   print('TEST parsed = %s' %
         [c for c in preParseOldOsage(intext)])
-  print('TEST      out = %s' % result.encode("utf-8"))
-  print('TEST expected = %s' % expected.encode("utf-8"))
+  print('TEST      out = %s' % result)
+  print('TEST expected = %s' % expected)
   if result != expected:
     print(' NOT CONVERTED CORRECTLY')
   else:
@@ -319,7 +320,7 @@ def printResult(expected, result, msg):
   if result != expected:
     print('%s: expected = >%s<, result = >%s<' % 
           (msg,
-           expected.encode('utf-8'), result.encode('utf-8')))
+           expected, result))
   else:
     print('%s: test passes!' % msg)
 

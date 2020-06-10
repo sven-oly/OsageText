@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys
 
 #TODO 13-Dec-2016
@@ -270,7 +271,7 @@ date_entered = '13-Dec-2016'
 description = 'First try for transliteration rules for Old Osage to Unicode'
 
 def printRules():
-  print 'Rules for %s' % Description
+  print('Rules for %s' % Description)
   lines = TRANS_LIT_RULES.split('\n')
   ruleNum = 0
   for line in lines:
@@ -284,5 +285,5 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    print 'ARGS = %s' % sys.argv 
+    print('ARGS = %s' % sys.argv) 
     sys.exit(main(sys.argv))
