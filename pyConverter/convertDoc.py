@@ -187,7 +187,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
               else:
                 notEncoded = rchild.text
                 if notEncoded and debug_output:
-                  print 'notEncoded = >%s<' % notEncoded.encode('utf-8')
+                  print('notEncoded = >%s<' % notEncoded.encode('utf-8'))
 
     if collectedText:
       (newConvertedCount, emptiedElements) = (
@@ -202,7 +202,7 @@ def parseDocXML(docfile_name, path_to_doc, unicodeFont='Pawhuska',
   # TODO: remove all emptied text elements.
   removeOldTextElements(allEmptiedTextElements, parent_map)
 
-  print ' %s: %d text items converted' % (docfile_name, convertCount)
+  print(' %s: %d text items converted' % (docfile_name, convertCount))
 
   if isString:
     return ET.tostring(root, encoding='utf-8')
@@ -235,7 +235,7 @@ def removeOldTextElements(allElementsToRemove, parent_map):
       count += 1
 
   # And probably remove the siblings and the empty parent, too.
-  print 'removed %d items' % count
+  print('removed %d items' % count)
   return count
 
 def isOsageFontNode(node):
@@ -254,7 +254,7 @@ def parseFontTable(docXML, unicodeFont):
     if re.search('}font$', node.tag):
       keys = node.attrib.keys()
       if re.search('}name', keys[0]) and node.attrib[keys[0]] == OfficialOsageFont:
-        print 'Replacing font %s with %s' % (node.attrib[keys[0]], unicodeFont)
+        print('Replacing font %s with %s' % (node.attrib[keys[0]], unicodeFont))
         node.attrib[keys[0]] = unicodeFont
   return ET.tostring(tree, encoding='utf-8')
 
@@ -269,8 +269,8 @@ def tryFontUpdate(newzip, unicodeFont):
 def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
   global debug_output
 
-  print 'TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
-      TIMESTAMP, osageConversion.TIMESTAMP)
+  print('TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
+      TIMESTAMP, osageConversion.TIMESTAMP))
 
   newzip = zipfile.ZipFile(path_to_doc)
   docfiles = ['word/document.xml', 'word/header1.xml', 'word/footer1.xml']
@@ -288,7 +288,7 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
         compress_method = info.compress_type
 
     if debug_output:
-      print 'COMPRESS TYPE = %s' % compress_method
+      print('COMPRESS TYPE = %s' % compress_method)
 
     try:
       docXML = newzip.read(docfile_name)  # A file-like object
@@ -310,7 +310,7 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
   outpath = os.path.join(output_dir, baseWOextension + '_unicode.docx')
   outzip = zipfile.ZipFile(outpath, 'w')  #, compress_method)
 
-  print '  OUTPATH = %s' % outpath
+  print('  OUTPATH = %s' % outpath)
 
   # copy other things
   for info in newzip.infolist():
@@ -318,12 +318,12 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
       copyfile = newzip.read(info.filename)
       outzip.writestr(info, copyfile)
       if debug_output:
-        print '  COPY %s' % info.filename
+        print('  COPY %s' % info.filename)
     else:
       # Skipping the new data for now.
       outzip.writestr(info, docPartsOut[info.filename])
       if debug_output:
-        print 'Adding %s' % info.filename
+        print('Adding %s' % info.filename)
 
   if debug_output:
     outzip.printdir()
@@ -333,11 +333,11 @@ def processDOCX(path_to_doc, output_dir, unicodeFont='Pawhuska', debug=False):
 
 def unzipInputFile(infile, outdir):
   # https://docs.python.org/3/library/zipfile.html
-  print 'unzipping %s to directory %s' % (infile, outdir)
+  print('unzipping %s to directory %s' % (infile, outdir))
 
   newzip = zipfile.ZipFile(infile)
   result = newzip.extractall(path=outdir, pwd=None)
-  print 'zip extract result = %s' % result
+  print('zip extract result = %s' % result)
 
   return newzip
 
@@ -348,7 +348,7 @@ def main(argv):
   args = convertUtil.parseArgs()
 
   paths_to_doc = args.filenames
-  print 'ARGS = %s' % args
+  print('ARGS = %s' % args)
 
   print('Args = %s'% args.debug)
 
@@ -357,7 +357,7 @@ def main(argv):
     if extension == '.docx':
       processDOCX(path, args.output_dir, args.font, debug_output)
     else:
-      print '!!! Not processing file %s !' % path
+      print('!!! Not processing file %s !' % path)
 
 
 if __name__ == "__main__":

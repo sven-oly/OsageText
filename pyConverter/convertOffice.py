@@ -17,7 +17,7 @@ import convertUtil
 def main(argv):
   args = convertUtil.parseArgs()
   UnicodeOsageFont = args.font
-  print '** args = %s' % args
+  print('** args = %s' % args)
 
   paths_to_doc = args.filenames
 
@@ -32,7 +32,7 @@ def main(argv):
       convertXLS.processOneSpreadsheet(path, args.output_dir,
                                        UnicodeOsageFont)
     else:
-      print '!!! Not processing file %s !' % path
+      print('!!! Not processing file %s !' % path)
 
 
 if __name__ == "__main__":

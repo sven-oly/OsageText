@@ -20,7 +20,7 @@ latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo; \[\]\^\\\'\/\._`,!]+'
 notOsageLatinLower = re.compile(r'[b-df-np-z]')
 
 # This identifies traditional Osage private use characters
-traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
+traditionalOsageCharacters = r'([\uf020-\uf05e]+)'
 
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
@@ -48,6 +48,7 @@ def processTable(shape, outFont):
                           fontObj = None
                           if run.font:
                             fontObj = run.font
+                          print('Font for text = %s. Text = %s' % (fontObj.name, run.text))
                           if fontObj and fontObj.name == OfficialOsageFont:
                             if not notOsageLatinLower.search(run.text):
                               tryResult = re.subn(latinOsagePattern2, replFunc, run.text)
@@ -80,8 +81,8 @@ def processsTextFrame(shape, outFont):
 def processOnePresentation(path_to_presentation, outputFont, output_dir=''):
   prs = Presentation(path_to_presentation)
 
-  print 'TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
-      TIMESTAMP, osageConversion.TIMESTAMP)
+  print('TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
+      TIMESTAMP, osageConversion.TIMESTAMP))
   print( '%d slides found in %s' % (len(prs.slides), path_to_presentation))
 
   conversionCount = 0
@@ -102,7 +103,7 @@ def processOnePresentation(path_to_presentation, outputFont, output_dir=''):
 
   print ('  %d conversions applied to Osage Unicode ' % conversionCount)
 
-  if output_dir is not '':
+  if output_dir != '':
     # String the directory tree to the file, substituting the output
     fileIn = os.path.split(path_to_presentation)[1]
     baseWOextension = os.path.splitext(fileIn)[0]
@@ -115,9 +116,9 @@ def processOnePresentation(path_to_presentation, outputFont, output_dir=''):
   prs.save(new_path_to_presentation)
 
   if conversionCount:
-    print '  Output to file %s\n' % new_path_to_presentation
+    print('  Output to file %s\n' % new_path_to_presentation)
   else:
-    print '  No new file written.\n'
+    print('  No new file written.\n')
 
 
 def main(argv):

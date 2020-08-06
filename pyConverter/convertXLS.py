@@ -12,26 +12,29 @@ import sys
 
 # https://openpyxl.readthedocs.io/en/default/tutorial.html
 
-from openpyxl import Workbook
+#from openpyxl import Workbook
+import openpyxl
 from openpyxl import load_workbook
 
 import convertUtil
 import osageConversion
+import quinteroConversion
 
-debug = False
+debug = False  #True
 
 # TIMESTAMP for version information.
 TIMESTAMP = "Version 2018-01-25 20:30"
 
 # Font names:
 OfficialOsageFont = 'Official Osage Language'
+SiDulosFont = 'Doulos SIL'
 
 # Rule for detecting Latin text or Old Osage font.
 # Some Old Osage text is in Latin CAPS, but with lower case a, e, and o.
 latinOsagePattern2 = r'[\^A-Z\[\]][A-Zaeo; \[\]\^\\\'\/\._`,!]+'
 
 # This identifies traditional Osage private use characters
-traditionalOsageCharacters = ur'([\uf020-\uf05e]+)'
+traditionalOsageCharacters = r'([\uf020-\uf05e]+)'
 
 # To avoid converting English words
 notOsageLatinLower = re.compile(r'[b-df-np-z]')
@@ -64,7 +67,7 @@ def checkAndConvertText(textIn):
 
 
 def convertSheet(ws, unicodeFont):
-  print '\n  Converting sheet: %s' % ws
+  print('\n  Converting sheet: %s' % ws)
   numConverts = 0
   notConverted = 0
   rowNum = 1
@@ -77,10 +80,16 @@ def convertSheet(ws, unicodeFont):
         continue
 
       if debug:
-        print 'Cell (%d, %d) = >%s<  font = %s' % (rowNum, col, cell.value, cell.font.name)
+        print('Cell (%d, %d) = >%s<  font = %s' % (rowNum, col, cell.value, cell.font.name))
       thisFont = cell.font
-      if thisFont and thisFont.name == OfficialOsageFont:
-        convertedText = checkAndConvertText(thisText)
+      if thisFont:
+        convertedText = thisText
+        if thisFont.name == OfficialOsageFont:
+          convertedText = checkAndConvertText(thisText)
+        elif thisFont.name == SiDulosFont:
+          convertedText = quinteroConversion.quiteroOsageToUnicode(thisText)[0]
+          print('*******QUINTERO Cell (%d, %d) CONVERTED %s to %s' % (
+            rowNum, col, thisText, convertedText))
         if thisText != convertedText:
           converted = True
           numConverts += 1
@@ -89,18 +98,18 @@ def convertSheet(ws, unicodeFont):
           newFont.name = unicodeFont
           cell.font = newFont
           if debug:
-            print '  Conversion = %s' % convertedText.encode('utf-8')
+            print('  Conversion = %s' % convertedText.encode('utf-8'))
         else:
           converted = False
           notConverted += 1
 
         # This is specific for Osage text in column B.
-        if not converted and col == 2:
-          print '**** NOT CONVERTED **** %s, %s' % (rowNum, cell.value)
+        # if not converted and col == 2:
+        #   print( '**** NOT CONVERTED **** %s, %s' % (rowNum, cell.value))
 
       col += 1
       rowNum += 1
-  print ('    %d values converted to Unicode' % numConverts)
+  print('    %d values converted to Unicode' % numConverts)
   return (numConverts, notConverted)
 
 
@@ -116,13 +125,13 @@ def convertAllSheets(wb, unicodeFont):
 
 def processOneSpreadsheet(path_to_spreadsheet, output_dir,
                           unicodeFont='Pawhuska'):
-  print 'PATH = %s' % path_to_spreadsheet
+  print('PATH = %s' % path_to_spreadsheet)
   wb = load_workbook(path_to_spreadsheet)
 
-  print 'Converting Osage in file: %s' % path_to_spreadsheet
+  print('Converting Osage in file: %s' % path_to_spreadsheet)
 
-  print 'TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
-      TIMESTAMP, osageConversion.TIMESTAMP)
+  print('TIMESTAMP: convertDoc: %s, osageConversion: %s' % (
+      TIMESTAMP, osageConversion.TIMESTAMP))
 
   numConverts = convertAllSheets(wb, unicodeFont)
 
@@ -138,9 +147,9 @@ def processOneSpreadsheet(path_to_spreadsheet, output_dir,
       unicode_path_to_spreadsheet = os.path.join(
           output_dir, baseWOextension + '_unicode.xlsx')
     wb.save(unicode_path_to_spreadsheet)
-    print 'Saved new version to file %s' % unicode_path_to_spreadsheet
+    print('Saved new version to file %s' % unicode_path_to_spreadsheet)
   else:
-    print '  No conversion done, so no new file croeated.'
+    print('  No conversion done, so no new file croeated.')
 
 
 def main(argv):
@@ -148,7 +157,7 @@ def main(argv):
 
   paths_to_spreadsheet = args.filenames
 
-  print 'files to process = %s' % paths_to_spreadsheet
+  print('files to process = %s' % paths_to_spreadsheet)
 
   convertFileCount = 0
 
@@ -156,7 +165,7 @@ def main(argv):
     processOneSpreadsheet(path, args.output_dir, args.font)
     convertFileCount += 1
 
-  print ('\n%d files processed' % convertFileCount)
+  print('\n%d files processed' % convertFileCount)
 
 
 if __name__ == "__main__":
