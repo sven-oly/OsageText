@@ -67,6 +67,7 @@ def checkAndConvertText(textIn):
 
 
 def convertSheet(ws, unicodeFont):
+  bracket_pattern = re.compile(r'([\[\(][^\)\]]*[\)\]])')
   print('\n  Converting sheet: %s' % ws)
   numConverts = 0
   notConverted = 0
@@ -87,9 +88,30 @@ def convertSheet(ws, unicodeFont):
         if thisFont.name == OfficialOsageFont:
           convertedText = checkAndConvertText(thisText)
         elif thisFont.name == SiDulosFont:
-          convertedText = quinteroConversion.quiteroOsageToUnicode(thisText)[0]
-          print('*******QUINTERO Cell (%d, %d) CONVERTED %s to %s' % (
-            rowNum, col, thisText, convertedText))
+          # Special case for items in [..]
+          has_bracket = bracket_pattern.search(thisText)
+          if has_bracket:
+            print(thisText);
+            matched_pattern = has_bracket.group(1)
+            print('Matched = %s' % matched_pattern)
+            splits = bracket_pattern.split(thisText)
+            print('Splits = %s' % splits)
+            result = []
+            for s in splits:
+              if s == matched_pattern:
+                result.append(matched_pattern)
+              else:
+                converted = quinteroConversion.quiteroOsageToUnicode(s)
+                if converted:
+                  result.append(converted[0])
+            print('Result = %s' % result)
+            convertedText = ''.join(result)
+            print(convertedText)
+          else:
+            convertedText = quinteroConversion.quiteroOsageToUnicode(thisText)[0]
+          if debug:
+            print('*******QUINTERO Cell (%d, %d) CONVERTED %s to %s' % (
+              rowNum, col, thisText, convertedText))
         if thisText != convertedText:
           converted = True
           numConverts += 1
@@ -137,7 +159,7 @@ def processOneSpreadsheet(path_to_spreadsheet, output_dir,
 
   if numConverts:
     newName = os.path.splitext(path_to_spreadsheet)[0]
-    if output_dir is not '':
+    if output_dir:
       fileIn = os.path.split(path_to_spreadsheet)[1]
       baseWOextension = os.path.splitext(fileIn)[0]
       unicode_path_to_spreadsheet = os.path.join(

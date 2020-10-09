@@ -34,6 +34,17 @@ convertAllInOldFontRange = True
 angle_pattern = r'(<[^>]*>)'
 angle_prog = prog = re.compile(angle_pattern)
 
+class Definition():
+  def __init__(self):
+    samples = []
+
+
+class DictionaryEntry():
+  def __init__(self):
+    word = ''
+    grammatical_term = ''
+    definitions = []
+
 # Converts Osage text that is labeld with the old font encoding
 # It assumes that the font has been detected.
 def checkAndConvertText(textIn):
@@ -179,6 +190,143 @@ def convertDoc(doc, unicodeFont, debugInfo=None,
   return (numConverts, notConverted)
 
 
+# Returns list of dictionary entries.
+def parseDictionaryEntries(path_to_doc, unicodeFont='Noto Sans Osage',
+                           debugInfo=None,
+               extractedFile=None):
+  doc = Document(path_to_doc)
+
+  sections = doc.sections
+  print ('  %d sections' % len(sections))
+
+  paragraphs = doc.paragraphs
+  print ('  %d paragraphs' % len(doc.paragraphs))
+
+  print ('  %d tables' % len(doc.tables))
+  if debugInfo and doc.inline_shapes:
+    print ('  %d inline_shapes' % len(doc.inline_shapes))
+
+  if debugInfo:
+#    print ('    doc dir: %s' % dir(doc))
+    for section in sections:
+      print ('Section = %s' % section)
+
+  numConverts = 0
+  notConverted = 0
+  paraNum = 0
+
+  # Output line for extracted text and Python conversion
+  extractedLine = []
+  extractedCount = 0
+
+  missingConversions = set([])
+  for para in paragraphs:
+
+    #para_format = para.paragraph_format
+    para_style = para.style
+    #para_alignment = para.alignment
+    #para_part = para.part
+
+    para_style_id = para_style.style_id
+    runs = para.runs
+    #print ('    %d runs in paragraph' % (len(runs)))
+    #print ('    paragraph text = %s' % (para.text))
+    runNum = 0
+    runNum = 1
+    afterVariant = False  # For bold words after "variant of" or "variant:"
+    original_para_text = para.text
+
+    # Get the different defitions, separated by "•"
+    raw_definitions = original_para_text.split(' • ')
+    # Process each of these definitions.
+
+    for run in runs:
+      if len(run.text):
+        thisText = run.text
+        originalText = thisText
+        fontObj = run.font
+        fontName = fontObj.name
+        if not fontName:
+          fontName = para_style.font.name
+
+        # Fix SIL font encoded text within angle brackets
+        thisText = angle_prog.sub(fixAngleString, thisText)
+
+        ## DECIDE IF further CONVERSION IS NEEDED
+        convertedText = thisText
+        if (((runNum == 1 and run.font.bold) or
+             (afterVariant and run.font.bold) or run.font.italic) and
+            fontName in FONTS_TO_CONVERT and thisText):
+
+          # Omit conversions within angle brackets.
+          # For each in the split, check if it matches
+          # if not, convert, else just copy
+          sp = angle_prog.split(convertedText)
+          pieces = []
+          convertItem = True
+          for s in sp:
+            if angle_prog.match(s):
+              pieces.append(s)
+            else:
+              if s != '':
+                # See it it contains a grammatical term or "do not convert"
+                for term in quinteroConversion.grammatical_terms:
+                  if re.search(term, s):
+                    convertItem = False
+                for term in quinteroConversion.do_not_convert_italics:
+                  if re.search(term, s):
+                    convertItem = False
+
+                if convertItem:
+                  (newText, notFound) = checkAndConvertText(s)
+                else:
+                  newText = s
+                pieces.append(newText)
+                if notFound:
+                  print('NOT FOUND in string %s: %s' % (thisText, notFound))
+                  for a in notFound:
+                    missingConversions.add(a)
+
+          convertedText = ''.join(pieces)
+          afterVariant = False
+          #print('!!!!!!!! CONVERTING %s to %s' % (originalText, convertedText))
+        else:
+          # Check for variant
+          m = re.search(r'\(variant', thisText)
+          if (m):
+            # Remember that variant precedes the next bold item.
+            afterVariant = True
+          else:
+            afterVariant = False  # Reset
+
+        if originalText != convertedText:
+          numConverts += 1
+          run.text = convertedText
+          if convertedText != thisText:
+            # It was changed from ASCII to Osage
+            fontObj.name = unicodeFont
+          if extractedFile:
+            extractedFile.write('%s\t%s\t%s\n' % (
+                fontName, thisText, convertedText))
+        else:
+            notConverted += 1
+      runNum += 1
+    if para.text != original_para_text and debugInfo:
+      print ('    Converted paragraph text = %s' % (para.text))
+    paraNum += 1
+
+  if missingConversions:
+    print('All missing characters = %s' % missingConversions)
+  else:
+    print('There are no missing characters = %s' % missingConversions)
+
+  if extractedFile:
+     extractedFile.close()
+
+  print ('  %d values converted to Unicode' % numConverts)
+  return (numConverts, notConverted)
+
+
 # Process one DOCX, substituting the
 def convertOneDoc(path_to_doc, unicodeFont='Noto Sans Osage',
                   outpath=None, isString=False):
@@ -216,17 +364,24 @@ def convertOneDoc(path_to_doc, unicodeFont='Noto Sans Osage',
 
 
 def processArgs(argv):
-  if len(sys.argv) <= 1:
+  if len(argv) <= 1:
     print ('Usage:')
     print ('  convertWordOsage.py inputFile.docx')
     print ('  convertWordOsage.py inputFile1.docx inputFile2.docx ... ')
-    print ('  convertWordOsage.py -i fileWithFileNames')
+    print ('  convertWordOsage.py -parse fileWithFileNames')
+    print ('  convertWordOsage.py -f fileWithFileNames')
     return None
 
   path_to_docs = []
 
+  parseDoc = False
+  if argv[1] == '-parse':
+    parseDoc = True
+    path_to_docs.append(argv[2])
+    return path_to_docs, parseDoc
+
   if len(argv) == 2:
-    path_to_docs.append(sys.argv[1])
+    path_to_docs.append(argv)
   else:
     if len(argv) == 3 and argv[1] == '-f':
       # Get the file containing conversion list and get all items.
@@ -239,21 +394,24 @@ def processArgs(argv):
       # Expect a list of files in the
       path_to_docs = [path for path in argv[1:]]
 
-  return path_to_docs
+  return path_to_docs, parseDoc
 
 
 def main(argv):
 
-  if len(sys.argv) > 1:
-    path_to_doc = sys.argv[1]
+  if len(argv) > 1:
+    path_to_doc = argv[1]
   else:
     path_to_doc = 'Harry Red Eagle Track 5.doc'
 
-  doc_list = processArgs(argv)
+  doc_list, parseDoc = processArgs(argv)
 
   convertFileCount = 0
   for doc_path in doc_list:
-    convertOneDoc(doc_path)
+    if parseDoc:
+      parsed_dictionary = parseDictionaryEntries(doc_path)
+    else:
+      convertOneDoc(doc_path)
     convertFileCount += 1
   print ('%d files were processed' % convertFileCount)
 
