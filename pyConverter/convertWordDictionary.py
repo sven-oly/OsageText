@@ -381,7 +381,7 @@ def processArgs(argv):
     return path_to_docs, parseDoc
 
   if len(argv) == 2:
-    path_to_docs.append(argv)
+    path_to_docs.append(argv[1])
   else:
     if len(argv) == 3 and argv[1] == '-f':
       # Get the file containing conversion list and get all items.
