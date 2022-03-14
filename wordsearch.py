@@ -4,8 +4,8 @@
 # Starting with
 #   https://codereview.stackexchange.com/questions/98247/wordsearch-generator
 from __future__ import print_function
-from builtins import range
-from builtins import object
+#from builtins import range
+#from builtins import object
 import itertools
 import logging
 import random

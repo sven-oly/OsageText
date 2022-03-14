@@ -32,6 +32,7 @@ links = [
   {"ref": "/words/getPhrases/", "linkText": "View database"},
   {"ref": "http://www.unicode.org/charts/PDF/U104B0.pdf", "linkText": "Unicode Osage"},
   {"ref": "http://std.dkuug.dk/jtc1/sc2/wg2/docs/n4619.pdf", "linkText": " Osage Unicode proposal"},
+  {"ref": "/games/wordsearch/", "linkText": "Wordsearch builder"},
 ]
 class MainHandler(webapp2.RequestHandler):
     def get(self):
